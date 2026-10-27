@@ -1,7 +1,7 @@
 ---
 change_id: role-based-signup
 title: Role based signup
-status: planned
+status: plan_reviewed
 created: 2026-10-27
 updated: 2026-10-27
 archived_at: null

@@ -99,12 +99,12 @@ Pierwsza migracja: `public.profiles`, trigger tworzący profil z roli w metadany
 
 #### 3. Typy bazy i domeny
 
-**File**: `src/db/database.types.ts` (wygenerowany), `src/types.ts`, `src/lib/supabase.ts`, `package.json`
+**File**: `src/db/database.types.ts` (wygenerowany), `src/types.ts`, `src/lib/supabase.ts`, `package.json`, `eslint.config.js`, `.prettierignore` (nowy)
 
 **Intent**: Typowany klient i jeden typ roli używany przez endpointy, middleware i UI.
 
 **Contract**:
-- Skrypt `"db:types": "supabase gen types typescript --local > src/db/database.types.ts"`. Plik generujemy i commitujemy. Jeśli lint lub Prettier go odrzucają, dodajemy go do ignore.
+- Skrypt `"db:types": "supabase gen types typescript --local > src/db/database.types.ts"`. Plik generujemy i commitujemy. `src/db/database.types.ts` trafia bezwarunkowo do ignores w `eslint.config.js` i do `.prettierignore`: lint-staged uruchamia `eslint --fix` (z `eslint-plugin-prettier`, `consistent-type-definitions`, `array-type`), który przepisałby wygenerowany plik i wywrócił sprawdzenie `git diff --exit-code`. Sprawdzenie 1.2 uruchamiamy po commicie pliku (plik nieśledzony przechodzi `git diff` trywialnie).
 - `src/types.ts` eksportuje `ROLES = ["owner","agent"] as const`, `type Role` i `type Profile` (wiersz `profiles`, oparty na `Database`).
 - `createServerClient<Database>(…)`.
 
@@ -164,7 +164,7 @@ Endpointy waliduje `zod` i chroni `try/catch`, błędy wędrują jako kody, a st
 - Nowe teksty:
   - `invalid_input`: „Sprawdź poprawność danych w formularzu”;
   - `unavailable`: obecny tekst niedostępności;
-  - `no_profile`: „Twoje konto nie ma przypisanej roli. Zarejestruj się ponownie albo skontaktuj się z nami.”;
+  - `no_profile`: „Twoje konto nie ma przypisanej roli. Skontaktuj się z nami.” (bez „zarejestruj się ponownie”, bo e-mail nadal istnieje w `auth.users` i ponowna rejestracja kończy się `user_already_exists`);
   - `unknown`: obecny fallback.
 
 #### 2. Schematy wejścia
@@ -187,7 +187,7 @@ Endpointy waliduje `zod` i chroni `try/catch`, błędy wędrują jako kody, a st
 
 **Contract**:
 - `formData()`, `safeParse` i wywołania Supabase są w `try/catch`.
-- Błędy: nieudany parse daje `?error=invalid_input`, brak klienta `?error=unavailable`, błąd Supabase `?error=<toAuthErrorCode>`, wyjątek `?error=unknown`.
+- Błędy: wyjątek z `formData()` (np. body JSON rzuca `TypeError`) i nieudany parse dają `?error=invalid_input`, brak klienta `?error=unavailable`, błąd Supabase `?error=<toAuthErrorCode>`, wyjątek z wywołania Supabase `?error=unknown`. `formData()` łapiemy osobno, żeby nie trafił do ogólnego `unknown`.
 - Sukces signin kieruje na `/dashboard`.
 - Sukces signup: gdy `data.session` istnieje, `/dashboard`; gdy jest `null`, `/auth/confirm-email`.
 
@@ -265,7 +265,8 @@ Bramkowanie po prefiksach z rolą, profil w `locals`, obsługa braku profilu, `/
 - `user` ustawiamy jak dotąd. Gdy `isGated(pathname)`:
   - brak użytkownika: redirect `/auth/signin`;
   - jest użytkownik: `select id, role, created_at from profiles where id = user.id` (`maybeSingle`);
-  - brak profilu albo błąd zapytania: `signOut()` i redirect `/auth/signin?error=no_profile`;
+  - błąd zapytania (`error`): redirect `/auth/signin?error=unavailable` bez `signOut()`, bo przejściowy błąd bazy nie może kasować sesji;
+  - brak profilu (`data === null`, bez błędu): `signOut()` i redirect `/auth/signin?error=no_profile`;
   - `requiredRole(pathname)` różna od `profile.role`: redirect `homeFor(profile.role)`.
 - Ścieżki niebramkowane nie pytają o profil (`profile = null`).
 
@@ -276,7 +277,7 @@ Bramkowanie po prefiksach z rolą, profil w `locals`, obsługa braku profilu, `/
 **Intent**: `/dashboard` nie ma własnej treści i przekierowuje wg roli. Każda rola ma swój panel w powłoce.
 
 **Contract**:
-- `dashboard.astro`: `return Astro.redirect(homeFor(Astro.locals.profile.role))`. Middleware gwarantuje, że profil istnieje.
+- `dashboard.astro`: `const { profile } = Astro.locals; if (!profile) throw new Error(…)` (jak guard w `AppLayout`), potem `return Astro.redirect(homeFor(profile.role))`. Middleware gwarantuje, że profil istnieje, ale `profile: Profile | null` w strict TS wymaga zawężenia.
 - `/owner`: `AppLayout title="Panel właściciela"`, karta powitalna z e-mailem i zdaniem, że tu pojawią się oferty.
 - `/agent`: `AppLayout title="Panel agenta"`, karta z e-mailem i zdaniem o zaproszeniach i profilu.
 - Treść stron to placeholdery zgodne z obecnym `dashboard.astro`.
@@ -291,6 +292,7 @@ Bramkowanie po prefiksach z rolą, profil w `locals`, obsługa braku profilu, `/
 - `navFor(role: Role): NavItem[]` zastępuje stały `navConfig`. Na razie jedna pozycja „Panel” z `href = homeFor(role)`.
 - `AppLayout` wymaga `user` i `profile` i rzuca błąd z komunikatem: „page must live under a gated prefix in src/lib/route-guard.ts”.
 - `AppLayout` przekazuje `role` do `Sidebar`, `Dock` i `AppTopbar`, a `AppTopbar` dalej do `MobileNav` (prop `role`).
+- Linki marki w powłoce (`AppTopbar.astro:20`, `Sidebar.astro:14`, `MobileNav.tsx:99`) zmieniają `href="/dashboard"` na `homeFor(role)`. `src/pages/index.astro:18` zostaje przy `/dashboard`, bo strona publiczna nie zna profilu.
 
 #### 5. Dokumentacja dla agentów
 
