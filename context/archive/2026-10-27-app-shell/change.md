@@ -1,10 +1,10 @@
 ---
 change_id: app-shell
 title: Powłoka aplikacji w design systemie helloDOM
-status: impl_reviewed
+status: archived
 created: 2026-10-27
 updated: 2026-10-27
-archived_at: null
+archived_at: 2026-10-27T14:38:08Z
 ---
 
 ## Notes
