@@ -379,40 +379,40 @@ Brak danych. Użytkownicy z istniejącą sesją nie są dotknięci. Domyślny mo
 
 - [x] 1.7 Przełączenie motywu zmienia tło i tekst; po przeładowaniu bez mignięcia — ff7f4d4
 - [x] 1.8 Fonty Manrope i Nunito załadowane; favicon SVG widoczny — ff7f4d4
-- [ ] 1.9 Baner braku konfiguracji czytelny w light i dark
+- [x] 1.9 Baner braku konfiguracji czytelny w light i dark
 - [x] 1.10 Widoczna obwódka focusu na linkach i przyciskach — ff7f4d4
 
 ### Phase 2: Komponenty bazowe
 
 #### Automated
 
-- [x] 2.1 Lint przechodzi: `npm run lint`
-- [x] 2.2 Typy przechodzą: `npx astro check`
-- [x] 2.3 Build przechodzi: `npm run build`
-- [x] 2.4 W komponentach auth nie ma kolorów startera
-- [x] 2.5 Brak angielskich komunikatów w komponentach auth
-- [x] 2.6 Endpointy nie przekazują surowych błędów Supabase
+- [x] 2.1 Lint przechodzi: `npm run lint` — eb135ca
+- [x] 2.2 Typy przechodzą: `npx astro check` — eb135ca
+- [x] 2.3 Build przechodzi: `npm run build` — eb135ca
+- [x] 2.4 W komponentach auth nie ma kolorów startera — eb135ca
+- [x] 2.5 Brak angielskich komunikatów w komponentach auth — eb135ca
+- [x] 2.6 Endpointy nie przekazują surowych błędów Supabase — eb135ca
 
 #### Manual
 
-- [x] 2.7 Pola mają stany default, hover, focus, błąd i disabled w light i dark
-- [x] 2.8 Polskie znaki renderują się w Nunito/Manrope
+- [x] 2.7 Pola mają stany default, hover, focus, błąd i disabled w light i dark — eb135ca
+- [x] 2.8 Polskie znaki renderują się w Nunito/Manrope — eb135ca
 
 ### Phase 3: Layout publiczny i strony anonimowe
 
 #### Automated
 
-- [ ] 3.1 Lint przechodzi: `npm run lint`
-- [ ] 3.2 Typy przechodzą: `npx astro check`
-- [ ] 3.3 Build przechodzi: `npm run build`
-- [ ] 3.4 Artefakty startera usunięte
-- [ ] 3.5 Brak stylów i tekstów startera w stronach publicznych
+- [x] 3.1 Lint przechodzi: `npm run lint`
+- [x] 3.2 Typy przechodzą: `npx astro check`
+- [x] 3.3 Build przechodzi: `npm run build`
+- [x] 3.4 Artefakty startera usunięte
+- [x] 3.5 Brak stylów i tekstów startera w stronach publicznych
 
 #### Manual
 
-- [ ] 3.6 Strony publiczne przy 360 px bez poziomego przewijania, poprawne w light i dark
-- [ ] 3.7 Zalogowany użytkownik na `/` widzi „Przejdź do panelu”
-- [ ] 3.8 Błędy logowania i rejestracji wyświetlają się po polsku w `ServerError`
+- [x] 3.6 Strony publiczne przy 360 px bez poziomego przewijania, poprawne w light i dark
+- [x] 3.7 Zalogowany użytkownik na `/` widzi „Przejdź do panelu”
+- [x] 3.8 Błędy logowania i rejestracji wyświetlają się po polsku w `ServerError`
 
 ### Phase 4: Powłoka aplikacji
 
