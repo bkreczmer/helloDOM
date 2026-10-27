@@ -40,7 +40,7 @@ const steps = [
   ["dashboard redirects anonymous user", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
   [
     "signup creates account",
-    () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
+    () => request("/api/auth/signup", { method: "POST", form: { email, password, role: "owner" } }),
     { status: 302, location: "/auth/confirm-email" },
   ],
   [

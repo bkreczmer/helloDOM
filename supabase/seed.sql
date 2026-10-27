@@ -1,0 +1,1 @@
+-- Intentionally empty: no seed data is needed for local development.

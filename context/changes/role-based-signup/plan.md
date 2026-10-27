@@ -512,15 +512,15 @@ Jedno dodatkowe zapytanie `profiles` (po kluczu głównym, objęte RLS) na żąd
 
 #### Automated
 
-- [ ] 1.1 Migracja stosuje się na czystej bazie: `npx supabase db reset`
-- [ ] 1.2 Typy się generują i są aktualne: `npm run db:types && git diff --exit-code src/db/database.types.ts`
-- [ ] 1.3 Lint, typy i build przechodzą: `npm run lint && npx astro check && npm run build`
-- [ ] 1.4 Smoke przechodzi na lokalnym Supabase: `npm run smoke`
+- [x] 1.1 Migracja stosuje się na czystej bazie: `npx supabase db reset`
+- [x] 1.2 Typy się generują i są aktualne: `npm run db:types && git diff --exit-code src/db/database.types.ts`
+- [x] 1.3 Lint, typy i build przechodzą: `npm run lint && npx astro check && npm run build`
+- [x] 1.4 Smoke przechodzi na lokalnym Supabase: `npm run smoke`
 
 #### Manual
 
-- [ ] 1.5 W Studio wiersz `profiles` z `role = owner` dla konta smoke, RLS włączony, jedna polityka select
-- [ ] 1.6 Signup bez `role` przez curl daje `?error=` i nie tworzy użytkownika
+- [x] 1.5 W Studio wiersz `profiles` z `role = owner` dla konta smoke, RLS włączony, jedna polityka select
+- [x] 1.6 Signup bez `role` przez curl daje `?error=` i nie tworzy użytkownika
 
 ### Phase 2: Endpointy auth
 
