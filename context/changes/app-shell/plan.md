@@ -379,7 +379,7 @@ Brak danych. Użytkownicy z istniejącą sesją nie są dotknięci. Domyślny mo
 
 - [x] 1.7 Przełączenie motywu zmienia tło i tekst; po przeładowaniu bez mignięcia — ff7f4d4
 - [x] 1.8 Fonty Manrope i Nunito załadowane; favicon SVG widoczny — ff7f4d4
-- [x] 1.9 Baner braku konfiguracji czytelny w light i dark
+- [x] 1.9 Baner braku konfiguracji czytelny w light i dark — 96a8a5c
 - [x] 1.10 Widoczna obwódka focusu na linkach i przyciskach — ff7f4d4
 
 ### Phase 2: Komponenty bazowe
@@ -402,32 +402,32 @@ Brak danych. Użytkownicy z istniejącą sesją nie są dotknięci. Domyślny mo
 
 #### Automated
 
-- [x] 3.1 Lint przechodzi: `npm run lint`
-- [x] 3.2 Typy przechodzą: `npx astro check`
-- [x] 3.3 Build przechodzi: `npm run build`
-- [x] 3.4 Artefakty startera usunięte
-- [x] 3.5 Brak stylów i tekstów startera w stronach publicznych
+- [x] 3.1 Lint przechodzi: `npm run lint` — 96a8a5c
+- [x] 3.2 Typy przechodzą: `npx astro check` — 96a8a5c
+- [x] 3.3 Build przechodzi: `npm run build` — 96a8a5c
+- [x] 3.4 Artefakty startera usunięte — 96a8a5c
+- [x] 3.5 Brak stylów i tekstów startera w stronach publicznych — 96a8a5c
 
 #### Manual
 
-- [x] 3.6 Strony publiczne przy 360 px bez poziomego przewijania, poprawne w light i dark
-- [x] 3.7 Zalogowany użytkownik na `/` widzi „Przejdź do panelu”
-- [x] 3.8 Błędy logowania i rejestracji wyświetlają się po polsku w `ServerError`
+- [x] 3.6 Strony publiczne przy 360 px bez poziomego przewijania, poprawne w light i dark — 96a8a5c
+- [x] 3.7 Zalogowany użytkownik na `/` widzi „Przejdź do panelu” — 96a8a5c
+- [x] 3.8 Błędy logowania i rejestracji wyświetlają się po polsku w `ServerError` — 96a8a5c
 
 ### Phase 4: Powłoka aplikacji
 
 #### Automated
 
-- [ ] 4.1 Lint przechodzi: `npm run lint`
-- [ ] 4.2 Typy przechodzą: `npx astro check`
-- [ ] 4.3 Build przechodzi: `npm run build`
-- [ ] 4.4 Smoke test przechodzi: `npm run smoke`
-- [ ] 4.5 W całym `src/` nie ma stylów startera
+- [x] 4.1 Lint przechodzi: `npm run lint`
+- [x] 4.2 Typy przechodzą: `npx astro check`
+- [x] 4.3 Build przechodzi: `npm run build`
+- [x] 4.4 Smoke test przechodzi: `npm run smoke`
+- [x] 4.5 W całym `src/` nie ma stylów startera
 
 #### Manual
 
-- [ ] 4.6 `/dashboard` poprawny na desktopie, tablecie i mobile
-- [ ] 4.7 Szuflada otwiera się i zamyka poprawnie, fokus wraca na hamburger
-- [ ] 4.8 Przy 360 px brak poziomego przewijania; light i dark na trzech szerokościach
-- [ ] 4.9 Wylogowanie z topbaru przekierowuje na `/`
-- [ ] 4.10 Przegląd w Chrome, Firefoksie i Safari
+- [x] 4.6 `/dashboard` poprawny na desktopie, tablecie i mobile
+- [x] 4.7 Szuflada otwiera się i zamyka poprawnie, fokus wraca na hamburger
+- [x] 4.8 Przy 360 px brak poziomego przewijania; light i dark na trzech szerokościach
+- [x] 4.9 Wylogowanie z topbaru przekierowuje na `/`
+- [x] 4.10 Przegląd w Chrome, Firefoksie i Safari

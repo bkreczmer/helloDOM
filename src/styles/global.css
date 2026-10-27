@@ -45,6 +45,7 @@
   --rs-accent-soft: color-mix(in oklab, var(--rs-accent-2) 14%, white);
   --rs-grad-brand: linear-gradient(to bottom right, #2b9af5, #0652a9);
   --rs-dark-section-bg: color-mix(in oklab, var(--rs-accent-fg) 60%, black);
+  --rs-overlay: color-mix(in oklab, black 40%, transparent);
 
   /* Statuses */
   --rs-success: oklch(0.65 0.16 145);
@@ -111,6 +112,7 @@
   --rs-accent-fg: color-mix(in oklab, var(--rs-accent) 78%, white);
   --rs-accent-hover: color-mix(in oklab, var(--rs-accent) 88%, white);
   --rs-input-bg: var(--rs-surface-2);
+  --rs-overlay: color-mix(in oklab, black 60%, transparent);
 
   --rs-success: oklch(0.7 0.16 145);
   --rs-danger: oklch(0.68 0.18 28);
@@ -155,6 +157,7 @@
   --color-rs-input-border: var(--rs-input-border);
   --color-rs-input-bg: var(--rs-input-bg);
   --color-rs-dark-section-bg: var(--rs-dark-section-bg);
+  --color-rs-overlay: var(--rs-overlay);
   --color-rs-success: var(--rs-success);
   --color-rs-success-soft: var(--rs-success-soft);
   --color-rs-success-fg: var(--rs-success-fg);

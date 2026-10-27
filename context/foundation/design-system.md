@@ -36,6 +36,7 @@ Kolory pochodne liczone przez `color-mix(in oklab, …)`.
 | `--rs-accent-soft` | `color-mix(in oklab, var(--rs-accent-2) 14%, white)` |
 | `--rs-grad-brand` | `linear-gradient(to bottom right, #2B9AF5, #0652A9)` |
 | `--rs-dark-section-bg` | `color-mix(in oklab, var(--rs-accent-fg) 60%, black)` |
+| `--rs-overlay` | `color-mix(in oklab, black 40%, transparent)` — tło pod szufladą i modalem |
 
 Statusy (`oklch`):
 
@@ -57,6 +58,7 @@ Statusy (`oklch`):
 | `--rs-accent-fg` | `color-mix(in oklab, var(--rs-accent) 78%, white)` |
 | `--rs-accent-hover` | `color-mix(in oklab, var(--rs-accent) 88%, white)` |
 | `--rs-input-bg` | `var(--rs-surface-2)` |
+| `--rs-overlay` | `color-mix(in oklab, black 60%, transparent)` |
 | success / danger | `oklch(0.70 0.16 145)` / `oklch(0.68 0.18 28)` |
 | success-fg / warn-fg / danger-fg | `oklch(0.85 0.12 145)` / `oklch(0.86 0.11 75)` / `oklch(0.82 0.10 28)` (≥4.5:1 na `-soft`) |
 | success-soft / danger-soft / warn-soft | `oklch(0.28 0.07 145)` / `oklch(0.30 0.08 28)` / `oklch(0.30 0.07 75)` |
