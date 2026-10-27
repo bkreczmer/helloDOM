@@ -66,10 +66,13 @@ npx wrangler deploy
 
 ## CI
 
-GitHub Actions (`.github/workflows/ci.yml`) uruchamia dwa joby przy każdym pushu i PR do `main`:
+GitHub Actions (`.github/workflows/ci.yml`) uruchamia przy każdym pushu i PR do `main`:
 
-- **ci** — lint, `astro check` i build. Wymaga sekretów repozytorium `SUPABASE_URL` i `SUPABASE_KEY`.
+- **ci** — lint, `astro check` i build.
 - **smoke** — stawia lokalny Supabase, buduje aplikację, serwuje podgląd produkcyjny i uruchamia `npm run smoke`.
+- **deploy** — tylko po pushu do `main` i po zielonych `ci` oraz `smoke`: `npx wrangler deploy` (sekrety repozytorium `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`), a potem sprawdzenie, że produkcja odpowiada.
+
+Produkcja: https://hellodom.hellodom.workers.dev
 
 ## Praca nad zmianami
 

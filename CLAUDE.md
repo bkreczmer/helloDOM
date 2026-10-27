@@ -46,7 +46,7 @@ No test framework yet; `npm run smoke` and `npx astro check` are the only checks
 
 ## CI
 
-`@.github/workflows/ci.yml`: lint, `astro check`, build, plus a smoke job against a local Supabase. Runs on push and PR to `main`. Build needs `SUPABASE_URL` / `SUPABASE_KEY` repository secrets.
+`@.github/workflows/ci.yml`: lint, `astro check`, build, plus a smoke job against a local Supabase. Runs on push and PR to `main`; a `deploy` job runs `wrangler deploy` on push to `main` after ci + smoke pass. Production Supabase secrets live as Worker secrets, not in GitHub.
 
 ## Commits & change workflow
 
