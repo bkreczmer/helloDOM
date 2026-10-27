@@ -20,8 +20,6 @@ Pre-commit: husky + lint-staged (`@package.json`).
 
 ## Architecture
 
-Astro 7 full SSR (`@astro.config.mjs`), React 19 islands, Tailwind 4, Supabase auth, shadcn/ui; deployed to Cloudflare Workers.
-
 ### Auth flow
 
 - `src/lib/supabase.ts` — Supabase SSR client (`@supabase/ssr`, cookie sessions); secrets via `astro:env/server`.
@@ -30,8 +28,7 @@ Astro 7 full SSR (`@astro.config.mjs`), React 19 islands, Tailwind 4, Supabase a
 
 ### Key conventions
 
-- **Path alias**: `@/*` → `./src/*`.
-- **Astro components** for static content/layout; **React** only when interactivity is needed.
+- **`.tsx` vs `.astro`**: a `.tsx` component only when it has state (`useState`/`useReducer`) or an event handler; everything else is `.astro`. Use `client:load` only for such islands. Pattern: `src/components/auth/SignInForm.tsx` vs `src/components/Topbar.astro`.
 - **Class names**: merge with `cn()` from `@/lib/utils`; never concatenate class strings.
 - **shadcn/ui** ("new-york"): `src/components/ui/`; add via `npx shadcn@latest add [name]`.
 - **API routes**: uppercase `GET`, `POST` exports; validate input with `z` from `astro/zod` (not a separate `zod` dependency).
@@ -41,8 +38,7 @@ Astro 7 full SSR (`@astro.config.mjs`), React 19 islands, Tailwind 4, Supabase a
 
 ### Environment
 
-- Node.js per `@.nvmrc`; env vars `SUPABASE_URL`, `SUPABASE_KEY` from `@.env.example`.
-- Local Supabase: `npx supabase start` (Docker). Deploy: `npx wrangler deploy`.
+Setup lokalny i deploy: @README.md
 
 ## Testing
 
