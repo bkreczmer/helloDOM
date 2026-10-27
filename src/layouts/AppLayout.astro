@@ -10,7 +10,13 @@ interface Props {
 
 const { title } = Astro.props;
 const { pathname } = Astro.url;
-const email = Astro.locals.user?.email ?? "";
+const { user } = Astro.locals;
+// Defence in depth: the redirect lives in middleware (Astro.redirect isn't allowed in layouts).
+// A page using this layout without being in PROTECTED_ROUTES fails loudly instead of showing the shell to anonymous users.
+if (!user) {
+  throw new Error(`AppLayout requires a signed-in user: add "${pathname}" to PROTECTED_ROUTES in src/middleware.ts`);
+}
+const email = user.email ?? "";
 ---
 
 <Layout title={title}>

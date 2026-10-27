@@ -1,4 +1,3 @@
-@import "@fontsource/manrope/300.css";
 @import "@fontsource/manrope/400.css";
 @import "@fontsource/manrope/500.css";
 @import "@fontsource/manrope/600.css";
@@ -30,8 +29,9 @@
   --rs-surface-2: color-mix(in oklab, white 90%, var(--rs-accent));
   --rs-surface-3: #ffffff;
   --rs-fg: #0652a9;
-  --rs-fg-2: color-mix(in oklab, var(--rs-fg) 72%, var(--rs-surface));
-  --rs-fg-3: color-mix(in oklab, var(--rs-fg) 46%, var(--rs-surface));
+  --rs-fg-2: color-mix(in oklab, var(--rs-fg) 88%, var(--rs-surface));
+  --rs-fg-3: color-mix(in oklab, var(--rs-fg) 80%, var(--rs-surface));
+  /* fg-4: decoration only (lines, non-informative marks), never text */
   --rs-fg-4: color-mix(in oklab, var(--rs-fg) 28%, var(--rs-surface));
   --rs-line: color-mix(in oklab, var(--rs-fg) 13%, var(--rs-surface));
   --rs-line-strong: color-mix(in oklab, var(--rs-fg) 24%, var(--rs-surface));
@@ -41,9 +41,11 @@
   /* Accent derivatives */
   --rs-accent-hover: color-mix(in oklab, var(--rs-accent) 82%, black);
   --rs-accent-active: color-mix(in oklab, var(--rs-accent) 66%, black);
+  /* CTA fill with white text (4.85:1) and active icons (>=3:1 in both themes); same in light and dark */
+  --rs-accent-strong: #1e75bc;
   --rs-accent-ring: color-mix(in oklab, var(--rs-accent) 30%, transparent);
   --rs-accent-soft: color-mix(in oklab, var(--rs-accent-2) 14%, white);
-  --rs-grad-brand: linear-gradient(to bottom right, #2b9af5, #0652a9);
+  --rs-grad-brand: linear-gradient(to bottom right, #1e75bc, #0652a9);
   --rs-dark-section-bg: color-mix(in oklab, var(--rs-accent-fg) 60%, black);
   --rs-overlay: color-mix(in oklab, black 40%, transparent);
 
@@ -142,6 +144,7 @@
   --color-rs-accent-2-soft: var(--rs-accent-2-soft);
   --color-rs-accent-hover: var(--rs-accent-hover);
   --color-rs-accent-active: var(--rs-accent-active);
+  --color-rs-accent-strong: var(--rs-accent-strong);
   --color-rs-accent-ring: var(--rs-accent-ring);
   --color-rs-accent-soft: var(--rs-accent-soft);
   --color-rs-bg: var(--rs-bg);
@@ -286,6 +289,6 @@
     font-size: 10.5px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--rs-fg-4);
+    color: var(--rs-fg-3);
   }
 }

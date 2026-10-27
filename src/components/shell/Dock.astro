@@ -23,10 +23,10 @@ const items = navConfig.slice(0, DOCK_MAX_ITEMS);
             aria-current={active ? "page" : undefined}
             class:list={[
               "flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-card font-display text-[9.5px] font-semibold transition-colors duration-[120ms] ease-rs",
-              active ? "text-rs-accent" : "text-rs-fg-3 hover:text-rs-fg",
+              active ? "text-rs-accent-fg" : "text-rs-fg-3 hover:text-rs-fg",
             ]}
           >
-            <Icon className="size-5" aria-hidden="true" />
+            <Icon className={active ? "size-5 text-rs-accent-strong" : "size-5"} aria-hidden="true" />
             <span>{label}</span>
           </a>
         </li>

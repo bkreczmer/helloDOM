@@ -3,13 +3,14 @@ import { CircleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const inputBase =
-  "h-[38px] w-full rounded-control border border-rs-input-border bg-rs-input-bg py-2.5 pr-3 pl-9 font-body text-[13.5px] font-medium text-rs-fg transition-[border-color,box-shadow] duration-[180ms] ease-rs placeholder:text-rs-fg-4 focus:border-rs-accent focus:shadow-focus focus:outline-none data-[state=error]:border-rs-danger";
+  "h-[38px] w-full rounded-control border border-rs-input-border bg-rs-input-bg py-2.5 pr-3 pl-9 font-body text-[13.5px] font-medium text-rs-fg transition-[border-color,box-shadow] duration-[180ms] ease-rs placeholder:text-rs-fg-3 focus:border-rs-accent focus:shadow-focus focus:outline-none data-[state=error]:border-rs-danger";
 
 interface FormFieldProps {
   id: string;
   name?: string;
   label: string;
   type?: string;
+  autoComplete?: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -24,6 +25,7 @@ export function FormField({
   name,
   label,
   type = "text",
+  autoComplete,
   value,
   onChange,
   placeholder,
@@ -33,6 +35,7 @@ export function FormField({
   endContent,
 }: FormFieldProps) {
   const errorId = `${id}-error`;
+  const hintId = `${id}-hint`;
 
   return (
     <div>
@@ -45,6 +48,7 @@ export function FormField({
           id={id}
           name={name ?? id}
           type={type}
+          autoComplete={autoComplete}
           value={value}
           onChange={(e) => {
             onChange(e.target.value);
@@ -52,7 +56,7 @@ export function FormField({
           placeholder={placeholder}
           data-state={error ? "error" : undefined}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? errorId : undefined}
+          aria-describedby={error ? errorId : hint ? hintId : undefined}
           className={cn(inputBase, endContent ? "pr-9" : undefined)}
         />
         {endContent}
@@ -63,7 +67,7 @@ export function FormField({
           {error}
         </p>
       ) : (
-        hint
+        hint && <div id={hintId}>{hint}</div>
       )}
     </div>
   );

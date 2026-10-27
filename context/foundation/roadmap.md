@@ -92,6 +92,11 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Pierwsze tabele i RLS w projekcie; rola jest podstawą wszystkich późniejszych reguł dostępu, więc błąd tutaj przenosi się do każdego wycinka.
+- **Carried over (app-shell impl review F2, F5, F6, F10):** przy przepisywaniu endpointów auth (`src/pages/api/auth/signin.ts`, `signup.ts`):
+  - `?error=` niesie kod błędu (np. `invalid_credentials`, `unavailable`), a nie tekst; strony auth mapują kod przez allowlist w `src/lib/services/auth-errors.ts`, nieznany kod → ogólny polski komunikat (dziś dowolny tekst z URL trafia do `ServerError`).
+  - wejście walidowane `z` z `astro/zod` (`safeParse`), `request.formData()` i wywołania Supabase w `try/catch` z przekierowaniem `?error=` zamiast 500.
+  - (F10) `src/pages/auth/confirm-email.astro` wybiera komunikat po `import.meta.env.DEV`, a nie po tym, czy Supabase wymaga potwierdzenia; decyduj na podstawie `session` zwróconej przez `signUp` (null = wymaga potwierdzenia) i przekaż to w przekierowaniu.
+  - (F5) pola formularza (`src/components/auth/FormField.tsx`) dostają stan hover z DoD design systemu: ciemniejsza ramka niż domyślna `--rs-input-border` (np. `--rs-fg-3`), focus i błąd mają pierwszeństwo.
 - **Status:** proposed
 
 ### S-02: Profil agenta

@@ -15,7 +15,7 @@ const initial = email.charAt(0).toUpperCase() || "?";
 
 <header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-rs-line bg-rs-surface px-3.5 py-3 tablet:px-8 tablet:py-4">
   <div class="flex items-center">
-    <MobileNav client:load pathname={pathname} />
+    <MobileNav client:media="(max-width: 640px)" pathname={pathname} />
     <a
       href="/dashboard"
       class="absolute left-1/2 -translate-x-1/2 font-display text-[18px] font-bold text-rs-accent-fg tablet:static tablet:translate-x-0 desktop:hidden dark:text-rs-fg"

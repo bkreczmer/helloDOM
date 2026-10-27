@@ -9,6 +9,7 @@ interface MobileNavProps {
 }
 
 const DRAWER_ID = "mobile-nav-drawer";
+const TABLET_UP = "(min-width: 641px)"; // --breakpoint-tablet in global.css
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export default function MobileNav({ pathname }: MobileNavProps) {
@@ -53,9 +54,16 @@ export default function MobileNav({ pathname }: MobileNavProps) {
       }
     };
     document.addEventListener("keydown", onKeyDown);
+    // The drawer is portaled out of the tablet:hidden wrapper, so close it once the viewport leaves mobile.
+    const tabletUp = window.matchMedia(TABLET_UP);
+    const onBreakpoint = (event: MediaQueryListEvent) => {
+      if (event.matches) close();
+    };
+    tabletUp.addEventListener("change", onBreakpoint);
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
+      tabletUp.removeEventListener("change", onBreakpoint);
     };
   }, [open]);
 
@@ -66,7 +74,7 @@ export default function MobileNav({ pathname }: MobileNavProps) {
         type="button"
         aria-label="Otwórz nawigację"
         aria-expanded={open}
-        aria-controls={DRAWER_ID}
+        aria-controls={open ? DRAWER_ID : undefined}
         onClick={() => {
           setOpen(true);
         }}
@@ -93,7 +101,7 @@ export default function MobileNav({ pathname }: MobileNavProps) {
               >
                 helloDOM
               </a>
-              <nav>
+              <nav aria-label="Główna nawigacja">
                 <ul className="flex flex-col gap-1">
                   {navConfig.map(({ href, label, icon: Icon }, index) => {
                     const active = isActive(pathname, href);
@@ -109,7 +117,10 @@ export default function MobileNav({ pathname }: MobileNavProps) {
                             active && "bg-rs-surface-2 text-rs-fg font-semibold",
                           )}
                         >
-                          <Icon className={cn("size-4 shrink-0", active && "text-rs-accent")} aria-hidden="true" />
+                          <Icon
+                            className={cn("size-4 shrink-0", active && "text-rs-accent-strong")}
+                            aria-hidden="true"
+                          />
                           {label}
                         </a>
                       </li>

@@ -24,10 +24,10 @@ const { Icon } = content;
 
 <PublicLayout title={content.heading}>
   <div class="mx-auto w-full max-w-sm">
+    <h1 class="page-title mb-[18px] text-center">{content.heading}</h1>
     <Card>
       <div class="flex flex-col items-center py-4 text-center">
         <Icon className="mb-4 size-12 text-rs-accent" aria-hidden="true" />
-        <h1 class="page-title mb-3">{content.heading}</h1>
         <p class="mb-6 text-rs-fg-2">{content.description}</p>
         <a href="/auth/signin" class="text-[13px] font-semibold text-rs-accent-fg hover:underline">
           {content.linkText}
