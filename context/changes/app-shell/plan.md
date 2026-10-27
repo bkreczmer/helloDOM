@@ -418,16 +418,16 @@ Brak danych. Użytkownicy z istniejącą sesją nie są dotknięci. Domyślny mo
 
 #### Automated
 
-- [x] 4.1 Lint przechodzi: `npm run lint`
-- [x] 4.2 Typy przechodzą: `npx astro check`
-- [x] 4.3 Build przechodzi: `npm run build`
-- [x] 4.4 Smoke test przechodzi: `npm run smoke`
-- [x] 4.5 W całym `src/` nie ma stylów startera
+- [x] 4.1 Lint przechodzi: `npm run lint` — 68efeb4
+- [x] 4.2 Typy przechodzą: `npx astro check` — 68efeb4
+- [x] 4.3 Build przechodzi: `npm run build` — 68efeb4
+- [x] 4.4 Smoke test przechodzi: `npm run smoke` — 68efeb4
+- [x] 4.5 W całym `src/` nie ma stylów startera — 68efeb4
 
 #### Manual
 
-- [x] 4.6 `/dashboard` poprawny na desktopie, tablecie i mobile
-- [x] 4.7 Szuflada otwiera się i zamyka poprawnie, fokus wraca na hamburger
-- [x] 4.8 Przy 360 px brak poziomego przewijania; light i dark na trzech szerokościach
-- [x] 4.9 Wylogowanie z topbaru przekierowuje na `/`
-- [x] 4.10 Przegląd w Chrome, Firefoksie i Safari
+- [x] 4.6 `/dashboard` poprawny na desktopie, tablecie i mobile — 68efeb4
+- [x] 4.7 Szuflada otwiera się i zamyka poprawnie, fokus wraca na hamburger — 68efeb4
+- [x] 4.8 Przy 360 px brak poziomego przewijania; light i dark na trzech szerokościach — 68efeb4
+- [x] 4.9 Wylogowanie z topbaru przekierowuje na `/` — 68efeb4
+- [x] 4.10 Przegląd w Chrome, Firefoksie i Safari — 68efeb4
