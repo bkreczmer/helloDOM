@@ -1,0 +1,25 @@
+---
+interface Props {
+  title?: string;
+  class?: string;
+}
+
+const { title, class: className } = Astro.props;
+const hasIcon = Astro.slots.has("icon");
+---
+
+<section class:list={["rounded-card border border-rs-line bg-rs-surface", className]}>
+  {title && (
+    <header class="flex items-center gap-2.5 px-[18px] py-[13px]">
+      {hasIcon && (
+        <span class="inline-flex size-[26px] shrink-0 items-center justify-center rounded-sm bg-rs-surface-2 text-rs-fg-2">
+          <slot name="icon" />
+        </span>
+      )}
+      <h3 class="font-display text-[14px] font-semibold text-rs-fg">{title}</h3>
+    </header>
+  )}
+  <div class="px-[18px] py-[14px]">
+    <slot />
+  </div>
+</section>

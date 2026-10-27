@@ -5,24 +5,24 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  "inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-control border border-rs-line-strong bg-rs-surface font-display text-[13px] font-semibold text-rs-fg transition-[translate,box-shadow,background-color,border-color,color] duration-[180ms] ease-rs hover:-translate-y-0.5 hover:shadow-[0_6px_18px_rgba(15,23,42,.08)] disabled:pointer-events-none disabled:translate-y-0 disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+        default: "",
+        primary: "border-rs-fg bg-rs-fg text-rs-surface",
+        accent:
+          "border-rs-accent bg-rs-accent font-bold text-rs-accent-on hover:border-rs-accent-hover hover:bg-rs-accent-hover",
+        ghost: "border-transparent bg-transparent hover:translate-y-0 hover:bg-rs-surface-2 hover:shadow-none",
+        link: "border-transparent bg-transparent text-rs-accent-fg underline-offset-4 hover:translate-y-0 hover:underline hover:shadow-none",
         destructive:
-          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
-        outline:
-          "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50",
-        secondary: "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
-        link: "text-primary underline-offset-4 hover:underline",
+          "border-rs-danger bg-rs-danger text-rs-accent-on hover:border-[color-mix(in_oklab,var(--rs-danger)_85%,black)] hover:bg-[color-mix(in_oklab,var(--rs-danger)_85%,black)]",
       },
       size: {
-        default: "h-9 px-4 py-2 has-[>svg]:px-3",
-        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
-        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
-        icon: "size-9",
+        default: "h-[38px] px-4 py-2.5",
+        sm: "h-[30px] gap-1.5 px-3 py-1",
+        lg: "h-[46px] px-5 py-3",
+        icon: "size-[34px] p-0",
       },
     },
     defaultVariants: {

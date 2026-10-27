@@ -368,35 +368,35 @@ Brak danych. Użytkownicy z istniejącą sesją nie są dotknięci. Domyślny mo
 
 #### Automated
 
-- [x] 1.1 Lint przechodzi: `npm run lint`
-- [x] 1.2 Typy przechodzą: `npx astro check`
-- [x] 1.3 Build przechodzi: `npm run build`
-- [x] 1.4 `bg-cosmic` i `.dark {` zniknęły z `src/styles/global.css`
-- [x] 1.5 Layout ma `lang="pl"` i skrypt motywu
-- [x] 1.6 Brak żądań do Google Fonts
+- [x] 1.1 Lint przechodzi: `npm run lint` — ff7f4d4
+- [x] 1.2 Typy przechodzą: `npx astro check` — ff7f4d4
+- [x] 1.3 Build przechodzi: `npm run build` — ff7f4d4
+- [x] 1.4 `bg-cosmic` i `.dark {` zniknęły z `src/styles/global.css` — ff7f4d4
+- [x] 1.5 Layout ma `lang="pl"` i skrypt motywu — ff7f4d4
+- [x] 1.6 Brak żądań do Google Fonts — ff7f4d4
 
 #### Manual
 
-- [x] 1.7 Przełączenie motywu zmienia tło i tekst; po przeładowaniu bez mignięcia
-- [x] 1.8 Fonty Manrope i Nunito załadowane; favicon SVG widoczny
+- [x] 1.7 Przełączenie motywu zmienia tło i tekst; po przeładowaniu bez mignięcia — ff7f4d4
+- [x] 1.8 Fonty Manrope i Nunito załadowane; favicon SVG widoczny — ff7f4d4
 - [ ] 1.9 Baner braku konfiguracji czytelny w light i dark
-- [x] 1.10 Widoczna obwódka focusu na linkach i przyciskach
+- [x] 1.10 Widoczna obwódka focusu na linkach i przyciskach — ff7f4d4
 
 ### Phase 2: Komponenty bazowe
 
 #### Automated
 
-- [ ] 2.1 Lint przechodzi: `npm run lint`
-- [ ] 2.2 Typy przechodzą: `npx astro check`
-- [ ] 2.3 Build przechodzi: `npm run build`
-- [ ] 2.4 W komponentach auth nie ma kolorów startera
-- [ ] 2.5 Brak angielskich komunikatów w komponentach auth
-- [ ] 2.6 Endpointy nie przekazują surowych błędów Supabase
+- [x] 2.1 Lint przechodzi: `npm run lint`
+- [x] 2.2 Typy przechodzą: `npx astro check`
+- [x] 2.3 Build przechodzi: `npm run build`
+- [x] 2.4 W komponentach auth nie ma kolorów startera
+- [x] 2.5 Brak angielskich komunikatów w komponentach auth
+- [x] 2.6 Endpointy nie przekazują surowych błędów Supabase
 
 #### Manual
 
-- [ ] 2.7 Pola mają stany default, hover, focus, błąd i disabled w light i dark
-- [ ] 2.8 Polskie znaki renderują się w Nunito/Manrope
+- [x] 2.7 Pola mają stany default, hover, focus, błąd i disabled w light i dark
+- [x] 2.8 Polskie znaki renderują się w Nunito/Manrope
 
 ### Phase 3: Layout publiczny i strony anonimowe
 
