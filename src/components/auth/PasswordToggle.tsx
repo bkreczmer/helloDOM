@@ -10,8 +10,8 @@ export function PasswordToggle({ visible, onToggle }: PasswordToggleProps) {
     <button
       type="button"
       onClick={onToggle}
-      className="absolute top-1/2 right-3 -translate-y-1/2 text-white/40 transition-colors hover:text-white/70"
-      aria-label={visible ? "Hide password" : "Show password"}
+      className="text-rs-fg-3 ease-rs hover:text-rs-fg absolute top-1/2 right-3 -translate-y-1/2 transition-colors duration-[180ms]"
+      aria-label={visible ? "Ukryj hasło" : "Pokaż hasło"}
     >
       {visible ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
     </button>

@@ -1,8 +1,33 @@
 ---
-import Welcome from "@/components/Welcome.astro";
-import Layout from "@/layouts/Layout.astro";
+import PublicLayout from "@/layouts/PublicLayout.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+
+const user = Astro.locals.user;
 ---
 
-<Layout>
-  <Welcome />
-</Layout>
+<PublicLayout>
+  <section class="rounded-card px-5 py-10 text-rs-accent-on [background:var(--rs-grad-brand)] tablet:px-10 tablet:py-16">
+    <h1 class="page-title max-w-2xl">Znajdź agenta dopasowanego do Twojej nieruchomości</h1>
+    <p class="mt-4 max-w-2xl text-[15px]">
+      Podaj miasto, typ nieruchomości i cenę, a helloDOM oceni każdego agenta w skali 0–100 na podstawie jego
+      doświadczenia i pokaże trzech najlepiej dopasowanych.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3">
+      {user ? (
+        <a href="/dashboard" class:list={cn(buttonVariants({ variant: "accent" }))}>
+          Przejdź do panelu
+        </a>
+      ) : (
+        <>
+          <a href="/auth/signup" class:list={cn(buttonVariants({ variant: "accent" }))}>
+            Załóż konto
+          </a>
+          <a href="/auth/signin" class:list={cn(buttonVariants({ variant: "default" }))}>
+            Zaloguj się
+          </a>
+        </>
+      )}
+    </div>
+  </section>
+</PublicLayout>

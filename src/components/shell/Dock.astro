@@ -1,0 +1,36 @@
+---
+import { DOCK_MAX_ITEMS, isActive, navConfig } from "@/components/shell/nav";
+
+interface Props {
+  pathname: string;
+}
+
+const { pathname } = Astro.props;
+const items = navConfig.slice(0, DOCK_MAX_ITEMS);
+---
+
+<nav
+  aria-label="Nawigacja dolna"
+  class="fixed inset-x-2.5 bottom-[calc(8px+env(safe-area-inset-bottom))] z-50 rounded-dock border border-rs-line bg-rs-surface p-1 tablet:hidden"
+>
+  <ul class="grid grid-cols-5">
+    {items.map(({ href, label, icon: Icon }) => {
+      const active = isActive(pathname, href);
+      return (
+        <li>
+          <a
+            href={href}
+            aria-current={active ? "page" : undefined}
+            class:list={[
+              "flex min-h-[54px] flex-col items-center justify-center gap-1 rounded-card font-display text-[9.5px] font-semibold transition-colors duration-[120ms] ease-rs",
+              active ? "text-rs-accent-fg" : "text-rs-fg-3 hover:text-rs-fg",
+            ]}
+          >
+            <Icon className={active ? "size-5 text-rs-accent-strong" : "size-5"} aria-hidden="true" />
+            <span>{label}</span>
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+</nav>

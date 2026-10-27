@@ -1,0 +1,44 @@
+---
+import { LogOut } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
+import ThemeToggle from "@/components/ThemeToggle";
+import MobileNav from "@/components/shell/MobileNav";
+
+interface Props {
+  email: string;
+}
+
+const { email } = Astro.props;
+const { pathname } = Astro.url;
+const initial = email.charAt(0).toUpperCase() || "?";
+---
+
+<header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-rs-line bg-rs-surface px-3.5 py-3 tablet:px-8 tablet:py-4">
+  <div class="flex items-center">
+    <MobileNav client:media="(max-width: 640px)" pathname={pathname} />
+    <a
+      href="/dashboard"
+      class="absolute left-1/2 -translate-x-1/2 font-display text-[18px] font-bold text-rs-accent-fg tablet:static tablet:translate-x-0 desktop:hidden dark:text-rs-fg"
+    >
+      helloDOM
+    </a>
+  </div>
+  <div class="flex items-center gap-2.5">
+    <ThemeToggle client:load />
+    <span
+      aria-hidden="true"
+      class="inline-flex size-8 items-center justify-center rounded-full bg-rs-surface-2 font-display text-[13px] font-semibold text-rs-fg-2"
+    >
+      {initial}
+    </span>
+    <div class="hidden flex-col leading-tight tablet:flex">
+      <span class="font-display text-[13.5px] font-semibold text-rs-fg">{email}</span>
+      {/* Role (11px) arrives with S-01. */}
+    </div>
+    <form method="POST" action="/api/auth/signout">
+      <button type="submit" aria-label="Wyloguj" class:list={[buttonVariants({ variant: "ghost", size: "icon" })]}>
+        <LogOut className="size-4" aria-hidden="true" />
+      </button>
+    </form>
+  </div>
+</header>

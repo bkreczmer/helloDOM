@@ -33,4 +33,4 @@ pnpm-debug.log*
 .claude/settings.local.json
 
 # private project plan (not for the public repo)
-PLAN.md
+/PLAN.md

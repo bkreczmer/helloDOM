@@ -8,7 +8,10 @@ export function ServerError({ message }: ServerErrorProps) {
   if (!message) return null;
 
   return (
-    <p className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+    <p
+      role="alert"
+      className="rounded-control bg-rs-danger-soft text-rs-danger-fg flex items-center gap-2 border border-[color-mix(in_oklab,var(--rs-danger)_30%,transparent)] px-3 py-2 text-[13px]"
+    >
       <CircleAlert className="size-4 shrink-0" />
       {message}
     </p>

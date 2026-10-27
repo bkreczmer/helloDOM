@@ -1,0 +1,24 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import ThemeToggle from "@/components/ThemeToggle";
+
+interface Props {
+  title?: string;
+}
+
+const { title } = Astro.props;
+---
+
+<Layout title={title}>
+  <div class="mx-auto flex min-h-screen max-w-[1440px] flex-col gap-[18px] px-[14px] py-4 tablet:px-8 tablet:pt-7 tablet:pb-[60px]">
+    <header class="flex items-center justify-between">
+      <a href="/" class="font-display text-[18px] font-bold text-rs-accent-fg dark:text-rs-fg">
+        helloDOM
+      </a>
+      <ThemeToggle client:load />
+    </header>
+    <main>
+      <slot />
+    </main>
+  </div>
+</Layout>

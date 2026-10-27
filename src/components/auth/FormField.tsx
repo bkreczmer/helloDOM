@@ -3,13 +3,14 @@ import { CircleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const inputBase =
-  "w-full rounded-lg bg-white/10 border px-3 py-2 pl-10 text-white placeholder-white/40 focus:outline-none focus:ring-2 transition-colors";
+  "h-[38px] w-full rounded-control border border-rs-input-border bg-rs-input-bg py-2.5 pr-3 pl-9 font-body text-[13.5px] font-medium text-rs-fg transition-[border-color,box-shadow] duration-[180ms] ease-rs placeholder:text-rs-fg-3 focus:border-rs-accent focus:shadow-focus focus:outline-none data-[state=error]:border-rs-danger";
 
 interface FormFieldProps {
   id: string;
   name?: string;
   label: string;
   type?: string;
+  autoComplete?: string;
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -24,6 +25,7 @@ export function FormField({
   name,
   label,
   type = "text",
+  autoComplete,
   value,
   onChange,
   placeholder,
@@ -32,36 +34,40 @@ export function FormField({
   icon,
   endContent,
 }: FormFieldProps) {
+  const errorId = `${id}-error`;
+  const hintId = `${id}-hint`;
+
   return (
     <div>
-      <label htmlFor={id} className="mb-1 block text-sm text-blue-100/80">
+      <label htmlFor={id} className="text-rs-fg-2 mb-1 block text-[11.5px] font-semibold">
         {label}
       </label>
       <div className="relative">
-        <span className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-white/40">{icon}</span>
+        <span className="text-rs-fg-3 pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2">{icon}</span>
         <input
           id={id}
           name={name ?? id}
           type={type}
+          autoComplete={autoComplete}
           value={value}
           onChange={(e) => {
             onChange(e.target.value);
           }}
           placeholder={placeholder}
-          className={cn(
-            inputBase,
-            error ? "border-red-400/60 focus:ring-red-400" : "border-white/20 focus:ring-purple-400",
-          )}
+          data-state={error ? "error" : undefined}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : hint ? hintId : undefined}
+          className={cn(inputBase, endContent ? "pr-9" : undefined)}
         />
         {endContent}
       </div>
       {error ? (
-        <p className="mt-1 flex items-center gap-1 text-xs text-red-300">
+        <p id={errorId} className="text-rs-danger-fg mt-1 flex items-center gap-1 text-[11.5px]">
           <CircleAlert className="size-3" />
           {error}
         </p>
       ) : (
-        hint
+        hint && <div id={hintId}>{hint}</div>
       )}
     </div>
   );
