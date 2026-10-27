@@ -44,7 +44,7 @@ Właściciel nieruchomości, który chce ją sprzedać lub wynająć, nie wie, k
 
 | ID   | Change ID                  | Outcome (user can …)                                                                 | Prerequisites | PRD refs                        | Status   |
 | ---- | -------------------------- | ------------------------------------------------------------------------------------ | ------------- | ------------------------------- | -------- |
-| F-01 | app-shell                  | (foundation) aplikacja ma tokeny, fonty i powłokę design systemu helloDOM (sidebar/dock, light/dark) | —             | NFR (360 px, polskie znaki, przeglądarki) | planning |
+| F-01 | app-shell                  | (foundation) aplikacja ma tokeny, fonty i powłokę design systemu helloDOM (sidebar/dock, light/dark) | —             | NFR (360 px, polskie znaki, przeglądarki) | in-progress |
 | S-01 | role-based-signup          | użytkownik rejestruje się jako właściciel albo agent i trafia na swój panel           | F-01          | FR-001, FR-002                  | proposed |
 | S-02 | agent-profile              | agent uzupełnia profil: miasta, typy, przedział cen, lata doświadczenia              | S-01          | FR-007                          | proposed |
 | S-03 | offer-top3-ranking         | właściciel zapisuje ofertę i widzi top 3 agentów z wynikiem 0–100                    | S-01, S-02    | US-01, FR-003, FR-008           | proposed |
@@ -78,7 +78,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** — (pełna specyfikacja tokenów light/dark rozstrzygnięta w `context/foundation/design-system.md`)
 - **Risk:** Stoi przed wycinkami, bo bez niego każdy widok trzeba by przestylować drugi raz. Ryzyko: rozrośnie się w kompletny katalog komponentów, więc zakres to tylko tokeny, fonty, powłoka i motyw; komponenty dochodzą w wycinkach, które ich używają.
-- **Status:** planning
+- **Status:** in-progress
 
 ## Slices
 
