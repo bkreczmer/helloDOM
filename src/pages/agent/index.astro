@@ -1,4 +1,5 @@
 ---
+import { ArrowRight, UserRound } from "lucide-react";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
 
@@ -8,8 +9,23 @@ const email = Astro.locals.user?.email ?? "";
 <AppLayout title="Panel agenta">
   <Card title="Witaj">
     <p class="text-[13px] leading-[1.6] text-rs-fg-2">
-      Zalogowano jako <span class="font-semibold text-rs-fg">{email}</span>. Tu pojawią się zaproszenia od właścicieli i
-      Twój profil agenta.
+      Zalogowano jako <span class="font-semibold text-rs-fg">{email}</span>. Tu pojawią się zaproszenia od właścicieli.
     </p>
+  </Card>
+  <Card title="Profil agenta">
+    <Fragment slot="icon">
+      <UserRound className="size-4" aria-hidden="true" />
+    </Fragment>
+    <p class="text-[13px] leading-[1.6] text-rs-fg-2">
+      Uzupełnij miasta, typy nieruchomości, przedział cen i doświadczenie. Tylko pełny profil pojawia się w rankingu
+      agentów dla ofert właścicieli.
+    </p>
+    <a
+      href="/agent/profile"
+      class="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-rs-accent-fg hover:underline"
+    >
+      Przejdź do profilu
+      <ArrowRight className="size-4" aria-hidden="true" />
+    </a>
   </Card>
 </AppLayout>

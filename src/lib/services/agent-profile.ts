@@ -4,9 +4,9 @@ import { CITIES, PROPERTY_TYPES } from "@/lib/dictionaries";
 import type { AgentProfile, City, PropertyType } from "@/types";
 
 // Upper bound of a Postgres integer column (price_min, price_max).
-const MAX_PRICE = 2_147_483_647;
+export const MAX_PRICE = 2_147_483_647;
 // Keep in sync with profiles_experience_years_range in the agent profile migration.
-const MAX_EXPERIENCE_YEARS = 60;
+export const MAX_EXPERIENCE_YEARS = 60;
 
 const dedupe = <T>(values: T[]): T[] => [...new Set(values)];
 

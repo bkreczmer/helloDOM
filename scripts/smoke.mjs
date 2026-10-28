@@ -90,6 +90,7 @@ const steps = [
   ["signup session routes dashboard to owner panel", () => request("/dashboard"), { status: 302, location: "/owner" }],
   ["signup session reaches owner panel", () => request("/owner"), { status: 200 }],
   ["owner is redirected from agent panel", () => request("/agent"), { status: 302, location: "/owner" }],
+  ["owner is redirected from agent profile", () => request("/agent/profile"), { status: 302, location: "/owner" }],
   ["signout after signup", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
     "signup without role is rejected",
@@ -128,6 +129,7 @@ const steps = [
   ["dashboard routes agent to agent panel", () => agent("/dashboard"), { status: 302, location: "/agent" }],
   ["agent panel renders for agent", () => agent("/agent"), { status: 200 }],
   ["agent is redirected from owner panel", () => agent("/owner"), { status: 302, location: "/agent" }],
+  ["agent profile page renders for agent", () => agent("/agent/profile"), { status: 200 }],
   [
     "agent saves profile with the full dictionary",
     () =>
@@ -185,6 +187,11 @@ const steps = [
     { status: 302, location: "/" },
   ],
   ["agent panel redirects after signout", () => agent("/agent"), { status: 302, location: "/auth/signin" }],
+  [
+    "agent profile page redirects anonymous user",
+    () => agent("/agent/profile"),
+    { status: 302, location: "/auth/signin" },
+  ],
   [
     "anonymous profile save redirects to signin",
     () => agent("/api/agent/profile", { method: "POST", form: validProfile }),
