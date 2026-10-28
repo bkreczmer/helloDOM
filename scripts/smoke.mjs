@@ -368,6 +368,32 @@ const steps = [
     () => request("/api/owner/invitations", { method: "POST", form: inviteForm(smokeAgentId) }),
     { status: 302, location: () => `/owner/offers/${rankedOfferId}?error=offer_locked` },
   ],
+  [
+    "agent panel lists the invitation",
+    () => agent("/agent"),
+    { status: 200, bodyIncludes: ["Warszawa", "Zobacz ofertę", () => `/agent/offers/${rankedOfferId}`] },
+  ],
+  [
+    "agent sees the invited offer without owner data",
+    () => agent(`/agent/offers/${rankedOfferId}`),
+    { status: 200, bodyIncludes: ["Podsumowanie oferty", "Zaproszono Cię do tej oferty"], bodyExcludes: [email] },
+  ],
+  [
+    "agent gets 404 for an offer without an invitation",
+    () => agent(`/agent/offers/${offerId}`),
+    { status: 404, bodyIncludes: ["Nie znaleziono oferty"], bodyExcludes: ["Podsumowanie oferty"] },
+  ],
+  ["agent offer page rejects a malformed id", () => agent("/agent/offers/not-a-uuid"), { status: 404 }],
+  [
+    "owner is redirected from agent offer page",
+    () => request(`/agent/offers/${rankedOfferId}`),
+    { status: 302, location: "/owner" },
+  ],
+  [
+    "anonymous user is redirected from agent offer page",
+    () => anonymous(`/agent/offers/${rankedOfferId}`),
+    { status: 302, location: "/auth/signin" },
+  ],
   ["second owner signout", () => otherOwner("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
     "owner signout after ranking checks",

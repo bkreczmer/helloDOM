@@ -343,28 +343,28 @@ Nowa tabela, polityka i funkcja, bez zmian istniejących danych. Na produkcję p
 
 #### Automated
 
-- [x] 2.1 Typy i lint przechodzą
-- [x] 2.2 Build przechodzi
-- [x] 2.3 Smoke przechodzi na podglądzie, w tym kroki zaproszenia
-- [x] 2.4 Test SQL zaproszeń nadal przechodzi
+- [x] 2.1 Typy i lint przechodzą — 1546189
+- [x] 2.2 Build przechodzi — 1546189
+- [x] 2.3 Smoke przechodzi na podglądzie, w tym kroki zaproszenia — 1546189
+- [x] 2.4 Test SQL zaproszeń nadal przechodzi — 1546189
 
 #### Manual
 
-- [x] 2.5 Wiersz zaproszenia smoke ma owner_id właściciela i status pending, a oferta status invited
-- [x] 2.6 Strona oferty przed i po zaproszeniu: przyciski, baner, pill, karta; light/dark, 360 px, fokus
-- [x] 2.7 Komunikaty offer_locked i agent_not_ranked widoczne na stronie oferty
+- [x] 2.5 Wiersz zaproszenia smoke ma owner_id właściciela i status pending, a oferta status invited — 1546189
+- [x] 2.6 Strona oferty przed i po zaproszeniu: przyciski, baner, pill, karta; light/dark, 360 px, fokus — 1546189
+- [x] 2.7 Komunikaty offer_locked i agent_not_ranked widoczne na stronie oferty — 1546189
 
 ### Phase 3: Widok agenta
 
 #### Automated
 
-- [ ] 3.1 Typy i lint przechodzą
-- [ ] 3.2 Build przechodzi
-- [ ] 3.3 Smoke przechodzi na podglądzie, w tym kroki agenta i IDOR
-- [ ] 3.4 Testy SQL nadal przechodzą
+- [x] 3.1 Typy i lint przechodzą
+- [x] 3.2 Build przechodzi
+- [x] 3.3 Smoke przechodzi na podglądzie, w tym kroki agenta i IDOR
+- [x] 3.4 Testy SQL nadal przechodzą
 
 #### Manual
 
-- [ ] 3.5 Panel agenta z zaproszeniem i bez: lista, pill, stan pusty; light/dark, 360 px, fokus
-- [ ] 3.6 Strona oferty agenta bez danych właściciela i 404 bez zaproszenia
+- [x] 3.5 Panel agenta z zaproszeniem i bez: lista, pill, stan pusty; light/dark, 360 px, fokus
+- [x] 3.6 Strona oferty agenta bez danych właściciela i 404 bez zaproszenia
 - [ ] 3.7 Na produkcji właściciel zaprasza agenta, a agent widzi zaproszenie i ofertę

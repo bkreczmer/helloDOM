@@ -86,24 +86,27 @@ type RankedAgentRow = Database["public"]["Functions"]["rank_agents_for_offer"]["
 
 const isCity = (value: string): value is City => (CITIES as readonly string[]).includes(value);
 
-/** Narrows a text column to its dictionary; the check constraints make a miss a schema drift, not user input. */
-function oneOf<T extends string>(values: readonly T[], value: string, column: string): T {
+/**
+ * Narrows a text column to its dictionary; the check constraints make a miss a schema drift, not user input.
+ * `column` is "table.column", e.g. "offers.city". Shared with the invitations service.
+ */
+export function oneOf<T extends string>(values: readonly T[], value: string, column: string): T {
   if ((values as readonly string[]).includes(value)) return value as T;
-  throw new Error(`offers.${column} outside the dictionary: ${value}`);
+  throw new Error(`${column} outside the dictionary: ${value}`);
 }
 
 /** Maps an offers row to the DTO. */
 export function toOffer(row: OfferRow): Offer {
   return {
     id: row.id,
-    city: oneOf(CITIES, row.city, "city"),
-    propertyType: oneOf(PROPERTY_TYPES, row.property_type, "property_type"),
-    transaction: oneOf(TRANSACTIONS, row.transaction, "transaction"),
+    city: oneOf(CITIES, row.city, "offers.city"),
+    propertyType: oneOf(PROPERTY_TYPES, row.property_type, "offers.property_type"),
+    transaction: oneOf(TRANSACTIONS, row.transaction, "offers.transaction"),
     price: row.price,
     areaM2: row.area_m2,
     rooms: row.rooms,
     description: row.description,
-    status: oneOf(OFFER_STATUSES, row.status, "status"),
+    status: oneOf(OFFER_STATUSES, row.status, "offers.status"),
     createdAt: row.created_at,
   };
 }
@@ -112,9 +115,9 @@ export function toOffer(row: OfferRow): Offer {
 export function toOfferListItem(row: OfferListRow): OfferListItem {
   return {
     id: row.id,
-    city: oneOf(CITIES, row.city, "city"),
-    propertyType: oneOf(PROPERTY_TYPES, row.property_type, "property_type"),
-    transaction: oneOf(TRANSACTIONS, row.transaction, "transaction"),
+    city: oneOf(CITIES, row.city, "offers.city"),
+    propertyType: oneOf(PROPERTY_TYPES, row.property_type, "offers.property_type"),
+    transaction: oneOf(TRANSACTIONS, row.transaction, "offers.transaction"),
     price: row.price,
     createdAt: row.created_at,
   };

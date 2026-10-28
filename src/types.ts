@@ -59,6 +59,15 @@ export interface Offer {
 // One row of the owner's offer list on /owner (a subset of Offer).
 export type OfferListItem = Pick<Offer, "id" | "city" | "propertyType" | "transaction" | "price" | "createdAt">;
 
+// One row of the agent's invitation list on /agent. `offer` is null when RLS hides the offer,
+// i.e. once the invitation is no longer pending/accepted (rejected in S-06).
+export interface AgentInvitationItem {
+  id: string;
+  status: InvitationStatus;
+  createdAt: string;
+  offer: Pick<Offer, "id" | "city" | "propertyType" | "transaction" | "price"> | null;
+}
+
 // One row of rank_agents_for_offer: anonymous on purpose (no e-mail or name), position comes from the order.
 export interface RankedAgent {
   agentId: string;
