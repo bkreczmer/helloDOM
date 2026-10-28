@@ -107,6 +107,26 @@ Wspólny słownik w TS oraz migracja dodająca kolumny profilu agenta z ogranicz
 - jako właściciel: update `cities` własnego wiersza → 0 wierszy.
 Uruchomienie: `docker exec -i supabase_db_10x-astro-starter psql -U postgres -v ON_ERROR_STOP=1 < supabase/tests/agent-profile.sql` (nazwa kontenera z `project_id` w `supabase/config.toml:5`; lokalnie nie ma `psql`). Z zainstalowanym `psql`: `psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -f supabase/tests/agent-profile.sql`.
 
+#### 5. Skrypt SQL w CI
+
+**File**: `.github/workflows/ci.yml`
+
+**Intent**: Asercje RLS i ograniczeń uruchamiają się automatycznie w każdym PR, nie tylko ręcznie na lokalnej bazie.
+
+**Contract**: W jobie `smoke` nowy krok `Run database tests` zaraz po `Start local Supabase` (przed sprawdzeniem typów i buildem, żeby błąd schematu wychodził najwcześniej). `psql` z runnera (`postgresql-client` jest na `ubuntu-latest`), bez zależności od nazwy kontenera:
+
+```yaml
+- name: Run database tests
+  run: |
+    for f in supabase/tests/*.sql; do
+      echo "::group::$f"
+      psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f "$f"
+      echo "::endgroup::"
+    done
+```
+
+Pętla po `supabase/tests/*.sql` obejmie kolejne skrypty (np. RLS ofert w S-03) bez zmian w CI. Skrypt kończy się `rollback`, więc nie zostawia danych, które mogłyby wpłynąć na smoke.
+
 ### Success Criteria:
 
 #### Automated Verification:
@@ -115,6 +135,8 @@ Uruchomienie: `docker exec -i supabase_db_10x-astro-starter psql -U postgres -v 
 - Skrypt SQL przechodzi wszystkie asercje: `docker exec -i supabase_db_10x-astro-starter psql -U postgres -v ON_ERROR_STOP=1 < supabase/tests/agent-profile.sql`
 - Typy są aktualne: `npm run db:types && git diff --exit-code src/db/database.types.ts` (po commicie wygenerowanego pliku)
 - Typy i lint przechodzą: `npx astro check && npm run lint`
+- Job `smoke` w PR uruchamia krok `Run database tests` i jest zielony: `gh pr checks`
+- Break-check: tymczasowo odwrócona asercja w `supabase/tests/agent-profile.sql` (np. oczekiwane `profile_complete = true` dla nowego agenta) daje niezerowy kod wyjścia `psql` lokalnie; zmiany nie commitować
 
 #### Manual Verification:
 
@@ -261,7 +283,7 @@ Strona `/agent/profile` z formularzem w design systemie, stan kompletności, poz
 
 ### Unit Tests:
 
-- Brak frameworka (CLAUDE.md). Reguły bazy dowodzi `supabase/tests/agent-profile.sql`; walidację endpointu — smoke.
+- Brak frameworka (CLAUDE.md). Reguły bazy dowodzi `supabase/tests/agent-profile.sql`, uruchamiany w każdym PR w jobie `smoke`; walidację endpointu — smoke.
 
 ### Integration Tests:
 
