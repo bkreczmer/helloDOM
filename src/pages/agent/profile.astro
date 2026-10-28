@@ -1,0 +1,57 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/ui/Card.astro";
+import AgentProfileForm from "@/components/agent/AgentProfileForm";
+import { ServerError } from "@/components/auth/ServerError";
+import { createClient } from "@/lib/supabase";
+import {
+  MAX_EXPERIENCE_YEARS,
+  MAX_PRICE,
+  missingForRanking,
+  profileErrorMessage,
+  toAgentProfile,
+} from "@/lib/services/agent-profile";
+import type { AgentProfile } from "@/types";
+
+// The middleware guarantees a signed-in agent on /agent/*.
+const userId = Astro.locals.user?.id;
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+
+let profile: AgentProfile | null = null;
+if (supabase && userId) {
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("cities, property_types, price_min, price_max, experience_years, profile_complete")
+      .eq("id", userId)
+      .maybeSingle();
+    if (!error && data) {
+      profile = toAgentProfile(data);
+    }
+  } catch {
+    profile = null;
+  }
+}
+
+const serverError = profileErrorMessage(Astro.url.searchParams.get("error"));
+const saved = Astro.url.searchParams.has("saved");
+---
+
+<AppLayout title="Profil agenta">
+  <div class="w-full max-w-2xl">
+    {profile ? (
+      <Card>
+        <AgentProfileForm
+          client:load
+          initial={profile}
+          missing={missingForRanking(profile)}
+          limits={{ maxPrice: MAX_PRICE, maxExperienceYears: MAX_EXPERIENCE_YEARS }}
+          serverError={serverError}
+          saved={saved}
+        />
+      </Card>
+    ) : (
+      <ServerError message="Profil jest chwilowo niedostępny. Odśwież stronę za chwilę." />
+    )}
+  </div>
+</AppLayout>

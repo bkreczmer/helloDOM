@@ -40,6 +40,13 @@ jobs:
         run: |
           supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,realtime,storage-api,postgres-meta,supavisor
           supabase status -o env | grep -E '^(API_URL|ANON_KEY)=' > supabase.env
+      - name: Run database tests
+        run: |
+          for f in supabase/tests/*.sql; do
+            echo "::group::$f"
+            psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f "$f"
+            echo "::endgroup::"
+          done
       - name: Check generated database types are up to date
         run: npm run db:types && git diff --exit-code src/db/database.types.ts
       - name: Configure secrets for build and preview
