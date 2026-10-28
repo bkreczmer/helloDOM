@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { SITE_URL } from "astro:env/server";
 import { createClient } from "@/lib/supabase";
 import { toAuthErrorCode, type AuthErrorCode } from "@/lib/services/auth-errors";
 import { signUpSchema } from "@/lib/services/auth-schemas";
@@ -25,10 +26,12 @@ export const POST: APIRoute = async (context) => {
       return fail("unavailable");
     }
     // The confirmation link must come back to this deployment, not to the Site URL configured in Supabase.
+    // SITE_URL pins it in production; without it the request origin is used (local dev).
+    const emailRedirectTo = new URL("/auth/callback", SITE_URL ?? context.url.origin).href;
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { role }, emailRedirectTo: `${context.url.origin}/auth/callback` },
+      options: { data: { role }, emailRedirectTo },
     });
     if (error) {
       return fail(toAuthErrorCode(error));

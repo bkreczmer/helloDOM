@@ -22,7 +22,7 @@ const AUTH_ERROR_MESSAGES: Record<AuthErrorCode, string> = {
   unavailable: "Usługa logowania jest chwilowo niedostępna",
   no_profile: "Twoje konto nie ma przypisanej roli. Skontaktuj się z nami.",
   rate_limited: "Za dużo prób. Spróbuj ponownie za kilka minut.",
-  link_expired: "Link wygasł lub został już użyty. Zaloguj się albo zarejestruj ponownie.",
+  link_expired: "Link wygasł lub został już użyty. Jeśli e-mail jest już potwierdzony, zaloguj się.",
   unknown: "Coś poszło nie tak. Spróbuj ponownie.",
 };
 

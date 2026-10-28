@@ -81,6 +81,7 @@ Pierwsza migracja: `public.profiles`, trigger tworzący profil z roli w metadany
 **Intent**: Tworzy tabelę ról i jedyne źródło prawdy o roli. Profil powstaje atomowo z kontem, a brak lub zła rola odrzuca rejestrację.
 
 **Contract**:
+
 - `public.profiles`: `id uuid primary key references auth.users(id) on delete cascade`, `role text not null check (role in ('owner','agent'))` bez wartości domyślnej, `created_at timestamptz not null default now()`.
 - `alter table … enable row level security`.
 - Jedna polityka `profiles_select_own`: `for select to authenticated using ((select auth.uid()) = id)`. Bez polityk insert, update i delete, bo rola jest stała.
@@ -104,6 +105,7 @@ Pierwsza migracja: `public.profiles`, trigger tworzący profil z roli w metadany
 **Intent**: Typowany klient i jeden typ roli używany przez endpointy, middleware i UI.
 
 **Contract**:
+
 - Skrypt `"db:types": "supabase gen types typescript --local > src/db/database.types.ts"`. Plik generujemy i commitujemy. `src/db/database.types.ts` trafia bezwarunkowo do ignores w `eslint.config.js` i do `.prettierignore`: lint-staged uruchamia `eslint --fix` (z `eslint-plugin-prettier`, `consistent-type-definitions`, `array-type`), który przepisałby wygenerowany plik i wywrócił sprawdzenie `git diff --exit-code`. Sprawdzenie 1.2 uruchamiamy po commicie pliku (plik nieśledzony przechodzi `git diff` trywialnie).
 - `src/types.ts` eksportuje `ROLES = ["owner","agent"] as const`, `type Role` i `type Profile` (wiersz `profiles`, oparty na `Database`).
 - `createServerClient<Database>(…)`.
@@ -157,6 +159,7 @@ Endpointy waliduje `zod` i chroni `try/catch`, błędy wędrują jako kody, a st
 **Intent**: Jedno miejsce, które zamienia błąd na kod (po stronie endpointu) i kod na polski komunikat (po stronie strony). Dowolny tekst z URL nie może trafić do UI.
 
 **Contract**:
+
 - `type AuthErrorCode` to zamknięty zbiór: `invalid_credentials`, `user_already_exists`, `email_not_confirmed`, `weak_password`, `invalid_input`, `unavailable`, `no_profile`, `unknown`.
 - `toAuthErrorCode(error: { code?: string }): AuthErrorCode` zwraca kod Supabase, jeśli jest w zbiorze, a w przeciwnym razie `unknown`.
 - `authErrorMessage(code: string | null): string | null` zwraca `null` dla braku kodu, polski tekst dla kodu z allowlisty i ogólny komunikat dla każdego innego ciągu.
@@ -174,8 +177,9 @@ Endpointy waliduje `zod` i chroni `try/catch`, błędy wędrują jako kody, a st
 **Intent**: Walidacja serwerowa zgodna z walidacją klienta, oparta na `z` z `astro/zod` (CLAUDE.md).
 
 **Contract**:
+
 - `signInSchema = { email: poprawny e-mail (trim), password: niepusty string }`.
-- `signUpSchema = { email, password: min 6 znaków (jak `MIN_PASSWORD_LENGTH` w `SignUpForm.tsx:9`), role: z.enum(ROLES) }`. `confirmPassword` jest walidowane tylko na kliencie.
+- `signUpSchema = { email, password: min 6 znaków (jak `MIN_PASSWORD_LENGTH`w`SignUpForm.tsx:9`), role: z.enum(ROLES) }`. `confirmPassword` jest walidowane tylko na kliencie.
 - Wywołujący używają `safeParse(Object.fromEntries(formData))`.
 - API e-maila (`z.email()` albo `z.string().email()`) dobieramy do wersji zod eksportowanej przez `astro/zod`.
 
@@ -186,6 +190,7 @@ Endpointy waliduje `zod` i chroni `try/catch`, błędy wędrują jako kody, a st
 **Intent**: Żadna ścieżka nie kończy się nieobsłużonym 500. Wynik to zawsze przekierowanie.
 
 **Contract**:
+
 - `formData()`, `safeParse` i wywołania Supabase są w `try/catch`.
 - Błędy: wyjątek z `formData()` (np. body JSON rzuca `TypeError`) i nieudany parse dają `?error=invalid_input`, brak klienta `?error=unavailable`, błąd Supabase `?error=<toAuthErrorCode>`, wyjątek z wywołania Supabase `?error=unknown`. `formData()` łapiemy osobno, żeby nie trafił do ogólnego `unknown`.
 - Sukces signin kieruje na `/dashboard`.
@@ -198,6 +203,7 @@ Endpointy waliduje `zod` i chroni `try/catch`, błędy wędrują jako kody, a st
 **Intent**: Strony pokazują tylko komunikaty z allowlisty. confirm-email ma jeden wariant.
 
 **Contract**:
+
 - `serverError={authErrorMessage(Astro.url.searchParams.get("error"))}`.
 - confirm-email: usunąć `import.meta.env.DEV` i wariant „Konto utworzone”. Zostaje tylko „Sprawdź skrzynkę” (ikona `MailCheck`).
 
@@ -208,6 +214,7 @@ Endpointy waliduje `zod` i chroni `try/catch`, błędy wędrują jako kody, a st
 **Intent**: Dopasować oczekiwania do F10 i nowego celu signin.
 
 **Contract**:
+
 - Lokalny Supabase ma wyłączone potwierdzanie, więc signup oczekuje `302 → /dashboard`, a smoke zachowuje ciasteczka.
 - Signin z dobrym hasłem oczekuje `302 → /dashboard`.
 - Nowy krok: signup bez roli oczekuje `302 → /auth/signup?error=invalid_input`.
@@ -247,6 +254,7 @@ Bramkowanie po prefiksach z rolą, profil w `locals`, obsługa braku profilu, `/
 **Intent**: Jedna definicja, które ścieżki są bramkowane i dla jakiej roli. Zastępuje listę `PROTECTED_ROUTES`.
 
 **Contract**:
+
 - `ROLE_PREFIXES: Record<Role, string> = { owner: "/owner", agent: "/agent" }`.
 - `GATED_PATHS = ["/dashboard", ...Object.values(ROLE_PREFIXES)]`.
 - `matchesPrefix(pathname, prefix)` ma tę samą semantykę co `isActive` (`pathname === prefix || pathname.startsWith(prefix + "/")`); `isActive` w `nav.ts` może go reużyć.
@@ -261,6 +269,7 @@ Bramkowanie po prefiksach z rolą, profil w `locals`, obsługa braku profilu, `/
 **Intent**: Dla ścieżek bramkowanych middleware wymaga sesji i profilu, a na cudzym prefiksie kieruje na własny panel.
 
 **Contract**:
+
 - `App.Locals` dostaje `profile: Profile | null`.
 - `user` ustawiamy jak dotąd. Gdy `isGated(pathname)`:
   - brak użytkownika: redirect `/auth/signin`;
@@ -277,6 +286,7 @@ Bramkowanie po prefiksach z rolą, profil w `locals`, obsługa braku profilu, `/
 **Intent**: `/dashboard` nie ma własnej treści i przekierowuje wg roli. Każda rola ma swój panel w powłoce.
 
 **Contract**:
+
 - `dashboard.astro`: `const { profile } = Astro.locals; if (!profile) throw new Error(…)` (jak guard w `AppLayout`), potem `return Astro.redirect(homeFor(profile.role))`. Middleware gwarantuje, że profil istnieje, ale `profile: Profile | null` w strict TS wymaga zawężenia.
 - `/owner`: `AppLayout title="Panel właściciela"`, karta powitalna z e-mailem i zdaniem, że tu pojawią się oferty.
 - `/agent`: `AppLayout title="Panel agenta"`, karta z e-mailem i zdaniem o zaproszeniach i profilu.
@@ -289,6 +299,7 @@ Bramkowanie po prefiksach z rolą, profil w `locals`, obsługa braku profilu, `/
 **Intent**: Powłoka pokazuje pozycje właściwe dla roli. Guard w layoucie odwołuje się do nowej reguły.
 
 **Contract**:
+
 - `navFor(role: Role): NavItem[]` zastępuje stały `navConfig`. Na razie jedna pozycja „Panel” z `href = homeFor(role)`.
 - `AppLayout` wymaga `user` i `profile` i rzuca błąd z komunikatem: „page must live under a gated prefix in src/lib/route-guard.ts”.
 - `AppLayout` przekazuje `role` do `Sidebar`, `Dock` i `AppTopbar`, a `AppTopbar` dalej do `MobileNav` (prop `role`).
@@ -309,6 +320,7 @@ Bramkowanie po prefiksach z rolą, profil w `locals`, obsługa braku profilu, `/
 **Intent**: Dopasować kroki z `/dashboard` do zwrotnicy.
 
 **Contract**:
+
 - „dashboard renders for signed-in user” zmienia się na: `/dashboard` daje `302 → /owner`, a `/owner` daje `200`.
 - Kroki anonimowe na `/dashboard` zostają (`302 → /auth/signin`).
 
@@ -346,6 +358,7 @@ Wybór roli jako dwie karty radio w `SignUpForm` i hover pól (F5). Od tej fazy 
 **Intent**: Wybór roli, której nie da się później zmienić, z opisem przy każdej opcji. Natywne radio zapewnia klawiaturę i a11y bez nowej zależności.
 
 **Contract**:
+
 - Props: `value: Role | ""`, `onChange(role)`, `error?: string`.
 - Renderuje `fieldset` z `legend` „Kim jesteś?” i dwie etykiety-karty z `input type="radio" name="role"` (wizualnie ukryte, ale fokusowalne):
   - „Właściciel” z ikoną `Home` (lucide) i opisem „Chcę sprzedać lub wynająć nieruchomość”;
@@ -367,6 +380,7 @@ Wybór roli jako dwie karty radio w `SignUpForm` i hover pól (F5). Od tej fazy 
 **Intent**: Rola jest wymagana także po stronie klienta, a fokus przy błędzie trafia na wybór roli.
 
 **Contract**:
+
 - Stan `role: Role | ""`. `RoleChoice` stoi jako pierwsze pole przed e-mailem.
 - `validate()` dodaje `errors.role = "Wybierz, czy jesteś właścicielem, czy agentem"`.
 - Fokus pierwszego `[aria-invalid="true"]` działa również dla radio (istniejący mechanizm `:64-68`).
@@ -414,6 +428,7 @@ Smoke pokrywa obie role i przekierowania krzyżowe. Ręcznie sprawdzamy izolacj�
 **Intent**: Automatycznie udowodnić routing ról i odrzucenie rejestracji bez roli na zbudowanej aplikacji.
 
 **Contract**:
+
 - Osobne słoiki ciasteczek per użytkownik (np. `jar` jako parametr albo funkcja `session()`).
 - Scenariusz ownera jak dotąd plus `/agent → 302 /owner`.
 - Scenariusz agenta: signup z `role=agent` daje `/dashboard`, potem `/dashboard → 302 /agent`, `/agent → 200`, `/owner → 302 /agent`.
@@ -428,6 +443,7 @@ Smoke pokrywa obie role i przekierowania krzyżowe. Ręcznie sprawdzamy izolacj�
 **Intent**: Udokumentować ręczne wdrażanie migracji wymagane przez `infrastructure.md:82`.
 
 **Contract**:
+
 - Kroki: `npx supabase login`, `npx supabase link --project-ref <ref>`, `npx supabase db push --dry-run`, `npx supabase db push`.
 - Reguła: wykonuje człowiek przed merge do `main`, a merge robi zaraz potem.
 - Uwaga: `wrangler rollback` nie cofa schematu, a SQL cofający jest w bloku `-- down:` migracji.
@@ -437,6 +453,7 @@ Smoke pokrywa obie role i przekierowania krzyżowe. Ręcznie sprawdzamy izolacj�
 **Intent**: Schemat na produkcji przed nowym kodem.
 
 **Contract**:
+
 1. Użytkownik usuwa konta testowe w produkcyjnym Supabase (Authentication).
 2. Wykonuje runbook (`--dry-run` pokazuje tylko migrację `create_profiles`), potem `db push`.
 3. Merge PR.
@@ -503,6 +520,16 @@ Jedno dodatkowe zapytanie `profiles` (po kluczu głównym, objęte RLS) na żąd
 - Wzorzec prefiksu: `src/components/shell/nav.ts:15-17`
 - Infrastruktura: `context/foundation/infrastructure.md:80-82,92`
 - Supabase: https://supabase.com/docs/guides/auth/managing-user-data, https://supabase.com/docs/guides/deployment/managing-environments
+
+## Addendum
+
+Zmiany wprowadzone w trakcie implementacji i po merge, odnotowane w impl-review (F3):
+
+1. **`src/pages/dashboard.ts` zamiast `dashboard.astro`** (faza 3): zwrotnica jest endpointem `GET`, bo `astro-eslint-parser` z regułą `no-misused-promises` crashuje na top-level `return Astro.redirect()` we frontmatterze. Zachowanie bez zmian.
+2. **Kody `link_expired` i `rate_limited`** (d4717df, e584f83): zbiór `AuthErrorCode` ma 10 kodów. `SUPABASE_CODE_ALIASES` mapuje `over_email_send_rate_limit` i `over_request_rate_limit` na `rate_limited`. Zbiór pozostaje zamknięty, a nieznany kod daje `unknown`.
+3. **`src/pages/auth/callback.ts` i `emailRedirectTo`** (d4717df): link potwierdzający z e-maila prowadził na `localhost:3000`. Signup przekazuje `emailRedirectTo: <origin>/auth/callback`, a callback wymienia `?code=` na sesję i kieruje na `/dashboard`. Każdy błąd daje `?error=link_expired`.
+4. **`additional_redirect_urls`** w `supabase/config.toml` zawiera także `http://localhost:4321/auth/callback`, wymagane przez punkt 3.
+5. **Tokeny ramek pól** (faza 4): `--rs-input-border` podniesiony do ≥3:1 w obu motywach i nowy `--rs-focus-border` (lesson o kontraście). Zmiana obejmuje wszystkie pola w aplikacji, opis jest w `design-system.md`.
 
 ## Progress
 
@@ -573,12 +600,12 @@ Jedno dodatkowe zapytanie `profiles` (po kluczu głównym, objęte RLS) na żąd
 
 #### Automated
 
-- [x] 5.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [x] 5.2 Smoke z oboma scenariuszami przechodzi lokalnie: `npm run smoke`
-- [ ] 5.3 Job CI `smoke` zielony na PR: `gh pr checks`
+- [x] 5.1 Lint, typy i build: `npm run lint && npx astro check && npm run build` — 155ea47
+- [x] 5.2 Smoke z oboma scenariuszami przechodzi lokalnie: `npm run smoke` — 155ea47
+- [x] 5.3 Job CI `smoke` zielony na PR: `gh pr checks` — 155ea47
 
 #### Manual
 
-- [x] 5.4 Ręczny check RLS w Studio SQL: tylko własny wiersz, update i insert odrzucone, anon bez dostępu
-- [ ] 5.5 `db push --dry-run` na produkcji pokazuje tylko `create_profiles`, `db push` przechodzi
-- [ ] 5.6 Po deployu: rejestracja ownera i agenta na produkcji prowadzi na właściwy panel, cudzy prefiks przekierowuje
+- [x] 5.4 Ręczny check RLS w Studio SQL: tylko własny wiersz, update i insert odrzucone, anon bez dostępu — 155ea47
+- [x] 5.5 `db push --dry-run` na produkcji pokazuje tylko `create_profiles`, `db push` przechodzi
+- [x] 5.6 Po deployu: rejestracja ownera i agenta na produkcji prowadzi na właściwy panel, cudzy prefiks przekierowuje

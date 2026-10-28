@@ -45,7 +45,7 @@ Właściciel nieruchomości, który chce ją sprzedać lub wynająć, nie wie, k
 | ID   | Change ID                  | Outcome (user can …)                                                                 | Prerequisites | PRD refs                        | Status   |
 | ---- | -------------------------- | ------------------------------------------------------------------------------------ | ------------- | ------------------------------- | -------- |
 | F-01 | app-shell                  | (foundation) aplikacja ma tokeny, fonty i powłokę design systemu helloDOM (sidebar/dock, light/dark) | —             | NFR (360 px, polskie znaki, przeglądarki) | done |
-| S-01 | role-based-signup          | użytkownik rejestruje się jako właściciel albo agent i trafia na swój panel           | F-01          | FR-001, FR-002                  | in-progress |
+| S-01 | role-based-signup          | użytkownik rejestruje się jako właściciel albo agent i trafia na swój panel           | F-01          | FR-001, FR-002                  | done |
 | S-02 | agent-profile              | agent uzupełnia profil: miasta, typy, przedział cen, lata doświadczenia              | S-01          | FR-007                          | proposed |
 | S-03 | offer-top3-ranking         | właściciel zapisuje ofertę i widzi top 3 agentów z wynikiem 0–100                    | S-01, S-02    | US-01, FR-003, FR-008           | proposed |
 | S-04 | owner-offer-management     | właściciel przegląda swoje oferty ze statusem, edytuje je i usuwa                    | S-03          | FR-004, FR-005, FR-006          | proposed |
@@ -97,7 +97,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
   - wejście walidowane `z` z `astro/zod` (`safeParse`), `request.formData()` i wywołania Supabase w `try/catch` z przekierowaniem `?error=` zamiast 500.
   - (F10) `src/pages/auth/confirm-email.astro` wybiera komunikat po `import.meta.env.DEV`, a nie po tym, czy Supabase wymaga potwierdzenia; decyduj na podstawie `session` zwróconej przez `signUp` (null = wymaga potwierdzenia) i przekaż to w przekierowaniu.
   - (F5) pola formularza (`src/components/auth/FormField.tsx`) dostają stan hover z DoD design systemu: ciemniejsza ramka niż domyślna `--rs-input-border` (np. `--rs-fg-3`), focus i błąd mają pierwszeństwo.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-02: Profil agenta
 
