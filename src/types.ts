@@ -16,6 +16,14 @@ export const OFFER_STATUSES = ["draft", "seeking_agent", "invited", "in_progress
 
 export type OfferStatus = (typeof OFFER_STATUSES)[number];
 
+// Keep in sync with invitations_status_valid in supabase/migrations/20261028180000_create_invitations.sql.
+export const INVITATION_STATUSES = ["pending", "accepted", "rejected"] as const;
+
+export type InvitationStatus = (typeof INVITATION_STATUSES)[number];
+
+// Tones of src/components/ui/StatusPill.astro (design-system.md, Pill statusu).
+export type StatusTone = "success" | "warn" | "danger" | "info" | "accent";
+
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 // The columns the middleware selects into `locals.profile`. The generated type has
@@ -50,6 +58,15 @@ export interface Offer {
 
 // One row of the owner's offer list on /owner (a subset of Offer).
 export type OfferListItem = Pick<Offer, "id" | "city" | "propertyType" | "transaction" | "price" | "createdAt">;
+
+// One row of the agent's invitation list on /agent. `offer` is null when RLS hides the offer,
+// i.e. once the invitation is no longer pending/accepted (rejected in S-06).
+export interface AgentInvitationItem {
+  id: string;
+  status: InvitationStatus;
+  createdAt: string;
+  offer: Pick<Offer, "id" | "city" | "propertyType" | "transaction" | "price"> | null;
+}
 
 // One row of rank_agents_for_offer: anonymous on purpose (no e-mail or name), position comes from the order.
 export interface RankedAgent {

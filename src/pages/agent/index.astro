@@ -2,30 +2,56 @@
 import { ArrowRight, UserRound } from "lucide-react";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
+import InvitationList from "@/components/agent/InvitationList.astro";
+import { createClient } from "@/lib/supabase";
+import { AGENT_INVITATIONS_LIMIT, toAgentInvitationItem } from "@/lib/services/invitations";
+import type { AgentInvitationItem } from "@/types";
 
+// The middleware guarantees a signed-in agent on /agent/*; RLS limits the select to the agent's own
+// invitations, and the embedded offer is null once RLS hides it (invitation no longer pending/accepted).
+const supabase = createClient(Astro.request.headers, Astro.cookies);
 const email = Astro.locals.user?.email ?? "";
+
+let invitations: AgentInvitationItem[] | null = null;
+if (supabase) {
+  try {
+    const { data, error } = await supabase
+      .from("invitations")
+      .select("id, status, created_at, offers(id, city, property_type, transaction, price)")
+      .order("created_at", { ascending: false })
+      .limit(AGENT_INVITATIONS_LIMIT);
+    if (!error) {
+      invitations = data.map(toAgentInvitationItem);
+    }
+  } catch {
+    invitations = null;
+  }
+}
 ---
 
 <AppLayout title="Panel agenta">
-  <Card title="Witaj">
-    <p class="text-[13px] leading-[1.6] text-rs-fg-2">
-      Zalogowano jako <span class="font-semibold text-rs-fg">{email}</span>. Tu pojawią się zaproszenia od właścicieli.
-    </p>
-  </Card>
-  <Card title="Profil agenta">
-    <Fragment slot="icon">
-      <UserRound className="size-4" aria-hidden="true" />
-    </Fragment>
-    <p class="text-[13px] leading-[1.6] text-rs-fg-2">
-      Uzupełnij miasta, typy nieruchomości, przedział cen i doświadczenie. Tylko pełny profil pojawia się w rankingu
-      agentów dla ofert właścicieli.
-    </p>
-    <a
-      href="/agent/profile"
-      class="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-rs-accent-fg hover:underline"
-    >
-      Przejdź do profilu
-      <ArrowRight className="size-4" aria-hidden="true" />
-    </a>
-  </Card>
+  <div class="flex w-full max-w-2xl flex-col gap-[18px]">
+    <Card title="Witaj">
+      <p class="text-[13px] leading-[1.6] text-rs-fg-2">
+        Zalogowano jako <span class="font-semibold text-rs-fg">{email}</span>.
+      </p>
+    </Card>
+    <InvitationList invitations={invitations} />
+    <Card title="Profil agenta">
+      <Fragment slot="icon">
+        <UserRound className="size-4" aria-hidden="true" />
+      </Fragment>
+      <p class="text-[13px] leading-[1.6] text-rs-fg-2">
+        Uzupełnij miasta, typy nieruchomości, przedział cen i doświadczenie. Tylko pełny profil pojawia się w rankingu
+        agentów dla ofert właścicieli.
+      </p>
+      <a
+        href="/agent/profile"
+        class="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-rs-accent-fg hover:underline"
+      >
+        Przejdź do profilu
+        <ArrowRight className="size-4" aria-hidden="true" />
+      </a>
+    </Card>
+  </div>
 </AppLayout>

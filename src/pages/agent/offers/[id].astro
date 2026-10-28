@@ -1,0 +1,99 @@
+---
+import { ArrowLeft, Send } from "lucide-react";
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/ui/Card.astro";
+import OfferSummary from "@/components/offers/OfferSummary.astro";
+import { ServerError } from "@/components/auth/ServerError";
+import { createClient } from "@/lib/supabase";
+import { formatOfferDate, parseOfferId, toOffer } from "@/lib/services/offers";
+import type { Offer } from "@/types";
+
+// The middleware guarantees a signed-in agent on /agent/*. RLS (offers_select_invited_agent) shows the offer
+// only with a pending or accepted invitation of this agent; owner_id is not selected, so no owner data leaks.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const offerId = parseOfferId(Astro.params.id);
+
+// "missing": bad id, no such offer or no active invitation → 404.
+let state: "found" | "missing" | "error" = "missing";
+let offer: Offer | null = null;
+let invitedAt: string | null = null;
+
+if (offerId && supabase) {
+  try {
+    const { data, error } = await supabase
+      .from("offers")
+      .select("id, city, property_type, transaction, price, area_m2, rooms, description, status, created_at")
+      .eq("id", offerId)
+      .maybeSingle();
+    if (error) {
+      state = "error";
+    } else if (data) {
+      offer = toOffer(data);
+      state = "found";
+    }
+  } catch {
+    state = "error";
+  }
+
+  if (offer) {
+    // The agent's own active invitation, read through RLS; a failed read only drops the date.
+    try {
+      const { data, error } = await supabase
+        .from("invitations")
+        .select("created_at")
+        .eq("offer_id", offer.id)
+        .in("status", ["pending", "accepted"])
+        .maybeSingle();
+      invitedAt = error ? null : (data?.created_at ?? null);
+    } catch {
+      invitedAt = null;
+    }
+  }
+} else if (offerId) {
+  state = "error";
+}
+
+if (state === "missing") {
+  Astro.response.status = 404;
+}
+---
+
+<AppLayout title={state === "missing" ? "Nie znaleziono oferty" : "Oferta"}>
+  <div class="flex w-full max-w-2xl flex-col gap-[18px]">
+    {state === "found" && offer ? (
+      <>
+        <OfferSummary offer={offer} />
+        <Card title="Zaproszenie">
+          <Fragment slot="icon">
+            <Send className="size-4" aria-hidden="true" />
+          </Fragment>
+          <p class="text-[13px] leading-[1.6] text-rs-fg-2">
+            {invitedAt
+              ? `Zaproszono Cię do tej oferty ${formatOfferDate(invitedAt)}.`
+              : "Zaproszono Cię do tej oferty."}
+          </p>
+          <a
+            href="/agent"
+            class="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-rs-accent-fg hover:underline"
+          >
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            Wróć do panelu
+          </a>
+        </Card>
+      </>
+    ) : state === "missing" ? (
+      <Card title="Nie znaleziono oferty">
+        <p class="text-[13px] leading-[1.6] text-rs-fg-2">Ta oferta nie istnieje albo nie masz do niej zaproszenia.</p>
+        <a
+          href="/agent"
+          class="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-rs-accent-fg hover:underline"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          Wróć do panelu
+        </a>
+      </Card>
+    ) : (
+      <ServerError message="Oferta jest chwilowo niedostępna. Odśwież stronę za chwilę." />
+    )}
+  </div>
+</AppLayout>

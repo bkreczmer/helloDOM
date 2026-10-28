@@ -1,0 +1,30 @@
+---
+import { Send } from "lucide-react";
+import Card from "@/components/ui/Card.astro";
+import { OFFER_STATUS_LABELS } from "@/lib/dictionaries";
+import { formatOfferDate } from "@/lib/services/offers";
+import type { OfferStatus } from "@/types";
+
+interface Props {
+  status: OfferStatus;
+  /** created_at of the active invitation; null when it is missing or could not be read. */
+  invitedAt: string | null;
+}
+
+const { status, invitedAt } = Astro.props;
+// Shown instead of the ranking once the offer has left seeking_agent. The invited agent stays anonymous.
+---
+
+<Card title={OFFER_STATUS_LABELS[status]}>
+  <Fragment slot="icon">
+    <Send className="size-4" aria-hidden="true" />
+  </Fragment>
+  {status === "invited" ? (
+    <p class="text-[13px] leading-[1.6] text-rs-fg-2">
+      {invitedAt ? `Zaproszenie wysłane ${formatOfferDate(invitedAt)}.` : "Zaproszenie wysłane."} Czekamy na odpowiedź
+      agenta.
+    </p>
+  ) : (
+    <p class="text-[13px] leading-[1.6] text-rs-fg-2">Status oferty: {OFFER_STATUS_LABELS[status]}.</p>
+  )}
+</Card>

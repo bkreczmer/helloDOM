@@ -1,0 +1,36 @@
+---
+// design-system.md, Pill statusu: `-soft` background, `-fg` text, 6px dot, radius 999px. Existing tokens only:
+// - success / warn / danger: -fg on -soft is >=4.5:1 in both themes (design-system.md, statuses);
+// - accent: like Badge — accent-fg on accent-soft in light (~7:1), fg on surface-3 in dark (~10:1),
+//   because accent-soft stays near-white in dark;
+// - info: there are no info-soft / info-fg tokens, so fg on surface-2 (as Badge "secondary").
+// The dot takes the text colour (bg-current), so it carries the same contrast as the label.
+import type { StatusTone } from "@/types";
+
+interface Props {
+  tone: StatusTone;
+  class?: string;
+}
+
+const { tone, class: className } = Astro.props;
+
+const TONE_CLASSES: Record<StatusTone, string> = {
+  success: "bg-rs-success-soft text-rs-success-fg",
+  warn: "bg-rs-warn-soft text-rs-warn-fg",
+  danger: "bg-rs-danger-soft text-rs-danger-fg",
+  info: "bg-rs-surface-2 text-rs-fg",
+  accent: "bg-rs-accent-soft text-rs-accent-fg dark:bg-rs-surface-3 dark:text-rs-fg",
+};
+---
+
+<span
+  data-status={tone}
+  class:list={[
+    "inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full px-2.5 py-[3px] font-display text-[11.5px] font-semibold whitespace-nowrap",
+    TONE_CLASSES[tone],
+    className,
+  ]}
+>
+  <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-current"></span>
+  <slot />
+</span>

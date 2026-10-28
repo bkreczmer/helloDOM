@@ -34,6 +34,55 @@ export type Database = {
   }
   public: {
     Tables: {
+      invitations: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          offer_id: string
+          owner_id: string
+          status: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          offer_id: string
+          owner_id: string
+          status?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          offer_id?: string
+          owner_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       offers: {
         Row: {
           area_m2: number | null
@@ -125,6 +174,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      invite_agent: {
+        Args: { p_agent_id: string; p_offer_id: string }
+        Returns: string
+      }
       rank_agents_for_offer: {
         Args: { p_offer_id: string }
         Returns: {
