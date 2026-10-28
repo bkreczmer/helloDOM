@@ -34,3 +34,6 @@ pnpm-debug.log*
 
 # private project plan (not for the public repo)
 /PLAN.md
+
+# private Claude instructions (advisor mode)
+/CLAUDE.local.md
