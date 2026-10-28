@@ -157,7 +157,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Parallel with:** S-04
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** Domyka drugie główne kryterium sukcesu; musi pilnować reguły „najwyżej jeden przyjęty agent na ofertę”.
+- **Risk:** Domyka drugie główne kryterium sukcesu; musi pilnować reguły „najwyżej jeden przyjęty agent na ofertę”. `rank_agents_for_offer` musi wykluczać agentów z odrzuconym zaproszeniem do tej oferty: `unique (offer_id, agent_id)` blokuje ich ponowne zaproszenie, a `invite_agent` zwróciłby wtedy mylące `offer_locked` (impl-review agent-invitation F3).
 - **Status:** proposed
 
 ### S-07: Usunięcie konta
@@ -170,7 +170,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:**
   - Usunięcie użytkownika z Supabase Auth wymaga uprawnień serwisowych; czy akceptujemy dodatkowy sekret Worker’a z takimi uprawnieniami? — Owner: user. Block: no.
-- **Risk:** Ostatni, bo musi sprzątać dane ze wszystkich wcześniejszych tabel (oferty, profile, zaproszenia); NFR wymaga, żeby po usunięciu nie zostały żadne dane konta.
+- **Risk:** Ostatni, bo musi sprzątać dane ze wszystkich wcześniejszych tabel (oferty, profile, zaproszenia); NFR wymaga, żeby po usunięciu nie zostały żadne dane konta. Kaskada `invitations.agent_id` kasuje też zaproszenie `pending`, a oferta zostaje w `invited` bez wyjścia: S-07 musi przywrócić `seeking_agent` każdej ofercie, której aktywne zaproszenie zniknęło (także po ręcznym usunięciu konta w panelu Supabase). Do tego czasu przy sprzątaniu kont testowych najpierw usuwaj ofertę (impl-review agent-invitation F1).
 - **Status:** proposed
 
 ## Backlog Handoff
