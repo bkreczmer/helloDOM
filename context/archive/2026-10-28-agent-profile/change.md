@@ -1,10 +1,10 @@
 ---
 change_id: agent-profile
 title: Edycja profilu agenta i wspólny słownik miast oraz typów nieruchomości
-status: implemented
+status: archived
 created: 2026-10-28
 updated: 2026-10-28
-archived_at: null
+archived_at: 2026-10-28T12:00:00Z
 ---
 
 ## Notes
