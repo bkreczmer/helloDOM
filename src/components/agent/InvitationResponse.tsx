@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SubmitButton } from "@/components/auth/SubmitButton";
@@ -26,6 +26,7 @@ export function InvitationResponse({ offerId }: InvitationResponseProps) {
   const acceptRef = useRef<HTMLButtonElement>(null);
   const rejectRef = useRef<HTMLButtonElement>(null);
   const confirmRef = useRef<HTMLButtonElement>(null);
+  const confirmTextId = useId();
   // Which button gets the focus after the step changes; null on the first render, so the page load moves nothing.
   const focusTarget = useRef<"confirm" | "accept" | "reject" | null>(null);
 
@@ -83,7 +84,7 @@ export function InvitationResponse({ offerId }: InvitationResponseProps) {
 
   return (
     <form
-      method="post"
+      method="POST"
       action="/api/agent/invitations"
       className="mt-2 flex flex-col gap-2.5"
       onSubmit={() => {
@@ -92,7 +93,9 @@ export function InvitationResponse({ offerId }: InvitationResponseProps) {
     >
       <input type="hidden" name="offerId" value={offerId} />
       <input type="hidden" name="response" value={step} />
-      <p className={cn(textClass, "text-rs-fg font-semibold")}>{CONFIRM_TEXT[step]}</p>
+      <p id={confirmTextId} className={cn(textClass, "text-rs-fg font-semibold")}>
+        {CONFIRM_TEXT[step]}
+      </p>
       <div className={actionsClass}>
         <SubmitButton
           ref={confirmRef}
@@ -101,6 +104,7 @@ export function InvitationResponse({ offerId }: InvitationResponseProps) {
           icon={accepting ? <Check aria-hidden="true" /> : <X aria-hidden="true" />}
           variant={accepting ? "accent" : "destructive"}
           className="w-auto"
+          describedBy={confirmTextId}
         >
           {accepting ? "Tak, przyjmij" : "Tak, odrzuć"}
         </SubmitButton>

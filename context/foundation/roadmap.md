@@ -50,7 +50,7 @@ Właściciel nieruchomości, który chce ją sprzedać lub wynająć, nie wie, k
 | S-03 | offer-top3-ranking         | właściciel zapisuje ofertę i widzi top 3 agentów z wynikiem 0–100                    | S-01, S-02    | US-01, FR-003, FR-008           | done |
 | S-04 | owner-offer-management     | właściciel przegląda swoje oferty ze statusem, edytuje je i usuwa                    | S-03          | FR-004, FR-005, FR-006          | proposed |
 | S-05 | agent-invitation           | właściciel zaprasza agenta z top 3, a agent widzi zaproszenie i ofertę               | S-03          | FR-009, FR-010                  | done |
-| S-06 | invitation-response        | agent przyjmuje albo odrzuca zaproszenie, a status oferty się zmienia                | S-05          | FR-011                          | in-progress |
+| S-06 | invitation-response        | agent przyjmuje albo odrzuca zaproszenie, a status oferty się zmienia                | S-05          | FR-011                          | done |
 | S-07 | account-deletion           | użytkownik usuwa konto razem ze wszystkimi swoimi danymi                             | S-06          | FR-012                          | proposed |
 
 ## Baseline
@@ -158,7 +158,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Domyka drugie główne kryterium sukcesu; musi pilnować reguły „najwyżej jeden przyjęty agent na ofertę”. `rank_agents_for_offer` musi wykluczać agentów z odrzuconym zaproszeniem do tej oferty: `unique (offer_id, agent_id)` blokuje ich ponowne zaproszenie, a `invite_agent` zwróciłby wtedy mylące `offer_locked` (impl-review agent-invitation F3).
-- **Status:** in-progress
+- **Status:** done
 
 ### S-07: Usunięcie konta
 
@@ -183,8 +183,8 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-03       | offer-top3-ranking     | Właściciel dodaje ofertę i widzi top 3 agentów              | no                    | Gwiazda przewodnia; czeka na S-01, S-02 |
 | S-04       | owner-offer-management | Lista, edycja i usuwanie ofert właściciela                  | no                    | Czeka na S-03 |
 | S-05       | agent-invitation       | Zaproszenie agenta z top 3 i widok zaproszeń agenta         | no                    | Czeka na S-03 |
-| S-06       | invitation-response    | Agent przyjmuje albo odrzuca zaproszenie                    | no                    | Czeka na S-05 |
-| S-07       | account-deletion       | Usunięcie konta razem z danymi                              | no                    | Czeka na S-06 |
+| S-06       | invitation-response    | Agent przyjmuje albo odrzuca zaproszenie                    | done                  | Zrobione (S-06) |
+| S-07       | account-deletion       | Usunięcie konta razem z danymi                              | yes                   | Run `/10x-plan account-deletion` |
 
 ## Open Roadmap Questions
 
