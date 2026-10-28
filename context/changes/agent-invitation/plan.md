@@ -333,26 +333,26 @@ Nowa tabela, polityka i funkcja, bez zmian istniejących danych. Na produkcję p
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się lokalnie
-- [x] 1.2 Test SQL zaproszeń przechodzi
-- [x] 1.3 Poprzednie testy SQL nadal przechodzą
-- [x] 1.4 Typy są aktualne
-- [x] 1.5 Typy i lint przechodzą
+- [x] 1.1 Migracja stosuje się lokalnie — 42710f0
+- [x] 1.2 Test SQL zaproszeń przechodzi — 42710f0
+- [x] 1.3 Poprzednie testy SQL nadal przechodzą — 42710f0
+- [x] 1.4 Typy są aktualne — 42710f0
+- [x] 1.5 Typy i lint przechodzą — 42710f0
 
 ### Phase 2: Zaproszenie przez właściciela
 
 #### Automated
 
-- [ ] 2.1 Typy i lint przechodzą
-- [ ] 2.2 Build przechodzi
-- [ ] 2.3 Smoke przechodzi na podglądzie, w tym kroki zaproszenia
-- [ ] 2.4 Test SQL zaproszeń nadal przechodzi
+- [x] 2.1 Typy i lint przechodzą
+- [x] 2.2 Build przechodzi
+- [x] 2.3 Smoke przechodzi na podglądzie, w tym kroki zaproszenia
+- [x] 2.4 Test SQL zaproszeń nadal przechodzi
 
 #### Manual
 
-- [ ] 2.5 Wiersz zaproszenia smoke ma owner_id właściciela i status pending, a oferta status invited
-- [ ] 2.6 Strona oferty przed i po zaproszeniu: przyciski, baner, pill, karta; light/dark, 360 px, fokus
-- [ ] 2.7 Komunikaty offer_locked i agent_not_ranked widoczne na stronie oferty
+- [x] 2.5 Wiersz zaproszenia smoke ma owner_id właściciela i status pending, a oferta status invited
+- [x] 2.6 Strona oferty przed i po zaproszeniu: przyciski, baner, pill, karta; light/dark, 360 px, fokus
+- [x] 2.7 Komunikaty offer_locked i agent_not_ranked widoczne na stronie oferty
 
 ### Phase 3: Widok agenta
 

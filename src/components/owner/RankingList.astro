@@ -2,18 +2,20 @@
 import { Info, Trophy } from "lucide-react";
 import Card from "@/components/ui/Card.astro";
 import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
 import { ServerError } from "@/components/auth/ServerError";
 import { CITY_LABELS } from "@/lib/dictionaries";
 import { formatExperience } from "@/lib/services/offers";
 import type { RankedAgent } from "@/types";
 
 interface Props {
+  offerId: string;
   /** null when the ranking RPC failed. */
   agents: RankedAgent[] | null;
 }
 
-const { agents } = Astro.props;
-// The ranking is anonymous: agentId is never rendered (S-05 may add it for invitations).
+const { offerId, agents } = Astro.props;
+// The ranking stays anonymous: agentId only travels in the hidden field of the invitation form.
 ---
 
 <Card title="Najlepiej dopasowani agenci">
@@ -48,6 +50,17 @@ const { agents } = Astro.props;
                   ))}
                 </ul>
               </div>
+              <form method="POST" action="/api/owner/invitations" class="flex justify-end">
+                <input type="hidden" name="offerId" value={offerId} />
+                <input type="hidden" name="agentId" value={agent.agentId} />
+                <button
+                  type="submit"
+                  aria-label={`Zaproś agenta ${index + 1}`}
+                  class:list={[buttonVariants({ variant: "accent", size: "sm" })]}
+                >
+                  Zaproś
+                </button>
+              </form>
             </li>
           ))}
         </ol>

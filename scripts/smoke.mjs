@@ -1,6 +1,8 @@
 // Smoke test: proves the built app, the Cloudflare adapter and the Supabase auth flow still work together.
 // Zero dependencies on purpose. Run against a live server: BASE_URL=http://localhost:4321 node scripts/smoke.mjs
 
+import { randomUUID } from "node:crypto";
+
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
@@ -42,6 +44,11 @@ function profileForm({ cities = ["warszawa"], propertyTypes = ["apartment"], pri
   ];
 }
 const validProfile = profileForm({ priceMin: "100000", priceMax: "900000", experienceYears: "5" });
+// Every run leaves a smoke agent behind, and ranking ties go to the oldest profile. A price unique to
+// this run plus 60 years of experience gives this run's agent 100/100 on the ranked offer and wins ties,
+// so it is "Agent 1" even with older smoke agents in the local database.
+const rankedPrice = String(500000 + (Date.now() % 100000));
+const rankedProfile = profileForm({ priceMin: rankedPrice, priceMax: rankedPrice, experienceYears: "60" });
 
 // Offer form with every field set; override single fields per step.
 function offerForm(overrides = {}) {
@@ -61,6 +68,10 @@ const OFFER_CREATED = /^\/owner\/offers\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0
 let offerId = null;
 // Id of the offer saved after the smoke agent's profile is complete (for the ranking page steps).
 let rankedOfferId = null;
+// The smoke agent's id, taken from the hidden agentId of the first "Zaproś" form on the offer page.
+let smokeAgentId = null;
+const AGENT_ID_FIELD = /name="agentId" value="([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"/;
+const inviteForm = (agentId) => ({ offerId: rankedOfferId, ...(agentId ? { agentId } : {}) });
 
 // One cookie jar per user, so owner and agent sessions never leak into each other.
 function session() {
@@ -250,7 +261,7 @@ const steps = [
   ],
   [
     "agent saves a full profile for the ranking",
-    () => agent("/api/agent/profile", { method: "POST", form: validProfile }),
+    () => agent("/api/agent/profile", { method: "POST", form: rankedProfile }),
     { status: 302, location: "/agent/profile?saved=1" },
   ],
   [
@@ -263,7 +274,7 @@ const steps = [
     async () => {
       const response = await request("/api/owner/offers", {
         method: "POST",
-        form: offerForm({ city: "warszawa", propertyType: "apartment", price: "500000" }),
+        form: offerForm({ city: "warszawa", propertyType: "apartment", price: rankedPrice }),
       });
       rankedOfferId = OFFER_CREATED.exec(response.location)?.[1] ?? null;
       return response;
@@ -271,10 +282,17 @@ const steps = [
     { status: 302, locationMatch: OFFER_CREATED },
   ],
   [
-    // No exact score: local dev agents may outrank the smoke agent.
-    "offer page shows the ranking without agent e-mail",
-    () => request(`/owner/offers/${rankedOfferId}?created=1`),
-    { status: 200, bodyIncludes: ["Agent 1", "/100", "Zapisano ofertę"], bodyExcludes: [agentEmail] },
+    "offer page shows the ranking with invite buttons and without agent e-mail",
+    async () => {
+      const response = await request(`/owner/offers/${rankedOfferId}?created=1`);
+      smokeAgentId = AGENT_ID_FIELD.exec(response.body)?.[1] ?? null;
+      return response;
+    },
+    {
+      status: 200,
+      bodyIncludes: ["Agent 1", "100/100", "Zapisano ofertę", "Zaproś", "Szuka agenta"],
+      bodyExcludes: [agentEmail],
+    },
   ],
   [
     "owner panel lists the offer",
@@ -305,6 +323,50 @@ const steps = [
     "anonymous user is redirected from offer page",
     () => anonymous(`/owner/offers/${rankedOfferId}`),
     { status: 302, location: "/auth/signin" },
+  ],
+  [
+    "agent cannot send an invitation",
+    () => agent("/api/owner/invitations", { method: "POST", form: inviteForm(smokeAgentId) }),
+    { status: 403 },
+  ],
+  [
+    "anonymous invitation redirects to signin",
+    () => anonymous("/api/owner/invitations", { method: "POST", form: inviteForm(smokeAgentId) }),
+    { status: 302, location: "/auth/signin" },
+  ],
+  [
+    "second owner gets 404 when inviting to someone else's offer",
+    () => otherOwner("/api/owner/invitations", { method: "POST", form: inviteForm(smokeAgentId) }),
+    { status: 404 },
+  ],
+  [
+    "invitation without an agent is rejected",
+    () => request("/api/owner/invitations", { method: "POST", form: inviteForm(null) }),
+    { status: 302, location: () => `/owner/offers/${rankedOfferId}?error=invalid_input` },
+  ],
+  [
+    "invitation of an agent outside the top 3 is rejected",
+    () => request("/api/owner/invitations", { method: "POST", form: inviteForm(randomUUID()) }),
+    { status: 302, location: () => `/owner/offers/${rankedOfferId}?error=agent_not_ranked` },
+  ],
+  [
+    "owner invites the smoke agent",
+    () => request("/api/owner/invitations", { method: "POST", form: inviteForm(smokeAgentId) }),
+    { status: 302, location: () => `/owner/offers/${rankedOfferId}?invited=1` },
+  ],
+  [
+    "offer page shows the invitation status instead of the ranking",
+    () => request(`/owner/offers/${rankedOfferId}?invited=1`),
+    {
+      status: 200,
+      bodyIncludes: ["Wysłano zaproszenie", "Zaproszenie wysłane"],
+      bodyExcludes: ["Zaproś", agentEmail],
+    },
+  ],
+  [
+    "second invitation to the same offer is rejected",
+    () => request("/api/owner/invitations", { method: "POST", form: inviteForm(smokeAgentId) }),
+    { status: 302, location: () => `/owner/offers/${rankedOfferId}?error=offer_locked` },
   ],
   ["second owner signout", () => otherOwner("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
@@ -345,24 +407,26 @@ const steps = [
   ],
 ];
 
-// Body expectations may be functions, resolved when the step runs (ids captured by earlier steps).
-const resolve = (texts = []) => texts.map((text) => (typeof text === "function" ? text() : text));
+// Body and location expectations may be functions, resolved when the step runs (ids captured by earlier steps).
+const resolveOne = (value) => (typeof value === "function" ? value() : value);
+const resolve = (texts = []) => texts.map(resolveOne);
 
 let failed = 0;
 for (const [name, run, expected] of steps) {
   const actual = await run();
   const missing = resolve(expected.bodyIncludes).filter((text) => !actual.body.includes(text));
   const leaked = resolve(expected.bodyExcludes).filter((text) => actual.body.includes(text));
+  const location = resolveOne(expected.location);
   const ok =
     actual.status === expected.status &&
-    (expected.location === undefined || actual.location === expected.location) &&
+    (location === undefined || actual.location === location) &&
     (expected.locationMatch === undefined || expected.locationMatch.test(actual.location)) &&
     missing.length === 0 &&
     leaked.length === 0;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
-    console.log(`      expected ${expected.status} ${expected.location ?? expected.locationMatch ?? ""}`);
+    console.log(`      expected ${expected.status} ${location ?? expected.locationMatch ?? ""}`);
     if (missing.length) console.log(`      body is missing: ${missing.join(" | ")}`);
     if (leaked.length) console.log(`      body must not contain: ${leaked.join(" | ")}`);
   }
@@ -371,6 +435,11 @@ for (const [name, run, expected] of steps) {
 if (offerId === null || rankedOfferId === null) {
   failed++;
   console.log("FAIL  offer id was not captured from the Location header");
+}
+
+if (smokeAgentId === null) {
+  failed++;
+  console.log("FAIL  agent id was not captured from the invitation form");
 }
 
 console.log(failed ? `\n${failed} step(s) failed` : "\nAll smoke steps passed");

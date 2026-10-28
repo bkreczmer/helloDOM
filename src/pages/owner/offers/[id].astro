@@ -2,10 +2,12 @@
 import { ArrowLeft, CircleCheck } from "lucide-react";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
-import OfferSummary from "@/components/owner/OfferSummary.astro";
+import OfferSummary from "@/components/offers/OfferSummary.astro";
+import InvitationStatusCard from "@/components/owner/InvitationStatusCard.astro";
 import RankingList from "@/components/owner/RankingList.astro";
 import { ServerError } from "@/components/auth/ServerError";
 import { createClient } from "@/lib/supabase";
+import { invitationErrorMessage } from "@/lib/services/invitations";
 import { parseOfferId, toOffer, toRankedAgent } from "@/lib/services/offers";
 import type { Offer, RankedAgent } from "@/types";
 
@@ -17,6 +19,7 @@ const offerId = parseOfferId(Astro.params.id);
 let state: "found" | "missing" | "error" = "missing";
 let offer: Offer | null = null;
 let agents: RankedAgent[] | null = null;
+let invitedAt: string | null = null;
 
 if (offerId && supabase) {
   try {
@@ -36,12 +39,26 @@ if (offerId && supabase) {
   }
 
   // Read through RLS first, so "no such offer" (404) and "no matching agents" stay apart.
-  if (offer) {
+  // The ranking (and inviting) only applies while the offer is seeking an agent.
+  if (offer?.status === "seeking_agent") {
     try {
       const { data, error } = await supabase.rpc("rank_agents_for_offer", { p_offer_id: offer.id });
       agents = error ? null : data.map(toRankedAgent);
     } catch {
       agents = null;
+    }
+  } else if (offer) {
+    // The active invitation, read through RLS; a failed read only drops the date from the status card.
+    try {
+      const { data, error } = await supabase
+        .from("invitations")
+        .select("created_at")
+        .eq("offer_id", offer.id)
+        .in("status", ["pending", "accepted"])
+        .maybeSingle();
+      invitedAt = error ? null : (data?.created_at ?? null);
+    } catch {
+      invitedAt = null;
     }
   }
 } else if (offerId) {
@@ -53,6 +70,8 @@ if (state === "missing") {
 }
 
 const created = Astro.url.searchParams.get("created") === "1";
+const invited = Astro.url.searchParams.get("invited") === "1";
+const inviteError = invitationErrorMessage(Astro.url.searchParams.get("error"));
 ---
 
 <AppLayout title={state === "missing" ? "Nie znaleziono oferty" : "Oferta"}>
@@ -68,8 +87,22 @@ const created = Astro.url.searchParams.get("created") === "1";
             Zapisano ofertę
           </p>
         )}
+        {invited && (
+          <p
+            role="status"
+            class="flex items-center gap-2 rounded-control border border-[color-mix(in_oklab,var(--rs-success)_30%,transparent)] bg-rs-success-soft px-3 py-2 text-[13px] font-semibold text-rs-success-fg"
+          >
+            <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
+            Wysłano zaproszenie
+          </p>
+        )}
+        <ServerError message={inviteError} />
         <OfferSummary offer={offer} />
-        <RankingList agents={agents} />
+        {offer.status === "seeking_agent" ? (
+          <RankingList offerId={offer.id} agents={agents} />
+        ) : (
+          <InvitationStatusCard status={offer.status} invitedAt={invitedAt} />
+        )}
       </>
     ) : state === "missing" ? (
       <Card title="Nie znaleziono oferty">

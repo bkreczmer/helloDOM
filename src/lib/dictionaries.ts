@@ -4,7 +4,7 @@
 // supabase/migrations/20261028100000_add_agent_profile.sql, and CITIES, PROPERTY_TYPES and
 // TRANSACTIONS with the checks in supabase/migrations/20261028140000_create_offers.sql.
 
-import type { City, PropertyType, Transaction } from "@/types";
+import type { City, InvitationStatus, OfferStatus, PropertyType, Transaction } from "@/types";
 
 // Sorted by Polish name.
 export const CITIES = [
@@ -62,4 +62,18 @@ export const TRANSACTIONS = ["sale", "rent"] as const;
 export const TRANSACTION_LABELS: Record<Transaction, string> = {
   sale: "Sprzedaż",
   rent: "Wynajem",
+};
+
+// Statuses themselves live in src/types.ts (OFFER_STATUSES, INVITATION_STATUSES), next to the SQL checks they mirror.
+export const OFFER_STATUS_LABELS: Record<OfferStatus, string> = {
+  draft: "Szkic",
+  seeking_agent: "Szuka agenta",
+  invited: "Zaproszenie wysłane",
+  in_progress: "W obsłudze",
+};
+
+export const INVITATION_STATUS_LABELS: Record<InvitationStatus, string> = {
+  pending: "Oczekuje na odpowiedź",
+  accepted: "Przyjęte",
+  rejected: "Odrzucone",
 };

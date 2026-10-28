@@ -16,6 +16,14 @@ export const OFFER_STATUSES = ["draft", "seeking_agent", "invited", "in_progress
 
 export type OfferStatus = (typeof OFFER_STATUSES)[number];
 
+// Keep in sync with invitations_status_valid in supabase/migrations/20261028180000_create_invitations.sql.
+export const INVITATION_STATUSES = ["pending", "accepted", "rejected"] as const;
+
+export type InvitationStatus = (typeof INVITATION_STATUSES)[number];
+
+// Tones of src/components/ui/StatusPill.astro (design-system.md, Pill statusu).
+export type StatusTone = "success" | "warn" | "danger" | "info" | "accent";
+
 type ProfileRow = Database["public"]["Tables"]["profiles"]["Row"];
 
 // The columns the middleware selects into `locals.profile`. The generated type has
