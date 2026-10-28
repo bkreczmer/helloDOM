@@ -306,4 +306,4 @@ Nowa tabela i funkcja, bez zmian istniejących danych. Na produkcję przed merge
 - [x] 3.5 Ranking 4 agentów: właściwi 3, kolejność i wyniki zgodne z regułą — 317dcad
 - [x] 3.6 Komunikaty przy 1 i 0 dopasowanych agentach — 317dcad
 - [x] 3.7 Strona oferty i panel: light/dark, 360 px, fokus, klawiatura — 317dcad
-- [ ] 3.8 Produkcja: właściciel dodaje ofertę i widzi ranking
+- [x] 3.8 Produkcja: właściciel dodaje ofertę i widzi ranking
