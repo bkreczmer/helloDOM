@@ -30,9 +30,10 @@ Kolory pochodne liczone przez `color-mix(in oklab, …)`.
 | `--rs-fg` | `#0652A9` |
 | `--rs-fg-2` / `--rs-fg-3` / `--rs-fg-4` | `color-mix(in oklab, var(--rs-fg) 88% / 80% / 28%, var(--rs-surface))` — `fg-2`/`fg-3` ≥4.5:1 na surface; `fg-4` tylko dekoracja (linie, znaki bez znaczenia), nigdy tekst |
 | `--rs-line` / `--rs-line-strong` | `color-mix(in oklab, var(--rs-fg) 13% / 24%, var(--rs-surface))` |
-| `--rs-input-border` | `color-mix(in oklab, var(--rs-fg) 28%, var(--rs-surface))` |
+| `--rs-input-border` | `color-mix(in oklab, var(--rs-fg) 61%, var(--rs-surface))` — 3.05:1 na surface (= input-bg), najmniejszy % spełniający WCAG 1.4.11 (patrz niżej) |
 | `--rs-accent-hover` / `--rs-accent-active` | `color-mix(in oklab, var(--rs-accent) 82% / 66%, black)` |
 | `--rs-accent-strong` | `#1E75BC` (accent 82% w czerni, ten sam w dark) — wypełnienie CTA z białym tekstem (4.85:1) i aktywne ikony (≥3:1, WCAG 1.4.11); `--rs-accent` tylko dla elementów dekoracyjnych |
+| `--rs-focus-border` | `var(--rs-accent-strong)` — ramka pola z fokusem: 4.85:1 na surface, wyraźnie mocniejsza od `--rs-input-border` (`--rs-accent` miał 2.98:1, tyle co ramka spoczynkowa) |
 | `--rs-accent-ring` | `color-mix(in oklab, var(--rs-accent) 30%, transparent)` |
 | `--rs-accent-soft` | `color-mix(in oklab, var(--rs-accent-2) 14%, white)` |
 | `--rs-grad-brand` | `linear-gradient(to bottom right, #1E75BC, #0652A9)` (biały tekst ≥4.5:1 na całym gradiencie) |
@@ -59,11 +60,17 @@ Statusy (`oklch`):
 | `--rs-accent-fg` | `color-mix(in oklab, var(--rs-accent) 78%, white)` |
 | `--rs-accent-hover` | `color-mix(in oklab, var(--rs-accent) 88%, white)` |
 | `--rs-input-bg` | `var(--rs-surface-2)` |
+| `--rs-input-border` | `color-mix(in oklab, var(--rs-fg) 42%, var(--rs-surface))` — 3.37:1 na surface, 3.06:1 na input-bg (surface-2), najmniejszy % spełniający WCAG 1.4.11 |
+| `--rs-focus-border` | `var(--rs-accent)` — 6.06:1 na surface, 5.49:1 na input-bg |
 | `--rs-overlay` | `color-mix(in oklab, black 60%, transparent)` |
 | success / danger | `oklch(0.70 0.16 145)` / `oklch(0.68 0.18 28)` |
 | success-fg / warn-fg / danger-fg | `oklch(0.85 0.12 145)` / `oklch(0.86 0.11 75)` / `oklch(0.82 0.10 28)` (≥4.5:1 na `-soft`) |
 | success-soft / danger-soft / warn-soft | `oklch(0.28 0.07 145)` / `oklch(0.30 0.08 28)` / `oklch(0.30 0.07 75)` |
 | cienie kafli i karty głównej | `none` |
+
+### Ramka pól i kart wyboru (WCAG 1.4.11)
+
+`--rs-input-border` to ramka spoczynkowa pól formularza i kart wyboru roli. Ramka jest jedyną wizualną granicą pola, więc według WCAG 1.4.11 (Non-text Contrast) musi mieć ≥3:1 względem sąsiedniego tła: `--rs-surface` (karta, na której leży pole) i `--rs-input-bg` (wnętrze pola). Wartość to najmniejszy % mieszania z `--rs-fg`, który daje ≥3:1 na obu tłach, liczony osobno dla każdego motywu. Poprzednie 28% dawało 1.60:1 (light) i 2.12:1 (dark). Fokus pola używa `--rs-focus-border` (plus pierścień `shadow-focus`), a nie `--rs-accent` wprost: w light `--rs-accent` ma tyle samo kontrastu co ramka spoczynkowa, więc fokus odróżniałby się tylko odcieniem. Komponenty używają jednego tokenu (`focus:border-rs-focus-border`), a różnicę między motywami trzyma `global.css`. Hover (`--rs-fg-3`) pozostaje wyraźnie mocniejszy od ramki spoczynkowej: 4.66:1 (light) i 10.33:1 (dark) na surface.
 
 Elementy stale ciemne (stopka, baner) używają `--rs-dark-section-bg`, nigdy `--rs-fg`/`--rs-bg` — te odwracają się w dark.
 

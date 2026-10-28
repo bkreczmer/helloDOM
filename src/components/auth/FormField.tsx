@@ -3,7 +3,7 @@ import { CircleAlert } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const inputBase =
-  "h-[38px] w-full rounded-control border border-rs-input-border bg-rs-input-bg py-2.5 pr-3 pl-9 font-body text-[13.5px] font-medium text-rs-fg transition-[border-color,box-shadow] duration-[180ms] ease-rs placeholder:text-rs-fg-3 focus:border-rs-accent focus:shadow-focus focus:outline-none data-[state=error]:border-rs-danger";
+  "h-[38px] w-full rounded-control border border-rs-input-border bg-rs-input-bg py-2.5 pr-3 pl-9 font-body text-[13.5px] font-medium text-rs-fg transition-[border-color,box-shadow] duration-[180ms] ease-rs placeholder:text-rs-fg-3 hover:not-focus:not-data-[state=error]:border-rs-fg-3 focus:border-rs-focus-border focus:shadow-focus focus:outline-none data-[state=error]:border-rs-danger";
 
 interface FormFieldProps {
   id: string;

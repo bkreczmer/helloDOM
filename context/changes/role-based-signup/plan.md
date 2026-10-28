@@ -542,32 +542,32 @@ Jedno dodatkowe zapytanie `profiles` (po kluczu głównym, objęte RLS) na żąd
 
 #### Automated
 
-- [x] 3.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [x] 3.2 Smoke przechodzi: `npm run smoke`
-- [x] 3.3 `PROTECTED_ROUTES` nie istnieje (grep w src, CLAUDE.md, AGENTS.md pusty)
+- [x] 3.1 Lint, typy i build: `npm run lint && npx astro check && npm run build` — 9e4775b
+- [x] 3.2 Smoke przechodzi: `npm run smoke` — 9e4775b
+- [x] 3.3 `PROTECTED_ROUTES` nie istnieje (grep w src, CLAUDE.md, AGENTS.md pusty) — 9e4775b
 
 #### Manual
 
-- [x] 3.4 Owner: `/dashboard`, `/agent` i `/agent/cokolwiek` prowadzą na `/owner`
-- [x] 3.5 `/ownerx` daje 404 i nie jest bramkowane
-- [x] 3.6 Usunięty profil: wylogowanie, komunikat `no_profile`, sesja wyczyszczona
-- [x] 3.7 Sidebar, Dock i MobileNav z aktywną pozycją „Panel” na `/owner` w obu motywach, 360px i desktop
+- [x] 3.4 Owner: `/dashboard`, `/agent` i `/agent/cokolwiek` prowadzą na `/owner` — 9e4775b
+- [x] 3.5 `/ownerx` daje 404 i nie jest bramkowane — 9e4775b
+- [x] 3.6 Usunięty profil: wylogowanie, komunikat `no_profile`, sesja wyczyszczona — 9e4775b
+- [x] 3.7 Sidebar, Dock i MobileNav z aktywną pozycją „Panel” na `/owner` w obu motywach, 360px i desktop — 9e4775b
 
 ### Phase 4: Formularz rejestracji
 
 #### Automated
 
-- [ ] 4.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [ ] 4.2 Smoke przechodzi: `npm run smoke`
+- [x] 4.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
+- [x] 4.2 Smoke przechodzi: `npm run smoke`
 
 #### Manual
 
-- [ ] 4.3 Rejestracja w przeglądarce jako owner i agent prowadzi na właściwy panel
-- [ ] 4.4 Wysłanie bez roli: błąd przy kartach, fokus na pierwszej karcie, VoiceOver ogłasza legend i błąd
-- [ ] 4.5 Karty roli: default, hover, focus-visible, checked i error obejrzane w light i dark
-- [ ] 4.6 Hover pól widoczny w obu motywach; focus i błąd nie są nadpisywane
-- [ ] 4.7 Kontrast ramek i ikon kart ≥3:1, tekstów ≥4.5:1 w obu motywach
-- [ ] 4.8 360px bez poziomego scrolla, polskie znaki poprawne
+- [x] 4.3 Rejestracja w przeglądarce jako owner i agent prowadzi na właściwy panel
+- [x] 4.4 Wysłanie bez roli: błąd przy kartach, fokus na pierwszej karcie, VoiceOver ogłasza legend i błąd
+- [x] 4.5 Karty roli: default, hover, focus-visible, checked i error obejrzane w light i dark
+- [x] 4.6 Hover pól widoczny w obu motywach; focus i błąd nie są nadpisywane
+- [x] 4.7 Kontrast ramek i ikon kart ≥3:1, tekstów ≥4.5:1 w obu motywach
+- [x] 4.8 360px bez poziomego scrolla, polskie znaki poprawne
 
 ### Phase 5: Smoke ról i wdrożenie
 
