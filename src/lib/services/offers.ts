@@ -11,6 +11,8 @@ export const AREA_M2_PATTERN = /^\d{1,5}([.,]\d{1,2})?$/;
 export const MIN_ROOMS = 1;
 export const MAX_ROOMS = 50;
 export const MAX_DESCRIPTION_LENGTH = 2000;
+// The owner panel shows the newest offers only; the full list with filters is S-04.
+export const OWNER_OFFERS_LIMIT = 50;
 
 // A missing key (`get` returns null) or a blank string means "not set".
 const blankToNull = z

@@ -3,7 +3,13 @@ import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
 import OfferForm from "@/components/owner/OfferForm";
 import { MAX_PRICE } from "@/lib/services/agent-profile";
-import { MAX_DESCRIPTION_LENGTH, MAX_ROOMS, MIN_ROOMS, offerErrorMessage } from "@/lib/services/offers";
+import {
+  AREA_M2_PATTERN,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_ROOMS,
+  MIN_ROOMS,
+  offerErrorMessage,
+} from "@/lib/services/offers";
 
 // The middleware guarantees a signed-in owner on /owner/*.
 const serverError = offerErrorMessage(Astro.url.searchParams.get("error"));
@@ -19,6 +25,7 @@ const serverError = offerErrorMessage(Astro.url.searchParams.get("error"));
           minRooms: MIN_ROOMS,
           maxRooms: MAX_ROOMS,
           maxDescriptionLength: MAX_DESCRIPTION_LENGTH,
+          areaM2Pattern: AREA_M2_PATTERN.source,
         }}
         serverError={serverError}
       />

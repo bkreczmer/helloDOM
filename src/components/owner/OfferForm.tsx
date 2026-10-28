@@ -55,14 +55,18 @@ const TRANSACTION_OPTIONS = TRANSACTIONS.map((value) => ({
 const controlBase =
   "w-full rounded-control border border-rs-input-border bg-rs-input-bg font-body text-[13.5px] font-medium text-rs-fg transition-[border-color,box-shadow] duration-[180ms] ease-rs placeholder:text-rs-fg-3 hover:not-focus:not-data-[state=error]:border-rs-fg-3 focus:border-rs-focus-border focus:shadow-focus focus:outline-none data-[state=error]:border-rs-danger";
 
-// Same format as AREA_M2_PATTERN in the offers service: up to 5 digits, optional 1–2 decimals after a dot or comma.
-const AREA_M2_PATTERN = /^\d{1,5}([.,]\d{1,2})?$/;
-
 type Field = "city" | "propertyType" | "transaction" | "price" | "areaM2" | "rooms" | "description";
 
 interface Props {
   /** Server-side limits (offers service), passed in so the island does not bundle the zod schema. */
-  limits: { maxPrice: number; minRooms: number; maxRooms: number; maxDescriptionLength: number };
+  limits: {
+    maxPrice: number;
+    minRooms: number;
+    maxRooms: number;
+    maxDescriptionLength: number;
+    /** Source of AREA_M2_PATTERN from the offers service. */
+    areaM2Pattern: string;
+  };
   serverError?: string | null;
 }
 
@@ -113,7 +117,7 @@ export default function OfferForm({ limits, serverError }: Props) {
 
     const areaText = areaM2.trim();
     if (areaText !== "") {
-      if (!AREA_M2_PATTERN.test(areaText)) {
+      if (!new RegExp(limits.areaM2Pattern).test(areaText)) {
         next.areaM2 = "Podaj metraż liczbą, np. 54 lub 54,5";
       } else if (Number(areaText.replace(",", ".")) <= 0) {
         next.areaM2 = "Metraż musi być większy od zera";

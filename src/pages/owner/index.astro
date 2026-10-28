@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { ServerError } from "@/components/auth/ServerError";
 import { CITY_LABELS, PROPERTY_TYPE_LABELS, TRANSACTION_LABELS } from "@/lib/dictionaries";
 import { createClient } from "@/lib/supabase";
-import { formatOfferDate, formatPrice, toOfferListItem } from "@/lib/services/offers";
+import { OWNER_OFFERS_LIMIT, formatOfferDate, formatPrice, toOfferListItem } from "@/lib/services/offers";
 import type { OfferListItem } from "@/types";
 
 // The middleware guarantees a signed-in owner on /owner/*; RLS limits the select to their own offers.
@@ -18,7 +18,8 @@ if (supabase) {
     const { data, error } = await supabase
       .from("offers")
       .select("id, city, property_type, transaction, price, created_at")
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(OWNER_OFFERS_LIMIT);
     if (!error) {
       offers = data.map(toOfferListItem);
     }
