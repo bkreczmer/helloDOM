@@ -177,6 +177,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_own_account: { Args: never; Returns: string }
       invite_agent: {
         Args: { p_agent_id: string; p_offer_id: string }
         Returns: string

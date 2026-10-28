@@ -1,0 +1,9 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import AccountCard from "@/components/account/AccountCard.astro";
+
+// The middleware guarantees a signed-in user with this prefix's role (AppLayout checks it too).
+const { user, profile } = Astro.locals;
+---
+
+<AppLayout title="Konto">{user && profile && <AccountCard email={user.email ?? ""} role={profile.role} />}</AppLayout>

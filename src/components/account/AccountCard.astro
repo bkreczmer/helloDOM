@@ -1,0 +1,38 @@
+---
+import { Trash2, UserCog } from "lucide-react";
+import Card from "@/components/ui/Card.astro";
+import { DeleteAccount } from "@/components/account/DeleteAccount";
+import { ServerError } from "@/components/auth/ServerError";
+import { accountErrorMessage } from "@/lib/services/account";
+import type { Role } from "@/types";
+
+interface Props {
+  email: string;
+  role: Role;
+}
+
+const { email, role } = Astro.props;
+const ROLE_LABELS: Record<Role, string> = { owner: "Właściciel", agent: "Agent" };
+const serverError = accountErrorMessage(Astro.url.searchParams.get("error"));
+---
+
+<div class="flex w-full max-w-2xl flex-col gap-[18px]">
+  <ServerError message={serverError} />
+  <Card title="Dane konta">
+    <Fragment slot="icon">
+      <UserCog className="size-4" aria-hidden="true" />
+    </Fragment>
+    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-[13px] leading-[1.6]">
+      <dt class="text-rs-fg-2">E-mail</dt>
+      <dd class="min-w-0 font-semibold break-words text-rs-fg">{email}</dd>
+      <dt class="text-rs-fg-2">Rola</dt>
+      <dd class="font-semibold text-rs-fg">{ROLE_LABELS[role]}</dd>
+    </dl>
+  </Card>
+  <Card title="Usuń konto">
+    <Fragment slot="icon">
+      <Trash2 className="size-4" aria-hidden="true" />
+    </Fragment>
+    <DeleteAccount client:load role={role} />
+  </Card>
+</div>
