@@ -1,10 +1,15 @@
 ---
-import { ArrowRight, UserRound } from "lucide-react";
+import { ArrowRight, CircleCheck, UserRound } from "lucide-react";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
 import InvitationList from "@/components/agent/InvitationList.astro";
+import { ServerError } from "@/components/auth/ServerError";
 import { createClient } from "@/lib/supabase";
-import { AGENT_INVITATIONS_LIMIT, toAgentInvitationItem } from "@/lib/services/invitations";
+import {
+  AGENT_INVITATIONS_LIMIT,
+  invitationResponseErrorMessage,
+  toAgentInvitationItem,
+} from "@/lib/services/invitations";
 import type { AgentInvitationItem } from "@/types";
 
 // The middleware guarantees a signed-in agent on /agent/*; RLS limits the select to the agent's own
@@ -27,6 +32,10 @@ if (supabase) {
     invitations = null;
   }
 }
+
+// Set by POST /api/agent/invitations: a rejection, or an error with no offer page to return to.
+const rejected = Astro.url.searchParams.get("rejected") === "1";
+const responseError = invitationResponseErrorMessage(Astro.url.searchParams.get("error"));
 ---
 
 <AppLayout title="Panel agenta">
@@ -36,6 +45,16 @@ if (supabase) {
         Zalogowano jako <span class="font-semibold text-rs-fg">{email}</span>.
       </p>
     </Card>
+    {rejected && (
+      <p
+        role="status"
+        class="flex items-center gap-2 rounded-control border border-[color-mix(in_oklab,var(--rs-success)_30%,transparent)] bg-rs-success-soft px-3 py-2 text-[13px] font-semibold text-rs-success-fg"
+      >
+        <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
+        Odrzucono zaproszenie
+      </p>
+    )}
+    <ServerError message={responseError} />
     <InvitationList invitations={invitations} />
     <Card title="Profil agenta">
       <Fragment slot="icon">

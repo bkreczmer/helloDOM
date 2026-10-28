@@ -353,26 +353,26 @@ Wykluczenie w rankingu to `not exists` na `invitations` po `(offer_id, agent_id)
 
 #### Automated
 
-- [x] 1.1 Migracja aplikuje się lokalnie: `npx supabase migration up`
-- [x] 1.2 Wszystkie testy SQL przechodzą
-- [x] 1.3 Typy aktualne: `npm run db:types && git diff --exit-code src/db/database.types.ts`
-- [x] 1.4 `npx astro check` i `npm run lint` bez błędów
+- [x] 1.1 Migracja aplikuje się lokalnie: `npx supabase migration up` — d929026
+- [x] 1.2 Wszystkie testy SQL przechodzą — d929026
+- [x] 1.3 Typy aktualne: `npm run db:types && git diff --exit-code src/db/database.types.ts` — d929026
+- [x] 1.4 `npx astro check` i `npm run lint` bez błędów — d929026
 
 ### Phase 2: Odpowiedź agenta
 
 #### Automated
 
-- [ ] 2.1 `npx astro check`, `npm run lint` i `npm run build` bez błędów
-- [ ] 2.2 Smoke przechodzi na lokalnym serwerze
-- [ ] 2.3 Testy SQL nadal przechodzą
+- [x] 2.1 `npx astro check`, `npm run lint` i `npm run build` bez błędów
+- [x] 2.2 Smoke przechodzi na lokalnym serwerze
+- [x] 2.3 Testy SQL nadal przechodzą
 
 #### Manual
 
-- [ ] 2.4 Potwierdzenie inline i fokus dla „Przyjmij” i „Odrzuć”
-- [ ] 2.5 Całość obsługiwana samą klawiaturą z widocznym fokusem
-- [ ] 2.6 Stan wysyłania widoczny przy throttlingu
-- [ ] 2.7 360 px bez przewijania; light i dark z kontrastem ≥4.5:1
-- [ ] 2.8 Banery i karty po przyjęciu i odrzuceniu
+- [x] 2.4 Potwierdzenie inline i fokus dla „Przyjmij” i „Odrzuć”
+- [x] 2.5 Całość obsługiwana samą klawiaturą z widocznym fokusem
+- [x] 2.6 Stan wysyłania widoczny przy throttlingu
+- [x] 2.7 360 px bez przewijania; light i dark z kontrastem ≥4.5:1
+- [x] 2.8 Banery i karty po przyjęciu i odrzuceniu
 
 ### Phase 3: Widok właściciela
 
