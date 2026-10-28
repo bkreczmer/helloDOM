@@ -34,6 +34,56 @@ export type Database = {
   }
   public: {
     Tables: {
+      offers: {
+        Row: {
+          area_m2: number | null
+          city: string
+          created_at: string
+          description: string | null
+          id: string
+          owner_id: string
+          price: number
+          property_type: string
+          rooms: number | null
+          status: string
+          transaction: string
+        }
+        Insert: {
+          area_m2?: number | null
+          city: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_id?: string
+          price: number
+          property_type: string
+          rooms?: number | null
+          status?: string
+          transaction: string
+        }
+        Update: {
+          area_m2?: number | null
+          city?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_id?: string
+          price?: number
+          property_type?: string
+          rooms?: number | null
+          status?: string
+          transaction?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           cities: string[]
@@ -75,7 +125,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      rank_agents_for_offer: {
+        Args: { p_offer_id: string }
+        Returns: {
+          agent_id: string
+          cities: string[]
+          experience_years: number
+          score: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
