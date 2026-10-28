@@ -353,10 +353,10 @@ Wykluczenie w rankingu to `not exists` na `invitations` po `(offer_id, agent_id)
 
 #### Automated
 
-- [ ] 1.1 Migracja aplikuje się lokalnie: `npx supabase migration up`
-- [ ] 1.2 Wszystkie testy SQL przechodzą
-- [ ] 1.3 Typy aktualne: `npm run db:types && git diff --exit-code src/db/database.types.ts`
-- [ ] 1.4 `npx astro check` i `npm run lint` bez błędów
+- [x] 1.1 Migracja aplikuje się lokalnie: `npx supabase migration up`
+- [x] 1.2 Wszystkie testy SQL przechodzą
+- [x] 1.3 Typy aktualne: `npm run db:types && git diff --exit-code src/db/database.types.ts`
+- [x] 1.4 `npx astro check` i `npm run lint` bez błędów
 
 ### Phase 2: Odpowiedź agenta
 

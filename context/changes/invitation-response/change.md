@@ -1,7 +1,7 @@
 ---
 change_id: invitation-response
 title: Invitation response
-status: plan_reviewed
+status: implementing
 created: 2026-10-28
 updated: 2026-10-28
 archived_at: null
