@@ -93,6 +93,16 @@ const steps = [
     { status: 302, location: "/" },
   ],
   ["agent panel redirects after signout", () => agent("/agent"), { status: 302, location: "/auth/signin" }],
+  [
+    "expired confirmation link lands on signin",
+    () => request("/auth/callback?error=access_denied&error_code=otp_expired"),
+    { status: 302, location: "/auth/signin?error=link_expired" },
+  ],
+  [
+    "invalid confirmation code lands on signin",
+    () => request("/auth/callback?code=not-a-real-code"),
+    { status: 302, location: "/auth/signin?error=link_expired" },
+  ],
 ];
 
 let failed = 0;

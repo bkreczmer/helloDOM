@@ -24,7 +24,12 @@ export const POST: APIRoute = async (context) => {
     if (!supabase) {
       return fail("unavailable");
     }
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { role } } });
+    // The confirmation link must come back to this deployment, not to the Site URL configured in Supabase.
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: { data: { role }, emailRedirectTo: `${context.url.origin}/auth/callback` },
+    });
     if (error) {
       return fail(toAuthErrorCode(error));
     }

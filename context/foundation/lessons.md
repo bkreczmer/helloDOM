@@ -15,3 +15,10 @@
 - **Problem**: W app-shell odhaczyłem krok 2.7 (hover i disabled przy wysyłaniu), choć w kodzie oba stany były nieosiągalne: useFormStatus nie działa przy natywnym  POST, a pola nie miały klasy hover. Wyszło to dopiero w impl-review (F3, F5).
 - **Rule**: Krok ręczny odhaczaj dopiero wtedy, gdy wywołałeś opisany stan w przeglądarce i go zobaczyłeś. Jeśli stanu nie da się wywołać (np. zbyt szybka odpowiedź), sprawdź go wymuszeniem (DevTools: throttling, :hover/:focus) albo zgłoś krok jako niezweryfikowany.
 - **Applies to**: 10x-implement, 10x-impl-review, src/components/**
+
+## Sprawdzaj flow potwierdzenia e-maila na produkcji, zanim zamkniesz slice
+
+- **Context**: Każda zmiana dotykająca rejestracji, logowania, resetu hasła lub linków z e-maili Supabase Auth (`signUp`, `resetPasswordForEmail`, magic link) oraz konfiguracji URL w Supabase.
+- **Problem**: Lokalnie `enable_confirmations = false`, więc `signUp` od razu zwraca sesję i link z e-maila nigdy nie jest klikany. Na produkcji link potwierdzający prowadził na `redirect_to=http://localhost:3000` i kończył się `otp_expired`: brakowało `emailRedirectTo`, route'u `/auth/callback` i poprawnego Site URL. Wyszło to dopiero w ręcznym kroku 5.6 po deployu (role-based-signup).
+- **Rule**: Flow z linkiem w e-mailu sprawdź lokalnie przez Mailpit (`http://localhost:54324`) z tymczasowo włączonym `enable_confirmations` — kliknij link i dojdź do panelu, a potem użyj go drugi raz i zobacz komunikat o wygasłym linku. Przed zamknięciem slice'a powtórz rejestrację na produkcji i porównaj `redirect_to` w linku z domeną produkcyjną.
+- **Applies to**: src/pages/api/auth/**, src/pages/auth/**, supabase/config.toml, context/foundation/infrastructure.md
