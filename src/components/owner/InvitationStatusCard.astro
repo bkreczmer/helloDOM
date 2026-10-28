@@ -9,9 +9,11 @@ interface Props {
   status: OfferStatus;
   /** created_at of the active invitation; null when it is missing or could not be read. */
   invitedAt: string | null;
+  /** responded_at of the accepted invitation; null when it is missing or could not be read. */
+  respondedAt: string | null;
 }
 
-const { status, invitedAt } = Astro.props;
+const { status, invitedAt, respondedAt } = Astro.props;
 // Shown instead of the ranking once the offer has left seeking_agent. The invited agent stays anonymous.
 ---
 
@@ -23,6 +25,10 @@ const { status, invitedAt } = Astro.props;
     <p class="text-[13px] leading-[1.6] text-rs-fg-2">
       {invitedAt ? `Zaproszenie wysłane ${formatOfferDate(invitedAt)}.` : "Zaproszenie wysłane."} Czekamy na odpowiedź
       agenta.
+    </p>
+  ) : status === "in_progress" ? (
+    <p class="text-[13px] leading-[1.6] text-rs-fg-2">
+      {respondedAt ? `Agent przyjął zaproszenie ${formatOfferDate(respondedAt)}.` : "Agent przyjął zaproszenie."}
     </p>
   ) : (
     <p class="text-[13px] leading-[1.6] text-rs-fg-2">Status oferty: {OFFER_STATUS_LABELS[status]}.</p>

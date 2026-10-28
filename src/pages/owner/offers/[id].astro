@@ -1,5 +1,5 @@
 ---
-import { ArrowLeft, CircleCheck } from "lucide-react";
+import { ArrowLeft, CircleCheck, Info } from "lucide-react";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
 import OfferSummary from "@/components/offers/OfferSummary.astro";
@@ -8,7 +8,7 @@ import RankingList from "@/components/owner/RankingList.astro";
 import { ServerError } from "@/components/auth/ServerError";
 import { createClient } from "@/lib/supabase";
 import { invitationErrorMessage } from "@/lib/services/invitations";
-import { parseOfferId, toOffer, toRankedAgent } from "@/lib/services/offers";
+import { formatOfferDate, parseOfferId, toOffer, toRankedAgent } from "@/lib/services/offers";
 import type { Offer, RankedAgent } from "@/types";
 
 // The middleware guarantees a signed-in owner on /owner/*.
@@ -20,6 +20,9 @@ let state: "found" | "missing" | "error" = "missing";
 let offer: Offer | null = null;
 let agents: RankedAgent[] | null = null;
 let invitedAt: string | null = null;
+let respondedAt: string | null = null;
+// responded_at of the latest rejected invitation, shown above the ranking once the offer is back to seeking_agent.
+let rejectedAt: string | null = null;
 
 if (offerId && supabase) {
   try {
@@ -47,18 +50,34 @@ if (offerId && supabase) {
     } catch {
       agents = null;
     }
+    // The latest rejection, read through RLS; a failed read only drops the notice.
+    try {
+      const { data, error } = await supabase
+        .from("invitations")
+        .select("responded_at")
+        .eq("offer_id", offer.id)
+        .eq("status", "rejected")
+        .order("responded_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      rejectedAt = error ? null : (data?.responded_at ?? null);
+    } catch {
+      rejectedAt = null;
+    }
   } else if (offer) {
     // The active invitation, read through RLS; a failed read only drops the date from the status card.
     try {
       const { data, error } = await supabase
         .from("invitations")
-        .select("created_at")
+        .select("created_at, responded_at")
         .eq("offer_id", offer.id)
         .in("status", ["pending", "accepted"])
         .maybeSingle();
       invitedAt = error ? null : (data?.created_at ?? null);
+      respondedAt = error ? null : (data?.responded_at ?? null);
     } catch {
       invitedAt = null;
+      respondedAt = null;
     }
   }
 } else if (offerId) {
@@ -99,9 +118,20 @@ const inviteError = invitationErrorMessage(Astro.url.searchParams.get("error"));
         <ServerError message={inviteError} />
         <OfferSummary offer={offer} />
         {offer.status === "seeking_agent" ? (
-          <RankingList offerId={offer.id} agents={agents} />
+          <>
+            {rejectedAt && (
+              <p
+                role="status"
+                class="flex items-center gap-2 rounded-control border border-rs-line bg-rs-surface-2 px-3 py-2 text-[13px] font-semibold text-rs-fg"
+              >
+                <Info className="size-4 shrink-0" aria-hidden="true" />
+                Agent odrzucił zaproszenie {formatOfferDate(rejectedAt)}. Wybierz kolejnego agenta z rankingu.
+              </p>
+            )}
+            <RankingList offerId={offer.id} agents={agents} />
+          </>
         ) : (
-          <InvitationStatusCard status={offer.status} invitedAt={invitedAt} />
+          <InvitationStatusCard status={offer.status} invitedAt={invitedAt} respondedAt={respondedAt} />
         )}
       </>
     ) : state === "missing" ? (

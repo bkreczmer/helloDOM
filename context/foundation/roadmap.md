@@ -206,6 +206,7 @@ Brak otwartych pytań. Pytania o tokeny design systemu i o format miast/typów z
 - **Firmy i zespoły agentów** — Why parked: PRD §Non-Goals; jeden agent to jedno konto.
 - **Eksport ofert na portale** — Why parked: PRD §Non-Goals.
 - **Limit czasu na odpowiedź agenta** — Why parked: PRD §Non-Goals; zaproszenie czeka bez limitu.
+- **Kontakt właściciel–agent po przyjęciu zaproszenia** — Why parked: PRD go nie wymaga; S-06 zmienia tylko statusy, a ujawnienie e-maila drugiej strony to nowa ścieżka do danych osobowych i testy RLS (decyzja 2026-10-28, S-06 invitation-response).
 - **Aplikacja mobilna** — Why parked: PRD §Non-Goals; produkt jest aplikacją webową.
 
 ## Milestone History

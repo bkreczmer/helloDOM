@@ -362,28 +362,28 @@ Wykluczenie w rankingu to `not exists` na `invitations` po `(offer_id, agent_id)
 
 #### Automated
 
-- [x] 2.1 `npx astro check`, `npm run lint` i `npm run build` bez błędów
-- [x] 2.2 Smoke przechodzi na lokalnym serwerze
-- [x] 2.3 Testy SQL nadal przechodzą
+- [x] 2.1 `npx astro check`, `npm run lint` i `npm run build` bez błędów — b4651b2
+- [x] 2.2 Smoke przechodzi na lokalnym serwerze — b4651b2
+- [x] 2.3 Testy SQL nadal przechodzą — b4651b2
 
 #### Manual
 
-- [x] 2.4 Potwierdzenie inline i fokus dla „Przyjmij” i „Odrzuć”
-- [x] 2.5 Całość obsługiwana samą klawiaturą z widocznym fokusem
-- [x] 2.6 Stan wysyłania widoczny przy throttlingu
-- [x] 2.7 360 px bez przewijania; light i dark z kontrastem ≥4.5:1
-- [x] 2.8 Banery i karty po przyjęciu i odrzuceniu
+- [x] 2.4 Potwierdzenie inline i fokus dla „Przyjmij” i „Odrzuć” — b4651b2
+- [x] 2.5 Całość obsługiwana samą klawiaturą z widocznym fokusem — b4651b2
+- [x] 2.6 Stan wysyłania widoczny przy throttlingu — b4651b2
+- [x] 2.7 360 px bez przewijania; light i dark z kontrastem ≥4.5:1 — b4651b2
+- [x] 2.8 Banery i karty po przyjęciu i odrzuceniu — b4651b2
 
 ### Phase 3: Widok właściciela
 
 #### Automated
 
-- [ ] 3.1 `npx astro check`, `npm run lint` i `npm run build` bez błędów
-- [ ] 3.2 Smoke przechodzi na lokalnym serwerze
+- [x] 3.1 `npx astro check`, `npm run lint` i `npm run build` bez błędów
+- [x] 3.2 Smoke przechodzi na lokalnym serwerze
 - [ ] 3.3 CI na PR zielone
 
 #### Manual
 
-- [ ] 3.4 Informacja o odrzuceniu nad rankingiem bez odrzucającego agenta, light/dark, 360 px
-- [ ] 3.5 Karta „W obsłudze” z datą, bez rankingu i „Zaproś”
+- [x] 3.4 Informacja o odrzuceniu nad rankingiem bez odrzucającego agenta, light/dark, 360 px
+- [x] 3.5 Karta „W obsłudze” z datą, bez rankingu i „Zaproś”
 - [ ] 3.6 Pełny przepływ na produkcji po `db push` i merge

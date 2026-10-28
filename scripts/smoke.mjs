@@ -478,6 +478,21 @@ const steps = [
       bodyExcludes: ['name="response"'],
     },
   ],
+  [
+    "owner offer page shows the rejection above the ranking",
+    () => request(`/owner/offers/${rankedOfferId}`),
+    { status: 200, bodyIncludes: ["Agent odrzucił zaproszenie"], bodyExcludes: [() => smokeAgentId] },
+  ],
+  [
+    "owner cannot re-invite the agent who rejected the offer",
+    () => request("/api/owner/invitations", { method: "POST", form: inviteForm(smokeAgentId) }),
+    { status: 302, location: () => `/owner/offers/${rankedOfferId}?error=agent_not_ranked` },
+  ],
+  [
+    "owner offer page shows the accepted invitation",
+    () => request(`/owner/offers/${acceptedOfferId}`),
+    { status: 200, bodyIncludes: ["W obsłudze", "Agent przyjął zaproszenie"], bodyExcludes: ["Zaproś"] },
+  ],
   ["second owner signout", () => otherOwner("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
     "owner signout after ranking checks",
