@@ -41,7 +41,7 @@ export const POST: APIRoute = async (context) => {
     const { cities, propertyTypes, priceMin, priceMax, experienceYears } = parsed.data;
 
     // Every save replaces all five columns: an empty or omitted field clears its value.
-    const { error } = await supabase
+    const { data: updated, error } = await supabase
       .from("profiles")
       .update({
         cities,
@@ -50,9 +50,11 @@ export const POST: APIRoute = async (context) => {
         price_max: priceMax,
         experience_years: experienceYears,
       })
-      .eq("id", user.id);
-    if (error) {
+      .eq("id", user.id)
+      .select("id");
+    if (error || updated.length === 0) {
       // Includes 23514 (check violation): the schema should have caught it, so it is not user input.
+      // Zero rows means RLS filtered the update out; do not report it as saved.
       return fail("unknown");
     }
   } catch {

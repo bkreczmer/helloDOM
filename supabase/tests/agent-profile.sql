@@ -1,4 +1,5 @@
--- Schema checks for the agent profile (migration 20261028100000_add_agent_profile.sql):
+-- Schema checks for the agent profile (migrations 20261028100000_add_agent_profile.sql and
+-- 20261028160000_profiles_price_max_non_negative.sql):
 -- dictionary and range constraints, the generated profile_complete column, the column-level
 -- update grant and the profiles_update_own_agent policy.
 -- Runs in one transaction and rolls back, so it leaves no data behind.
@@ -60,6 +61,11 @@ exception when check_violation then null; end $$;
 do $$ begin
   update public.profiles set price_min = -1 where id = '00000000-0000-0000-0000-00000000000a';
   raise exception 'expected failure: price_min = -1';
+exception when check_violation then null; end $$;
+
+do $$ begin
+  update public.profiles set price_min = null, price_max = -1 where id = '00000000-0000-0000-0000-00000000000a';
+  raise exception 'expected failure: price_max = -1 with price_min = null';
 exception when check_violation then null; end $$;
 
 do $$ begin
