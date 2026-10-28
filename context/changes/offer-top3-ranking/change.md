@@ -1,7 +1,7 @@
 ---
 change_id: offer-top3-ranking
 title: Offer top3 ranking
-status: implemented
+status: impl_reviewed
 created: 2026-10-28
 updated: 2026-10-28
 archived_at: null

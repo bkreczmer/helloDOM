@@ -123,7 +123,8 @@ end $$;
 
 -- ---------------------------------------------------------------------------------------------
 -- Ordering and limit, four agents in rzeszow (offer: apartment, 500000).
--- A: 100 (25 years), B: 100 (10 years), C and D: 85 (5 years). D was created earlier than C,
+-- A: 100 (10 years), B: 100 (25 years), C and D: 85 (5 years). B has the higher id, so only the
+-- experience tie-break puts B above A. D was created earlier than C,
 -- while C has the lower id, so only the created_at tie-break puts D above C.
 -- ---------------------------------------------------------------------------------------------
 
@@ -133,8 +134,8 @@ update public.profiles
     '00000000-0000-0000-0001-000000000021', '00000000-0000-0000-0001-000000000022',
     '00000000-0000-0000-0001-000000000023', '00000000-0000-0000-0001-000000000024'
   );
-update public.profiles set experience_years = 25 where id = '00000000-0000-0000-0001-000000000021';
-update public.profiles set experience_years = 10 where id = '00000000-0000-0000-0001-000000000022';
+update public.profiles set experience_years = 10 where id = '00000000-0000-0000-0001-000000000021';
+update public.profiles set experience_years = 25 where id = '00000000-0000-0000-0001-000000000022';
 update public.profiles set experience_years = 5, created_at = '2026-01-02 00:00:00+00'
   where id = '00000000-0000-0000-0001-000000000023';
 update public.profiles set experience_years = 5, created_at = '2026-01-01 00:00:00+00'
@@ -152,11 +153,11 @@ begin
     into got, scores
     from public.rank_agents_for_offer('00000000-0000-0000-0002-000000000002') with ordinality as r(agent_id, score, experience_years, cities, ord);
   if got is distinct from array[
-    '00000000-0000-0000-0001-000000000021',
     '00000000-0000-0000-0001-000000000022',
+    '00000000-0000-0000-0001-000000000021',
     '00000000-0000-0000-0001-000000000024'
   ]::uuid[] then
-    raise exception 'ordering: expected A, B, D (exactly 3), got %', got;
+    raise exception 'ordering: expected B, A, D (exactly 3), got %', got;
   end if;
   if scores is distinct from array[100, 100, 85] then
     raise exception 'ordering: expected scores 100, 100, 85, got %', scores;

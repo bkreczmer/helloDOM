@@ -307,3 +307,14 @@ Nowa tabela i funkcja, bez zmian istniejących danych. Na produkcję przed merge
 - [x] 3.6 Komunikaty przy 1 i 0 dopasowanych agentach — 317dcad
 - [x] 3.7 Strona oferty i panel: light/dark, 360 px, fokus, klawiatura — 317dcad
 - [x] 3.8 Produkcja: właściciel dodaje ofertę i widzi ranking
+
+## Addendum (impl-review 2026-10-28)
+
+Odstępstwa i decyzje z `reviews/impl-review.md`:
+
+- **F1 (naprawione)**: test SQL nie dowodził remisu po stażu — A i B miały ten sam `created_at`, a A mniejsze id. Staże zamienione (A 10, B 25), oczekiwana kolejność B, A, D; break-check potwierdza, że bez `experience_years desc` test pada.
+- **F2 (naprawione)**: lista ofert na `/owner` dostała `.limit(OWNER_OFFERS_LIMIT)` (50); pełna lista z filtrami zostaje w S-04.
+- **F3 (zaakceptowane ryzyko)**: `rank_agents_for_offer` zwraca `agent_id` przez PostgREST, a brak limitu ofert pozwala wyliczyć pełne profile agentów (UUID, staż, miasta). Bez danych osobowych, więc PRD Guardrails nie są naruszone; `agent_id` jest potrzebny w S-05 do zaproszenia. Wejście do test-planu M3 (`follow-ups/review-fixes.md`).
+- **F4 (odłożone do M3)**: błędy Supabase/RPC bez logu, stan `error` strony oferty zwraca 200 — wzorzec całego repo, do `/10x-observability-audit`.
+- **F5 (naprawione)**: `AREA_M2_PATTERN` nie jest już kopiowany w `OfferForm.tsx`; strona przekazuje go propsem (`limits.areaM2Pattern`), jak pozostałe limity.
+- **F6 (odłożone do archiwizacji)**: S-03 w roadmapie nadal `in-progress`.
