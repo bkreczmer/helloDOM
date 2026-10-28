@@ -1,0 +1,89 @@
+---
+import { ArrowLeft, CircleCheck } from "lucide-react";
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/ui/Card.astro";
+import OfferSummary from "@/components/owner/OfferSummary.astro";
+import RankingList from "@/components/owner/RankingList.astro";
+import { ServerError } from "@/components/auth/ServerError";
+import { createClient } from "@/lib/supabase";
+import { parseOfferId, toOffer, toRankedAgent } from "@/lib/services/offers";
+import type { Offer, RankedAgent } from "@/types";
+
+// The middleware guarantees a signed-in owner on /owner/*.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const offerId = parseOfferId(Astro.params.id);
+
+// "missing": bad id, someone else's or no such offer (RLS hides other owners' rows) → 404.
+let state: "found" | "missing" | "error" = "missing";
+let offer: Offer | null = null;
+let agents: RankedAgent[] | null = null;
+
+if (offerId && supabase) {
+  try {
+    const { data, error } = await supabase
+      .from("offers")
+      .select("id, city, property_type, transaction, price, area_m2, rooms, description, status, created_at")
+      .eq("id", offerId)
+      .maybeSingle();
+    if (error) {
+      state = "error";
+    } else if (data) {
+      offer = toOffer(data);
+      state = "found";
+    }
+  } catch {
+    state = "error";
+  }
+
+  // Read through RLS first, so "no such offer" (404) and "no matching agents" stay apart.
+  if (offer) {
+    try {
+      const { data, error } = await supabase.rpc("rank_agents_for_offer", { p_offer_id: offer.id });
+      agents = error ? null : data.map(toRankedAgent);
+    } catch {
+      agents = null;
+    }
+  }
+} else if (offerId) {
+  state = "error";
+}
+
+if (state === "missing") {
+  Astro.response.status = 404;
+}
+
+const created = Astro.url.searchParams.get("created") === "1";
+---
+
+<AppLayout title={state === "missing" ? "Nie znaleziono oferty" : "Oferta"}>
+  <div class="flex w-full max-w-2xl flex-col gap-[18px]">
+    {state === "found" && offer ? (
+      <>
+        {created && (
+          <p
+            role="status"
+            class="flex items-center gap-2 rounded-control border border-[color-mix(in_oklab,var(--rs-success)_30%,transparent)] bg-rs-success-soft px-3 py-2 text-[13px] font-semibold text-rs-success-fg"
+          >
+            <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
+            Zapisano ofertę
+          </p>
+        )}
+        <OfferSummary offer={offer} />
+        <RankingList agents={agents} />
+      </>
+    ) : state === "missing" ? (
+      <Card title="Nie znaleziono oferty">
+        <p class="text-[13px] leading-[1.6] text-rs-fg-2">Ta oferta nie istnieje albo nie należy do Twojego konta.</p>
+        <a
+          href="/owner"
+          class="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-rs-accent-fg hover:underline"
+        >
+          <ArrowLeft className="size-4" aria-hidden="true" />
+          Wróć do panelu
+        </a>
+      </Card>
+    ) : (
+      <ServerError message="Oferta jest chwilowo niedostępna. Odśwież stronę za chwilę." />
+    )}
+  </div>
+</AppLayout>

@@ -47,7 +47,7 @@ Właściciel nieruchomości, który chce ją sprzedać lub wynająć, nie wie, k
 | F-01 | app-shell                  | (foundation) aplikacja ma tokeny, fonty i powłokę design systemu helloDOM (sidebar/dock, light/dark) | —             | NFR (360 px, polskie znaki, przeglądarki) | done |
 | S-01 | role-based-signup          | użytkownik rejestruje się jako właściciel albo agent i trafia na swój panel           | F-01          | FR-001, FR-002                  | done |
 | S-02 | agent-profile              | agent uzupełnia profil: miasta, typy, przedział cen, lata doświadczenia              | S-01          | FR-007                          | done |
-| S-03 | offer-top3-ranking         | właściciel zapisuje ofertę i widzi top 3 agentów z wynikiem 0–100                    | S-01, S-02    | US-01, FR-003, FR-008           | proposed |
+| S-03 | offer-top3-ranking         | właściciel zapisuje ofertę i widzi top 3 agentów z wynikiem 0–100                    | S-01, S-02    | US-01, FR-003, FR-008           | in-progress |
 | S-04 | owner-offer-management     | właściciel przegląda swoje oferty ze statusem, edytuje je i usuwa                    | S-03          | FR-004, FR-005, FR-006          | proposed |
 | S-05 | agent-invitation           | właściciel zaprasza agenta z top 3, a agent widzi zaproszenie i ofertę               | S-03          | FR-009, FR-010                  | proposed |
 | S-06 | invitation-response        | agent przyjmuje albo odrzuca zaproszenie, a status oferty się zmienia                | S-05          | FR-011                          | proposed |
@@ -122,7 +122,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Kiedy oferta przechodzi ze „szkicu” do „szuka agenta”: od razu po zapisaniu czy po osobnej akcji właściciela? — Owner: user. Block: no.
 - **Risk:** Formularz oferty używa słownika miast i typów z S-02, więc dopasowanie po mieście to porównanie pozycji słownika, nie tekstu. To gwiazda przewodnia i miejsce, w którym żyje reguła wyniku (miasto jako warunek konieczny, 35/35/30 pkt, remisy według stażu, potem daty rejestracji); błąd w regule podważa cały produkt.
-- **Status:** proposed
+- **Status:** in-progress
 
 ### S-04: Zarządzanie ofertami właściciela
 

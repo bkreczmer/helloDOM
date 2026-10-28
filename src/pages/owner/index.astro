@@ -1,14 +1,76 @@
 ---
+import { ChevronRight, FilePlus2, Files } from "lucide-react";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
+import { buttonVariants } from "@/components/ui/button";
+import { ServerError } from "@/components/auth/ServerError";
+import { CITY_LABELS, PROPERTY_TYPE_LABELS, TRANSACTION_LABELS } from "@/lib/dictionaries";
+import { createClient } from "@/lib/supabase";
+import { formatOfferDate, formatPrice, toOfferListItem } from "@/lib/services/offers";
+import type { OfferListItem } from "@/types";
 
-const email = Astro.locals.user?.email ?? "";
+// The middleware guarantees a signed-in owner on /owner/*; RLS limits the select to their own offers.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+
+let offers: OfferListItem[] | null = null;
+if (supabase) {
+  try {
+    const { data, error } = await supabase
+      .from("offers")
+      .select("id, city, property_type, transaction, price, created_at")
+      .order("created_at", { ascending: false });
+    if (!error) {
+      offers = data.map(toOfferListItem);
+    }
+  } catch {
+    offers = null;
+  }
+}
 ---
 
 <AppLayout title="Panel właściciela">
-  <Card title="Witaj">
-    <p class="text-[13px] leading-[1.6] text-rs-fg-2">
-      Zalogowano jako <span class="font-semibold text-rs-fg">{email}</span>. Tu pojawią się Twoje oferty.
-    </p>
-  </Card>
+  <div class="flex w-full max-w-2xl flex-col gap-[18px]">
+    <a href="/owner/offers/new" class:list={[buttonVariants({ variant: "accent" }), "self-start"]}>
+      <FilePlus2 className="size-4" aria-hidden="true" />
+      Dodaj ofertę
+    </a>
+
+    <Card title="Twoje oferty">
+      <Fragment slot="icon">
+        <Files className="size-4" aria-hidden="true" />
+      </Fragment>
+      {offers === null ? (
+        <ServerError message="Lista ofert jest chwilowo niedostępna. Odśwież stronę za chwilę." />
+      ) : offers.length === 0 ? (
+        <p class="text-[13px] leading-[1.6] text-rs-fg-2">
+          Nie masz jeszcze ofert. Dodaj pierwszą ofertę, a pokażemy Ci trzech najlepiej dopasowanych agentów.
+        </p>
+      ) : (
+        <ul class="-mx-2 flex flex-col">
+          {offers.map((offer) => (
+            <li class="border-b border-rs-line last:border-b-0">
+              <a
+                href={`/owner/offers/${offer.id}`}
+                class="group flex items-center gap-3 rounded-sm px-2 py-2.5 transition-colors duration-[180ms] ease-rs hover:bg-rs-surface-2"
+              >
+                <span class="flex min-w-0 flex-1 flex-col gap-0.5">
+                  <span class="font-display text-[13.5px] font-semibold text-rs-fg group-hover:underline">
+                    {CITY_LABELS[offer.city]} · {PROPERTY_TYPE_LABELS[offer.propertyType]} ·{" "}
+                    {TRANSACTION_LABELS[offer.transaction]}
+                  </span>
+                  <span class="text-[11.5px] text-rs-fg-2">
+                    Dodano <time datetime={offer.createdAt}>{formatOfferDate(offer.createdAt)}</time>
+                  </span>
+                </span>
+                <span class="font-numeric text-[14px] font-bold whitespace-nowrap tabular-nums text-rs-fg">
+                  {formatPrice(offer.price)}
+                </span>
+                <ChevronRight className="size-4 shrink-0 text-rs-fg-2" aria-hidden="true" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </Card>
+  </div>
 </AppLayout>

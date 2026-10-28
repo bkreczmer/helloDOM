@@ -1,0 +1,47 @@
+---
+import { FileText } from "lucide-react";
+import Card from "@/components/ui/Card.astro";
+import { CITY_LABELS, PROPERTY_TYPE_LABELS, TRANSACTION_LABELS } from "@/lib/dictionaries";
+import { formatArea, formatPrice } from "@/lib/services/offers";
+import type { Offer } from "@/types";
+
+interface Props {
+  offer: Offer;
+}
+
+const { offer } = Astro.props;
+
+const details: [string, string][] = [
+  ["Miasto", CITY_LABELS[offer.city]],
+  ["Typ nieruchomości", PROPERTY_TYPE_LABELS[offer.propertyType]],
+  ["Transakcja", TRANSACTION_LABELS[offer.transaction]],
+  ...(offer.areaM2 === null ? [] : [["Metraż", formatArea(offer.areaM2)] as [string, string]]),
+  ...(offer.rooms === null ? [] : [["Pokoje", String(offer.rooms)] as [string, string]]),
+];
+---
+
+<Card title="Podsumowanie oferty">
+  <Fragment slot="icon">
+    <FileText className="size-4" aria-hidden="true" />
+  </Fragment>
+  <div class="flex flex-col gap-4">
+    <div>
+      <p class="microlabel">Cena</p>
+      <p class="font-numeric text-[17px] font-bold tabular-nums text-rs-fg">{formatPrice(offer.price)}</p>
+    </div>
+    <dl class="grid grid-cols-2 gap-x-4 gap-y-3 tablet:grid-cols-3">
+      {details.map(([label, value]) => (
+        <div class="min-w-0">
+          <dt class="microlabel">{label}</dt>
+          <dd class="text-[13px] font-semibold break-words text-rs-fg">{value}</dd>
+        </div>
+      ))}
+    </dl>
+    {offer.description && (
+      <div>
+        <p class="microlabel">Opis</p>
+        <p class="text-[13px] leading-[1.6] break-words whitespace-pre-line text-rs-fg-2">{offer.description}</p>
+      </div>
+    )}
+  </div>
+</Card>

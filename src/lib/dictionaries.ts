@@ -1,9 +1,10 @@
-// Single source of slugs and Polish labels for cities and property types,
+// Single source of slugs and Polish labels for cities, property types and transactions,
 // shared by the agent profile (S-02) and the offer and ranking (S-03).
 // Keep CITIES and PROPERTY_TYPES in sync with the check constraints in
-// supabase/migrations/20261028100000_add_agent_profile.sql.
+// supabase/migrations/20261028100000_add_agent_profile.sql, and CITIES, PROPERTY_TYPES and
+// TRANSACTIONS with the checks in supabase/migrations/20261028140000_create_offers.sql.
 
-import type { City, PropertyType } from "@/types";
+import type { City, PropertyType, Transaction } from "@/types";
 
 // Sorted by Polish name.
 export const CITIES = [
@@ -54,4 +55,11 @@ export const PROPERTY_TYPE_LABELS: Record<PropertyType, string> = {
   apartment: "Mieszkanie",
   house: "Dom",
   plot: "Działka",
+};
+
+export const TRANSACTIONS = ["sale", "rent"] as const;
+
+export const TRANSACTION_LABELS: Record<Transaction, string> = {
+  sale: "Sprzedaż",
+  rent: "Wynajem",
 };

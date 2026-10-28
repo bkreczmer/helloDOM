@@ -1,0 +1,65 @@
+---
+import { Info, Trophy } from "lucide-react";
+import Card from "@/components/ui/Card.astro";
+import { Badge } from "@/components/ui/badge";
+import { ServerError } from "@/components/auth/ServerError";
+import { CITY_LABELS } from "@/lib/dictionaries";
+import { formatExperience } from "@/lib/services/offers";
+import type { RankedAgent } from "@/types";
+
+interface Props {
+  /** null when the ranking RPC failed. */
+  agents: RankedAgent[] | null;
+}
+
+const { agents } = Astro.props;
+// The ranking is anonymous: agentId is never rendered (S-05 may add it for invitations).
+---
+
+<Card title="Najlepiej dopasowani agenci">
+  <Fragment slot="icon">
+    <Trophy className="size-4" aria-hidden="true" />
+  </Fragment>
+  {agents === null ? (
+    <ServerError message="Ranking agentów jest chwilowo niedostępny. Odśwież stronę za chwilę." />
+  ) : (
+    <div class="flex flex-col gap-3">
+      {agents.length > 0 && (
+        <ol class="flex flex-col gap-2.5">
+          {agents.map((agent, index) => (
+            <li class="flex flex-col gap-2 rounded-control border border-rs-line px-3 py-2.5">
+              <div class="flex flex-wrap items-center justify-between gap-2">
+                <h3 class="font-display text-[13.5px] font-semibold text-rs-fg">Agent {index + 1}</h3>
+                <Badge className="font-numeric text-[12px] font-bold tabular-nums">
+                  <span class="sr-only">Wynik dopasowania: </span>
+                  {agent.score}/100
+                </Badge>
+              </div>
+              <p class="text-[13px] text-rs-fg-2">
+                Staż: <span class="font-semibold text-rs-fg">{formatExperience(agent.experienceYears)}</span>
+              </p>
+              <div class="flex flex-col gap-1">
+                <p class="microlabel">Obsługiwane miasta</p>
+                <ul class="flex flex-wrap gap-1.5">
+                  {agent.cities.map((city) => (
+                    <li>
+                      <Badge variant="secondary">{CITY_LABELS[city]}</Badge>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+      {agents.length < 3 && (
+        <p class="flex items-start gap-2 rounded-control bg-rs-surface-2 px-3 py-2 text-[13px] text-rs-fg">
+          <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          {agents.length === 0
+            ? "Nie ma jeszcze dopasowanych agentów dla tej oferty. Ranking uzupełni się, gdy agenci z tego miasta uzupełnią profile."
+            : "Dopasowanych agentów jest mniej niż 3. Ranking uzupełni się, gdy kolejni agenci z tego miasta uzupełnią profile."}
+        </p>
+      )}
+    </div>
+  )}
+</Card>

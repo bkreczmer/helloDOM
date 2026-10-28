@@ -1,0 +1,27 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/ui/Card.astro";
+import OfferForm from "@/components/owner/OfferForm";
+import { MAX_PRICE } from "@/lib/services/agent-profile";
+import { MAX_DESCRIPTION_LENGTH, MAX_ROOMS, MIN_ROOMS, offerErrorMessage } from "@/lib/services/offers";
+
+// The middleware guarantees a signed-in owner on /owner/*.
+const serverError = offerErrorMessage(Astro.url.searchParams.get("error"));
+---
+
+<AppLayout title="Nowa oferta">
+  <div class="w-full max-w-2xl">
+    <Card>
+      <OfferForm
+        client:load
+        limits={{
+          maxPrice: MAX_PRICE,
+          minRooms: MIN_ROOMS,
+          maxRooms: MAX_ROOMS,
+          maxDescriptionLength: MAX_DESCRIPTION_LENGTH,
+        }}
+        serverError={serverError}
+      />
+    </Card>
+  </div>
+</AppLayout>
