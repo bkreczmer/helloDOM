@@ -8,6 +8,9 @@ const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
 const agentEmail = `smoke-agent-${Date.now()}@example.com`;
 const otherOwnerEmail = `smoke-other-${Date.now()}@example.com`;
+// Second agent, created at the end: once the first agent deletes their account, the accepted offer
+// is back in the ranking and must offer an invitation form even on a fresh database.
+const secondAgentEmail = `smoke-agent2-${Date.now()}@example.com`;
 
 // Written out on purpose (the smoke does not import TS): a second, independent copy of the
 // dictionary, so a drift between src/lib/dictionaries.ts and the SQL check fails here.
@@ -44,11 +47,13 @@ function profileForm({ cities = ["warszawa"], propertyTypes = ["apartment"], pri
   ];
 }
 const validProfile = profileForm({ priceMin: "100000", priceMax: "900000", experienceYears: "5" });
-// Every run leaves a smoke agent behind, and ranking ties go to the oldest profile. A price unique to
-// this run plus 60 years of experience gives this run's agent 100/100 on the ranked offer and wins ties,
-// so it is "Agent 1" even with older smoke agents in the local database.
+// The run deletes its accounts at the end, but a failed run leaves them behind (and older local databases
+// still hold smoke agents from before), and ranking ties go to the oldest profile. A price unique to this
+// run plus 60 years of experience gives this run's agent 100/100 on the ranked offer and wins ties,
+// so it is "Agent 1" even with leftover smoke agents in the local database.
 const rankedPrice = String(500000 + (Date.now() % 100000));
 const rankedProfile = profileForm({ priceMin: rankedPrice, priceMax: rankedPrice, experienceYears: "60" });
+const secondAgentProfile = profileForm({ priceMin: rankedPrice, priceMax: rankedPrice, experienceYears: "10" });
 
 // Offer form with every field set; override single fields per step.
 function offerForm(overrides = {}) {
@@ -115,6 +120,7 @@ function session() {
 const request = session();
 const agent = session();
 const otherOwner = session();
+const secondAgent = session();
 const anonymous = session();
 
 const steps = [
@@ -529,6 +535,82 @@ const steps = [
     "invalid confirmation code lands on signin",
     () => request("/auth/callback?code=not-a-real-code"),
     { status: 302, location: "/auth/signin?error=link_expired" },
+  ],
+  // Account deletion: every account the run created is deleted, which also cleans up after the smoke.
+  [
+    "second agent signup creates account",
+    () =>
+      secondAgent("/api/auth/signup", {
+        method: "POST",
+        form: { email: secondAgentEmail, password, role: "agent" },
+      }),
+    { status: 302, location: "/dashboard" },
+  ],
+  [
+    "second agent saves a profile matching the accepted offer",
+    () => secondAgent("/api/agent/profile", { method: "POST", form: secondAgentProfile }),
+    { status: 302, location: "/agent/profile?saved=1" },
+  ],
+  [
+    "agent signs in again",
+    () => agent("/api/auth/signin", { method: "POST", form: { email: agentEmail, password } }),
+    { status: 302, location: "/dashboard" },
+  ],
+  [
+    "agent with an accepted invitation deletes the account",
+    () => agent("/api/account/delete", { method: "POST" }),
+    { status: 302, location: "/?deleted=1" },
+  ],
+  ["deleted agent has no session", () => agent("/agent"), { status: 302, location: "/auth/signin" }],
+  [
+    "owner signs in to check the accepted offer",
+    () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
+    { status: 302, location: "/dashboard" },
+  ],
+  [
+    "accepted offer is seeking an agent again after the agent deletion",
+    () => request(`/owner/offers/${acceptedOfferId}`),
+    {
+      status: 200,
+      bodyIncludes: ["Szuka agenta", "Najlepiej dopasowani agenci", 'action="/api/owner/invitations"', "Zaproś"],
+      bodyExcludes: ["W obsłudze", agentEmail, () => acceptedAgentId],
+    },
+  ],
+  [
+    "second agent deletes the account",
+    () => secondAgent("/api/account/delete", { method: "POST" }),
+    { status: 302, location: "/?deleted=1" },
+  ],
+  [
+    "second owner signs in again",
+    () => otherOwner("/api/auth/signin", { method: "POST", form: { email: otherOwnerEmail, password } }),
+    { status: 302, location: "/dashboard" },
+  ],
+  [
+    "second owner deletes the account",
+    () => otherOwner("/api/account/delete", { method: "POST" }),
+    { status: 302, location: "/?deleted=1" },
+  ],
+  [
+    "owner deletes the account",
+    () => request("/api/account/delete", { method: "POST" }),
+    { status: 302, location: "/?deleted=1" },
+  ],
+  ["deleted owner has no session", () => request("/owner"), { status: 302, location: "/auth/signin" }],
+  [
+    "signin of the deleted owner fails",
+    () => anonymous("/api/auth/signin", { method: "POST", form: { email, password } }),
+    { status: 302, location: "/auth/signin?error=invalid_credentials" },
+  ],
+  [
+    "signin of the deleted agent fails",
+    () => anonymous("/api/auth/signin", { method: "POST", form: { email: agentEmail, password } }),
+    { status: 302, location: "/auth/signin?error=invalid_credentials" },
+  ],
+  [
+    "home confirms the account deletion",
+    () => anonymous("/?deleted=1"),
+    { status: 200, bodyIncludes: ["Konto zostało usunięte razem z Twoimi danymi."] },
   ],
 ];
 

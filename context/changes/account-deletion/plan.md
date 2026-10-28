@@ -296,23 +296,23 @@ Trigger wykonuje jeden `update` po kluczu głównym na każde usunięte zaprosze
 
 #### Automated
 
-- [x] 2.1 Lint, typy i build przechodzą
-- [x] 2.2 POST /api/account/delete bez sesji przekierowuje na logowanie
-- [x] 2.3 Usunięcie agenta przez endpoint czyści sesję i przywraca ofertę
-- [x] 2.4 Strony konta dostępne tylko dla właściwej roli
-- [x] 2.5 Smoke przechodzi bez zmian
+- [x] 2.1 Lint, typy i build przechodzą — 8ab01dc
+- [x] 2.2 POST /api/account/delete bez sesji przekierowuje na logowanie — 8ab01dc
+- [x] 2.3 Usunięcie agenta przez endpoint czyści sesję i przywraca ofertę — 8ab01dc
+- [x] 2.4 Strony konta dostępne tylko dla właściwej roli — 8ab01dc
+- [x] 2.5 Smoke przechodzi bez zmian — 8ab01dc
 
 #### Manual
 
-- [x] 2.6 Strony konta: wygląd, motywy, 360 px, aktywna nawigacja
-- [x] 2.7 Potwierdzenie: fokus, klawiatura, stan wysyłania
-- [x] 2.8 Po usunięciu: komunikat na /, brak dostępu, logowanie nieudane
+- [x] 2.6 Strony konta: wygląd, motywy, 360 px, aktywna nawigacja — 8ab01dc
+- [x] 2.7 Potwierdzenie: fokus, klawiatura, stan wysyłania — 8ab01dc
+- [x] 2.8 Po usunięciu: komunikat na /, brak dostępu, logowanie nieudane — 8ab01dc
 
 ### Phase 3: Smoke i produkcja
 
 #### Automated
 
-- [ ] 3.1 Smoke z krokami usunięcia konta przechodzi lokalnie
+- [x] 3.1 Smoke z krokami usunięcia konta przechodzi lokalnie
 - [ ] 3.2 CI zielone na PR
 - [ ] 3.3 Deploy na main zielony
 
