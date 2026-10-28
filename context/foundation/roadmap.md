@@ -46,7 +46,7 @@ Właściciel nieruchomości, który chce ją sprzedać lub wynająć, nie wie, k
 | ---- | -------------------------- | ------------------------------------------------------------------------------------ | ------------- | ------------------------------- | -------- |
 | F-01 | app-shell                  | (foundation) aplikacja ma tokeny, fonty i powłokę design systemu helloDOM (sidebar/dock, light/dark) | —             | NFR (360 px, polskie znaki, przeglądarki) | done |
 | S-01 | role-based-signup          | użytkownik rejestruje się jako właściciel albo agent i trafia na swój panel           | F-01          | FR-001, FR-002                  | done |
-| S-02 | agent-profile              | agent uzupełnia profil: miasta, typy, przedział cen, lata doświadczenia              | S-01          | FR-007                          | planning |
+| S-02 | agent-profile              | agent uzupełnia profil: miasta, typy, przedział cen, lata doświadczenia              | S-01          | FR-007                          | in-progress |
 | S-03 | offer-top3-ranking         | właściciel zapisuje ofertę i widzi top 3 agentów z wynikiem 0–100                    | S-01, S-02    | US-01, FR-003, FR-008           | proposed |
 | S-04 | owner-offer-management     | właściciel przegląda swoje oferty ze statusem, edytuje je i usuwa                    | S-03          | FR-004, FR-005, FR-006          | proposed |
 | S-05 | agent-invitation           | właściciel zaprasza agenta z top 3, a agent widzi zaproszenie i ofertę               | S-03          | FR-009, FR-010                  | proposed |
@@ -109,7 +109,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Stoi przed gwiazdą przewodnią, bo ranking bez profili agentów nie ma czego liczyć. Wprowadza wspólny słownik miast (18 wojewódzkich) i typów (mieszkanie, dom, działka), z którego potem korzystają S-03 i ranking (zob. Decisions w `## Milestone`).
-- **Status:** planning
+- **Status:** in-progress
 
 ### S-03: Oferta i ranking top 3
 

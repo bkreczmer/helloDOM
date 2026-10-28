@@ -321,14 +321,14 @@ Brak istotnych: jeden `select` i jeden `update` po kluczu głównym.
 
 #### Automated
 
-- [ ] 1.1 Migracja stosuje się na czystej bazie
-- [ ] 1.2 Skrypt SQL przechodzi wszystkie asercje
-- [ ] 1.3 Typy są aktualne
-- [ ] 1.4 Typy i lint przechodzą
+- [x] 1.1 Migracja stosuje się na czystej bazie
+- [x] 1.2 Skrypt SQL przechodzi wszystkie asercje
+- [x] 1.3 Typy są aktualne
+- [x] 1.4 Typy i lint przechodzą
 
 #### Manual
 
-- [ ] 1.5 Lista slugów w check zgadza się 1:1 z CITIES
+- [x] 1.5 Lista slugów w check zgadza się 1:1 z CITIES
 
 ### Phase 2: Zapis profilu
 

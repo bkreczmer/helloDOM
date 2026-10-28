@@ -36,18 +36,36 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          cities: string[]
           created_at: string
+          experience_years: number | null
           id: string
+          price_max: number | null
+          price_min: number | null
+          profile_complete: boolean | null
+          property_types: string[]
           role: string
         }
         Insert: {
+          cities?: string[]
           created_at?: string
+          experience_years?: number | null
           id: string
+          price_max?: number | null
+          price_min?: number | null
+          profile_complete?: boolean | null
+          property_types?: string[]
           role: string
         }
         Update: {
+          cities?: string[]
           created_at?: string
+          experience_years?: number | null
           id?: string
+          price_max?: number | null
+          price_min?: number | null
+          profile_complete?: boolean | null
+          property_types?: string[]
           role?: string
         }
         Relationships: []
