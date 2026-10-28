@@ -5,11 +5,11 @@ import Card from "@/components/ui/Card.astro";
 const email = Astro.locals.user?.email ?? "";
 ---
 
-<AppLayout title="Panel">
+<AppLayout title="Panel agenta">
   <Card title="Witaj">
     <p class="text-[13px] leading-[1.6] text-rs-fg-2">
-      Zalogowano jako <span class="font-semibold text-rs-fg">{email}</span>. Tu pojawią się Twoje oferty albo
-      zaproszenia.
+      Zalogowano jako <span class="font-semibold text-rs-fg">{email}</span>. Tu pojawią się zaproszenia od właścicieli i
+      Twój profil agenta.
     </p>
   </Card>
 </AppLayout>

@@ -64,6 +64,21 @@ npx wrangler deploy
 
 `SUPABASE_URL` i `SUPABASE_KEY` ustaw jako sekrety w Cloudflare (`npx wrangler secret put <NAZWA>`).
 
+### Migracje bazy na produkcji
+
+CI nie wdraża migracji. Robi to człowiek ze swojej maszyny, przed merge do `main`:
+
+```bash
+npx supabase login
+npx supabase link --project-ref <ref>
+npx supabase db push --dry-run   # sprawdź, które migracje zostaną zastosowane
+npx supabase db push
+```
+
+Merge do `main` zrób zaraz po `db push`, żeby produkcyjny kod nie rozjechał się ze schematem.
+
+`npx wrangler rollback` cofa tylko kod Workera, nie schemat ani polityki RLS. SQL cofający każdą migrację jest w jej bloku `-- down:` w `supabase/migrations/`; uruchom go ręcznie w SQL Editorze projektu.
+
 ## CI
 
 GitHub Actions (`.github/workflows/ci.yml`) uruchamia przy każdym pushu i PR do `main`:

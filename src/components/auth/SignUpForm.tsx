@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { Mail, Lock, UserPlus } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
+import { RoleChoice } from "@/components/auth/RoleChoice";
 import { PasswordToggle } from "@/components/auth/PasswordToggle";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { ServerError } from "@/components/auth/ServerError";
 import { useNativeSubmitting } from "@/components/hooks/useNativeSubmitting";
+import type { Role } from "@/types";
 
 const MIN_PASSWORD_LENGTH = 6;
 
@@ -21,16 +23,23 @@ interface Props {
 }
 
 export default function SignUpForm({ serverError }: Props) {
+  const [role, setRole] = useState<Role | "">("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [errors, setErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
+  const [errors, setErrors] = useState<{ role?: string; email?: string; password?: string; confirmPassword?: string }>(
+    {},
+  );
   const [submitting, setSubmitting] = useNativeSubmitting();
 
   function validate() {
     const next: typeof errors = {};
+
+    if (!role) {
+      next.role = "Wybierz, czy jesteś właścicielem, czy agentem";
+    }
 
     if (!email.trim()) {
       next.email = "Podaj adres e-mail";
@@ -78,6 +87,15 @@ export default function SignUpForm({ serverError }: Props) {
 
   return (
     <form method="POST" action="/api/auth/signup" className="space-y-4" onSubmit={handleSubmit} noValidate>
+      <RoleChoice
+        value={role}
+        onChange={(r) => {
+          setRole(r);
+          clearError("role");
+        }}
+        error={errors.role}
+      />
+
       <FormField
         id="email"
         autoComplete="email"

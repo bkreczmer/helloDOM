@@ -3,21 +3,25 @@ import { LogOut } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 import MobileNav from "@/components/shell/MobileNav";
+import { homeFor } from "@/lib/route-guard";
+import type { Role } from "@/types";
 
 interface Props {
   email: string;
+  role: Role;
 }
 
-const { email } = Astro.props;
+const { email, role } = Astro.props;
 const { pathname } = Astro.url;
 const initial = email.charAt(0).toUpperCase() || "?";
+const ROLE_LABELS: Record<Role, string> = { owner: "Właściciel", agent: "Agent" };
 ---
 
 <header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-rs-line bg-rs-surface px-3.5 py-3 tablet:px-8 tablet:py-4">
   <div class="flex items-center">
-    <MobileNav client:media="(max-width: 640px)" pathname={pathname} />
+    <MobileNav client:media="(max-width: 640px)" pathname={pathname} role={role} />
     <a
-      href="/dashboard"
+      href={homeFor(role)}
       class="absolute left-1/2 -translate-x-1/2 font-display text-[18px] font-bold text-rs-accent-fg tablet:static tablet:translate-x-0 desktop:hidden dark:text-rs-fg"
     >
       helloDOM
@@ -33,7 +37,7 @@ const initial = email.charAt(0).toUpperCase() || "?";
     </span>
     <div class="hidden flex-col leading-tight tablet:flex">
       <span class="font-display text-[13.5px] font-semibold text-rs-fg">{email}</span>
-      {/* Role (11px) arrives with S-01. */}
+      <span class="text-[11px] text-rs-fg-3">{ROLE_LABELS[role]}</span>
     </div>
     <form method="POST" action="/api/auth/signout">
       <button type="submit" aria-label="Wyloguj" class:list={[buttonVariants({ variant: "ghost", size: "icon" })]}>

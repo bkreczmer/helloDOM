@@ -1,12 +1,14 @@
 ---
-import { DOCK_MAX_ITEMS, isActive, navConfig } from "@/components/shell/nav";
+import { DOCK_MAX_ITEMS, isActive, navFor } from "@/components/shell/nav";
+import type { Role } from "@/types";
 
 interface Props {
   pathname: string;
+  role: Role;
 }
 
-const { pathname } = Astro.props;
-const items = navConfig.slice(0, DOCK_MAX_ITEMS);
+const { pathname, role } = Astro.props;
+const items = navFor(role).slice(0, DOCK_MAX_ITEMS);
 ---
 
 <nav

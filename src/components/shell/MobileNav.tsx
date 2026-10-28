@@ -2,17 +2,20 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { isActive, navConfig } from "@/components/shell/nav";
+import { isActive, navFor } from "@/components/shell/nav";
+import { homeFor } from "@/lib/route-guard";
+import type { Role } from "@/types";
 
 interface MobileNavProps {
   pathname: string;
+  role: Role;
 }
 
 const DRAWER_ID = "mobile-nav-drawer";
 const TABLET_UP = "(min-width: 641px)"; // --breakpoint-tablet in global.css
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-export default function MobileNav({ pathname }: MobileNavProps) {
+export default function MobileNav({ pathname, role }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const firstLinkRef = useRef<HTMLAnchorElement>(null);
@@ -96,14 +99,14 @@ export default function MobileNav({ pathname }: MobileNavProps) {
               className="bg-rs-surface border-rs-line absolute inset-y-0 left-0 flex w-[86%] max-w-[320px] flex-col gap-6 border-r px-3.5 py-[22px]"
             >
               <a
-                href="/dashboard"
+                href={homeFor(role)}
                 className="font-display text-rs-accent-fg dark:text-rs-fg px-2.5 text-[18px] font-bold"
               >
                 helloDOM
               </a>
               <nav aria-label="Główna nawigacja">
                 <ul className="flex flex-col gap-1">
-                  {navConfig.map(({ href, label, icon: Icon }, index) => {
+                  {navFor(role).map(({ href, label, icon: Icon }, index) => {
                     const active = isActive(pathname, href);
                     return (
                       <li key={href}>

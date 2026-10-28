@@ -1,15 +1,38 @@
-const AUTH_ERROR_MESSAGES: Record<string, string> = {
+export const AUTH_ERROR_CODES = [
+  "invalid_credentials",
+  "user_already_exists",
+  "email_not_confirmed",
+  "weak_password",
+  "invalid_input",
+  "unavailable",
+  "no_profile",
+  "unknown",
+] as const;
+
+export type AuthErrorCode = (typeof AUTH_ERROR_CODES)[number];
+
+const AUTH_ERROR_MESSAGES: Record<AuthErrorCode, string> = {
   invalid_credentials: "Nieprawidłowy e-mail lub hasło",
   user_already_exists: "Konto z tym adresem e-mail już istnieje",
   email_not_confirmed: "Potwierdź adres e-mail, zanim się zalogujesz",
   weak_password: "Hasło jest za słabe — użyj co najmniej 6 znaków",
+  invalid_input: "Sprawdź poprawność danych w formularzu",
+  unavailable: "Usługa logowania jest chwilowo niedostępna",
+  no_profile: "Twoje konto nie ma przypisanej roli. Skontaktuj się z nami.",
+  unknown: "Coś poszło nie tak. Spróbuj ponownie.",
 };
 
-const FALLBACK_MESSAGE = "Coś poszło nie tak. Spróbuj ponownie.";
+function isAuthErrorCode(value: string): value is AuthErrorCode {
+  return (AUTH_ERROR_CODES as readonly string[]).includes(value);
+}
 
-export const AUTH_UNAVAILABLE_MESSAGE = "Usługa logowania jest chwilowo niedostępna";
+/** Endpoint side: maps a Supabase auth error to a code from the closed set (keyed by the stable `code`). */
+export function toAuthErrorCode(error: { code?: string }): AuthErrorCode {
+  return error.code && isAuthErrorCode(error.code) ? error.code : "unknown";
+}
 
-/** Maps a Supabase auth error to a Polish, user-facing message (keyed by the stable `code`). */
-export function toPolishAuthError(error: { code?: string; message: string }): string {
-  return (error.code ? AUTH_ERROR_MESSAGES[error.code] : undefined) ?? FALLBACK_MESSAGE;
+/** Page side: maps a `?error=` value to a Polish message. Arbitrary URL text never reaches the UI. */
+export function authErrorMessage(code: string | null): string | null {
+  if (code === null) return null;
+  return isAuthErrorCode(code) ? AUTH_ERROR_MESSAGES[code] : AUTH_ERROR_MESSAGES.unknown;
 }

@@ -35,7 +35,8 @@
   --rs-fg-4: color-mix(in oklab, var(--rs-fg) 28%, var(--rs-surface));
   --rs-line: color-mix(in oklab, var(--rs-fg) 13%, var(--rs-surface));
   --rs-line-strong: color-mix(in oklab, var(--rs-fg) 24%, var(--rs-surface));
-  --rs-input-border: color-mix(in oklab, var(--rs-fg) 28%, var(--rs-surface));
+  /* smallest mix with >=3:1 on surface and input-bg (WCAG 1.4.11): 3.05:1 */
+  --rs-input-border: color-mix(in oklab, var(--rs-fg) 61%, var(--rs-surface));
   --rs-input-bg: var(--rs-surface);
 
   /* Accent derivatives */
@@ -43,6 +44,8 @@
   --rs-accent-active: color-mix(in oklab, var(--rs-accent) 66%, black);
   /* CTA fill with white text (4.85:1) and active icons (>=3:1 in both themes); same in light and dark */
   --rs-accent-strong: #1e75bc;
+  /* focused field border: 4.85:1 on surface, clearly stronger than input-border */
+  --rs-focus-border: var(--rs-accent-strong);
   --rs-accent-ring: color-mix(in oklab, var(--rs-accent) 30%, transparent);
   --rs-accent-soft: color-mix(in oklab, var(--rs-accent-2) 14%, white);
   --rs-grad-brand: linear-gradient(to bottom right, #1e75bc, #0652a9);
@@ -111,9 +114,12 @@
   --rs-fg: color-mix(in oklab, white 92%, var(--rs-accent));
   --rs-line: color-mix(in oklab, white 12%, var(--rs-surface));
   --rs-line-strong: color-mix(in oklab, white 22%, var(--rs-surface));
+  /* smallest mix with >=3:1 on surface (3.37:1) and input-bg = surface-2 (3.06:1) */
+  --rs-input-border: color-mix(in oklab, var(--rs-fg) 42%, var(--rs-surface));
   --rs-accent-fg: color-mix(in oklab, var(--rs-accent) 78%, white);
   --rs-accent-hover: color-mix(in oklab, var(--rs-accent) 88%, white);
   --rs-input-bg: var(--rs-surface-2);
+  --rs-focus-border: var(--rs-accent);
   --rs-overlay: color-mix(in oklab, black 60%, transparent);
 
   --rs-success: oklch(0.7 0.16 145);
@@ -159,6 +165,7 @@
   --color-rs-line-strong: var(--rs-line-strong);
   --color-rs-input-border: var(--rs-input-border);
   --color-rs-input-bg: var(--rs-input-bg);
+  --color-rs-focus-border: var(--rs-focus-border);
   --color-rs-dark-section-bg: var(--rs-dark-section-bg);
   --color-rs-overlay: var(--rs-overlay);
   --color-rs-success: var(--rs-success);

@@ -1,0 +1,14 @@
+---
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/ui/Card.astro";
+
+const email = Astro.locals.user?.email ?? "";
+---
+
+<AppLayout title="Panel właściciela">
+  <Card title="Witaj">
+    <p class="text-[13px] leading-[1.6] text-rs-fg-2">
+      Zalogowano jako <span class="font-semibold text-rs-fg">{email}</span>. Tu pojawią się Twoje oferty.
+    </p>
+  </Card>
+</AppLayout>
