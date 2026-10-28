@@ -557,28 +557,28 @@ Jedno dodatkowe zapytanie `profiles` (po kluczu głównym, objęte RLS) na żąd
 
 #### Automated
 
-- [x] 4.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [x] 4.2 Smoke przechodzi: `npm run smoke`
+- [x] 4.1 Lint, typy i build: `npm run lint && npx astro check && npm run build` — 2ea6071
+- [x] 4.2 Smoke przechodzi: `npm run smoke` — 2ea6071
 
 #### Manual
 
-- [x] 4.3 Rejestracja w przeglądarce jako owner i agent prowadzi na właściwy panel
-- [x] 4.4 Wysłanie bez roli: błąd przy kartach, fokus na pierwszej karcie, VoiceOver ogłasza legend i błąd
-- [x] 4.5 Karty roli: default, hover, focus-visible, checked i error obejrzane w light i dark
-- [x] 4.6 Hover pól widoczny w obu motywach; focus i błąd nie są nadpisywane
-- [x] 4.7 Kontrast ramek i ikon kart ≥3:1, tekstów ≥4.5:1 w obu motywach
-- [x] 4.8 360px bez poziomego scrolla, polskie znaki poprawne
+- [x] 4.3 Rejestracja w przeglądarce jako owner i agent prowadzi na właściwy panel — 2ea6071
+- [x] 4.4 Wysłanie bez roli: błąd przy kartach, fokus na pierwszej karcie, VoiceOver ogłasza legend i błąd — 2ea6071
+- [x] 4.5 Karty roli: default, hover, focus-visible, checked i error obejrzane w light i dark — 2ea6071
+- [x] 4.6 Hover pól widoczny w obu motywach; focus i błąd nie są nadpisywane — 2ea6071
+- [x] 4.7 Kontrast ramek i ikon kart ≥3:1, tekstów ≥4.5:1 w obu motywach — 2ea6071
+- [x] 4.8 360px bez poziomego scrolla, polskie znaki poprawne — 2ea6071
 
 ### Phase 5: Smoke ról i wdrożenie
 
 #### Automated
 
-- [ ] 5.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [ ] 5.2 Smoke z oboma scenariuszami przechodzi lokalnie: `npm run smoke`
+- [x] 5.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
+- [x] 5.2 Smoke z oboma scenariuszami przechodzi lokalnie: `npm run smoke`
 - [ ] 5.3 Job CI `smoke` zielony na PR: `gh pr checks`
 
 #### Manual
 
-- [ ] 5.4 Ręczny check RLS w Studio SQL: tylko własny wiersz, update i insert odrzucone, anon bez dostępu
+- [x] 5.4 Ręczny check RLS w Studio SQL: tylko własny wiersz, update i insert odrzucone, anon bez dostępu
 - [ ] 5.5 `db push --dry-run` na produkcji pokazuje tylko `create_profiles`, `db push` przechodzi
 - [ ] 5.6 Po deployu: rejestracja ownera i agenta na produkcji prowadzi na właściwy panel, cudzy prefiks przekierowuje

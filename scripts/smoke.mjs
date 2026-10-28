@@ -4,36 +4,44 @@
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
-const jar = new Map();
+const agentEmail = `smoke-agent-${Date.now()}@example.com`;
 
-function cookieHeader() {
-  return [...jar.entries()].map(([k, v]) => `${k}=${v}`).join("; ");
-}
+// One cookie jar per user, so owner and agent sessions never leak into each other.
+function session() {
+  const jar = new Map();
 
-function storeCookies(response) {
-  for (const raw of response.headers.getSetCookie()) {
-    const [pair, ...attrs] = raw.split(";");
-    const [name, ...rest] = pair.split("=");
-    const expired = attrs.some((a) => /max-age=0/i.test(a.trim()));
-    if (expired) jar.delete(name.trim());
-    else jar.set(name.trim(), rest.join("="));
+  function cookieHeader() {
+    return [...jar.entries()].map(([k, v]) => `${k}=${v}`).join("; ");
   }
+
+  function storeCookies(response) {
+    for (const raw of response.headers.getSetCookie()) {
+      const [pair, ...attrs] = raw.split(";");
+      const [name, ...rest] = pair.split("=");
+      const expired = attrs.some((a) => /max-age=0/i.test(a.trim()));
+      if (expired) jar.delete(name.trim());
+      else jar.set(name.trim(), rest.join("="));
+    }
+  }
+
+  return async function request(path, { method = "GET", form } = {}) {
+    const response = await fetch(BASE_URL + path, {
+      method,
+      redirect: "manual",
+      headers: {
+        Cookie: cookieHeader(),
+        Origin: BASE_URL,
+        ...(form ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
+      },
+      body: form ? new URLSearchParams(form).toString() : undefined,
+    });
+    storeCookies(response);
+    return { status: response.status, location: response.headers.get("location") ?? "" };
+  };
 }
 
-async function request(path, { method = "GET", form } = {}) {
-  const response = await fetch(BASE_URL + path, {
-    method,
-    redirect: "manual",
-    headers: {
-      Cookie: cookieHeader(),
-      Origin: BASE_URL,
-      ...(form ? { "Content-Type": "application/x-www-form-urlencoded" } : {}),
-    },
-    body: form ? new URLSearchParams(form).toString() : undefined,
-  });
-  storeCookies(response);
-  return { status: response.status, location: response.headers.get("location") ?? "" };
-}
+const request = session();
+const agent = session();
 
 const steps = [
   ["home renders", () => request("/"), { status: 200 }],
@@ -45,10 +53,16 @@ const steps = [
   ],
   ["signup session routes dashboard to owner panel", () => request("/dashboard"), { status: 302, location: "/owner" }],
   ["signup session reaches owner panel", () => request("/owner"), { status: 200 }],
+  ["owner is redirected from agent panel", () => request("/agent"), { status: 302, location: "/owner" }],
   ["signout after signup", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
     "signup without role is rejected",
     () => request("/api/auth/signup", { method: "POST", form: { email: `norole-${email}`, password } }),
+    { status: 302, location: "/auth/signup?error=invalid_input" },
+  ],
+  [
+    "signup with unknown role is rejected",
+    () => request("/api/auth/signup", { method: "POST", form: { email: `admin-${email}`, password, role: "admin" } }),
     { status: 302, location: "/auth/signup?error=invalid_input" },
   ],
   [
@@ -65,6 +79,20 @@ const steps = [
   ["owner panel renders for signed-in owner", () => request("/owner"), { status: 200 }],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  [
+    "agent signup creates account",
+    () => agent("/api/auth/signup", { method: "POST", form: { email: agentEmail, password, role: "agent" } }),
+    { status: 302, location: "/dashboard" },
+  ],
+  ["dashboard routes agent to agent panel", () => agent("/dashboard"), { status: 302, location: "/agent" }],
+  ["agent panel renders for agent", () => agent("/agent"), { status: 200 }],
+  ["agent is redirected from owner panel", () => agent("/owner"), { status: 302, location: "/agent" }],
+  [
+    "agent signout clears session",
+    () => agent("/api/auth/signout", { method: "POST" }),
+    { status: 302, location: "/" },
+  ],
+  ["agent panel redirects after signout", () => agent("/agent"), { status: 302, location: "/auth/signin" }],
 ];
 
 let failed = 0;
