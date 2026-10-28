@@ -6,6 +6,7 @@ export const AUTH_ERROR_CODES = [
   "invalid_input",
   "unavailable",
   "no_profile",
+  "link_expired",
   "unknown",
 ] as const;
 
@@ -19,6 +20,7 @@ const AUTH_ERROR_MESSAGES: Record<AuthErrorCode, string> = {
   invalid_input: "Sprawdź poprawność danych w formularzu",
   unavailable: "Usługa logowania jest chwilowo niedostępna",
   no_profile: "Twoje konto nie ma przypisanej roli. Skontaktuj się z nami.",
+  link_expired: "Link wygasł lub został już użyty. Zaloguj się albo zarejestruj ponownie.",
   unknown: "Coś poszło nie tak. Spróbuj ponownie.",
 };
 
