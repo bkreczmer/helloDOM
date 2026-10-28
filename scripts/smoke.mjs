@@ -42,6 +42,23 @@ function profileForm({ cities = ["warszawa"], propertyTypes = ["apartment"], pri
 }
 const validProfile = profileForm({ priceMin: "100000", priceMax: "900000", experienceYears: "5" });
 
+// Offer form with every field set; override single fields per step.
+function offerForm(overrides = {}) {
+  return {
+    city: "warszawa",
+    propertyType: "apartment",
+    transaction: "sale",
+    price: "500000",
+    areaM2: "54,5",
+    rooms: "3",
+    description: "Smoke test offer",
+    ...overrides,
+  };
+}
+const OFFER_CREATED = /^\/owner\/offers\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\?created=1$/;
+// Id of the offer saved by the owner, taken from the Location header (for the offer page steps).
+let offerId = null;
+
 // One cookie jar per user, so owner and agent sessions never leak into each other.
 function session() {
   const jar = new Map();
@@ -114,6 +131,45 @@ const steps = [
   ],
   ["dashboard routes signed-in owner to owner panel", () => request("/dashboard"), { status: 302, location: "/owner" }],
   ["owner panel renders for signed-in owner", () => request("/owner"), { status: 200 }],
+  ["new offer page renders for owner", () => request("/owner/offers/new"), { status: 200 }],
+  [
+    "owner saves a valid offer",
+    async () => {
+      const response = await request("/api/owner/offers", { method: "POST", form: offerForm() });
+      offerId = OFFER_CREATED.exec(response.location)?.[1] ?? null;
+      return response;
+    },
+    { status: 302, locationMatch: OFFER_CREATED },
+  ],
+  ...ALL_CITIES.map((city) => [
+    `owner saves an offer in ${city}`,
+    () =>
+      request("/api/owner/offers", {
+        method: "POST",
+        form: offerForm({ city, areaM2: "", rooms: "", description: "" }),
+      }),
+    { status: 302, locationMatch: OFFER_CREATED },
+  ]),
+  [
+    "offer rejects unknown city",
+    () => request("/api/owner/offers", { method: "POST", form: offerForm({ city: "atlantis" }) }),
+    { status: 302, location: "/owner/offers/new?error=invalid_input" },
+  ],
+  [
+    "offer rejects missing price",
+    () => request("/api/owner/offers", { method: "POST", form: offerForm({ price: "" }) }),
+    { status: 302, location: "/owner/offers/new?error=invalid_input" },
+  ],
+  [
+    "offer rejects price 0",
+    () => request("/api/owner/offers", { method: "POST", form: offerForm({ price: "0" }) }),
+    { status: 302, location: "/owner/offers/new?error=invalid_input" },
+  ],
+  [
+    "offer rejects non-numeric area",
+    () => request("/api/owner/offers", { method: "POST", form: offerForm({ areaM2: "abc" }) }),
+    { status: 302, location: "/owner/offers/new?error=invalid_input" },
+  ],
   [
     "owner cannot save an agent profile",
     () => request("/api/agent/profile", { method: "POST", form: validProfile }),
@@ -129,6 +185,12 @@ const steps = [
   ["dashboard routes agent to agent panel", () => agent("/dashboard"), { status: 302, location: "/agent" }],
   ["agent panel renders for agent", () => agent("/agent"), { status: 200 }],
   ["agent is redirected from owner panel", () => agent("/owner"), { status: 302, location: "/agent" }],
+  ["agent is redirected from new offer page", () => agent("/owner/offers/new"), { status: 302, location: "/agent" }],
+  [
+    "agent cannot save an offer",
+    () => agent("/api/owner/offers", { method: "POST", form: offerForm() }),
+    { status: 403 },
+  ],
   ["agent profile page renders for agent", () => agent("/agent/profile"), { status: 200 }],
   [
     "agent saves profile with the full dictionary",
@@ -198,6 +260,11 @@ const steps = [
     { status: 302, location: "/auth/signin" },
   ],
   [
+    "anonymous offer save redirects to signin",
+    () => agent("/api/owner/offers", { method: "POST", form: offerForm() }),
+    { status: 302, location: "/auth/signin" },
+  ],
+  [
     "expired confirmation link lands on signin",
     () => request("/auth/callback?error=access_denied&error_code=otp_expired"),
     { status: 302, location: "/auth/signin?error=link_expired" },
@@ -213,12 +280,19 @@ let failed = 0;
 for (const [name, run, expected] of steps) {
   const actual = await run();
   const ok =
-    actual.status === expected.status && (expected.location === undefined || actual.location === expected.location);
+    actual.status === expected.status &&
+    (expected.location === undefined || actual.location === expected.location) &&
+    (expected.locationMatch === undefined || expected.locationMatch.test(actual.location));
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
-    console.log(`      expected ${expected.status} ${expected.location ?? ""}`);
+    console.log(`      expected ${expected.status} ${expected.location ?? expected.locationMatch ?? ""}`);
   }
+}
+
+if (offerId === null) {
+  failed++;
+  console.log("FAIL  offer id was not captured from the Location header");
 }
 
 console.log(failed ? `\n${failed} step(s) failed` : "\nAll smoke steps passed");

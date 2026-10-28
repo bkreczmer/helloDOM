@@ -273,24 +273,24 @@ Nowa tabela i funkcja, bez zmian istniejących danych. Na produkcję przed merge
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie
-- [x] 1.2 Test SQL przechodzi wszystkie asercje
-- [x] 1.3 Poprzedni test SQL nadal przechodzi
-- [x] 1.4 Typy są aktualne
-- [x] 1.5 Typy i lint przechodzą
+- [x] 1.1 Migracja stosuje się na czystej bazie — 855eff4
+- [x] 1.2 Test SQL przechodzi wszystkie asercje — 855eff4
+- [x] 1.3 Poprzedni test SQL nadal przechodzi — 855eff4
+- [x] 1.4 Typy są aktualne — 855eff4
+- [x] 1.5 Typy i lint przechodzą — 855eff4
 
 ### Phase 2: Zapis oferty
 
 #### Automated
 
-- [ ] 2.1 Typy i lint przechodzą
-- [ ] 2.2 Build przechodzi
-- [ ] 2.3 Smoke przechodzi na podglądzie
+- [x] 2.1 Typy i lint przechodzą
+- [x] 2.2 Build przechodzi
+- [x] 2.3 Smoke przechodzi na podglądzie
 
 #### Manual
 
-- [ ] 2.4 Wiersz oferty smoke ma status seeking_agent i owner_id właściciela
-- [ ] 2.5 Formularz oferty: walidacja, fokus, klawiatura, 360 px, light/dark
+- [x] 2.4 Wiersz oferty smoke ma status seeking_agent i owner_id właściciela
+- [x] 2.5 Formularz oferty: walidacja, fokus, klawiatura, 360 px, light/dark
 
 ### Phase 3: Ranking i panel
 
