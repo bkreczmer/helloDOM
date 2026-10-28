@@ -346,16 +346,16 @@ Brak istotnych: jeden `select` i jeden `update` po kluczu głównym.
 
 #### Automated
 
-- [x] 3.1 Typy i lint przechodzą
-- [x] 3.2 Build przechodzi
-- [x] 3.3 Smoke przechodzi na podglądzie
+- [x] 3.1 Typy i lint przechodzą — 1fbb7a0
+- [x] 3.2 Build przechodzi — 1fbb7a0
+- [x] 3.3 Smoke przechodzi na podglądzie — 1fbb7a0
 
 #### Manual
 
-- [x] 3.4 Zapis pełnego profilu z potwierdzeniem i zachowaniem wartości
-- [x] 3.5 Profil niepełny pokazuje braki
-- [x] 3.6 Walidacja klienta z fokusem na pierwszym błędnym polu
-- [x] 3.7 7 stanów kafelków i pól widziane w przeglądarce
-- [x] 3.8 360 px, polskie znaki, light i dark
-- [x] 3.9 Aktywna pozycja nawigacji i dock
-- [x] 3.10 Właściciel nie widzi pozycji Profil
+- [x] 3.4 Zapis pełnego profilu z potwierdzeniem i zachowaniem wartości — 1fbb7a0
+- [x] 3.5 Profil niepełny pokazuje braki — 1fbb7a0
+- [x] 3.6 Walidacja klienta z fokusem na pierwszym błędnym polu — 1fbb7a0
+- [x] 3.7 7 stanów kafelków i pól widziane w przeglądarce — 1fbb7a0
+- [x] 3.8 360 px, polskie znaki, light i dark — 1fbb7a0
+- [x] 3.9 Aktywna pozycja nawigacji i dock — 1fbb7a0
+- [x] 3.10 Właściciel nie widzi pozycji Profil — 1fbb7a0
