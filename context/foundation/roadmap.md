@@ -3,7 +3,7 @@ project: helloDOM
 version: 1
 status: draft                    # draft | active | locked
 created: 2026-10-27
-updated: 2026-10-27
+updated: 2026-10-28
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -212,3 +212,4 @@ Brak otwartych pytań. Pytania o tokeny design systemu i o format miast/typów z
 ## Done
 
 - **F-01: (foundation) aplikacja ma tokeny, fonty, tryb light/dark i powłokę (sidebar 244 px na desktopie, dock na mobile) zgodne ze specyfikacją [`design-system.md`](design-system.md); istniejące strony auth z niej korzystają.** — Archived 2026-10-27 → `context/archive/2026-10-27-app-shell/`. Lesson: —.
+- **S-01: użytkownik rejestruje się e-mailem i hasłem, wybierając rolę właściciel albo agent na stałe, loguje się, wylogowuje i trafia na panel swojej roli; niezalogowany jest przekierowywany do logowania.** — Archived 2026-10-28 → `context/archive/2026-10-27-role-based-signup/`. Lesson: —.
