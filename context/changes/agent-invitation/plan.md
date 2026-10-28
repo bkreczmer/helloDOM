@@ -358,13 +358,13 @@ Nowa tabela, polityka i funkcja, bez zmian istniejących danych. Na produkcję p
 
 #### Automated
 
-- [x] 3.1 Typy i lint przechodzą
-- [x] 3.2 Build przechodzi
-- [x] 3.3 Smoke przechodzi na podglądzie, w tym kroki agenta i IDOR
-- [x] 3.4 Testy SQL nadal przechodzą
+- [x] 3.1 Typy i lint przechodzą — 74a1d50
+- [x] 3.2 Build przechodzi — 74a1d50
+- [x] 3.3 Smoke przechodzi na podglądzie, w tym kroki agenta i IDOR — 74a1d50
+- [x] 3.4 Testy SQL nadal przechodzą — 74a1d50
 
 #### Manual
 
-- [x] 3.5 Panel agenta z zaproszeniem i bez: lista, pill, stan pusty; light/dark, 360 px, fokus
-- [x] 3.6 Strona oferty agenta bez danych właściciela i 404 bez zaproszenia
+- [x] 3.5 Panel agenta z zaproszeniem i bez: lista, pill, stan pusty; light/dark, 360 px, fokus — 74a1d50
+- [x] 3.6 Strona oferty agenta bez danych właściciela i 404 bez zaproszenia — 74a1d50
 - [ ] 3.7 Na produkcji właściciel zaprasza agenta, a agent widzi zaproszenie i ofertę
