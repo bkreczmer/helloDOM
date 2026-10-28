@@ -282,31 +282,31 @@ Trigger wykonuje jeden `update` po kluczu głównym na każde usunięte zaprosze
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się lokalnie bez błędu
-- [x] 1.2 Test SQL account-deletion przechodzi
-- [x] 1.3 Pozostałe testy SQL przechodzą
-- [x] 1.4 Typy bazy są aktualne
-- [x] 1.5 Lint i astro check przechodzą
+- [x] 1.1 Migracja stosuje się lokalnie bez błędu — 48ab761
+- [x] 1.2 Test SQL account-deletion przechodzi — 48ab761
+- [x] 1.3 Pozostałe testy SQL przechodzą — 48ab761
+- [x] 1.4 Typy bazy są aktualne — 48ab761
+- [x] 1.5 Lint i astro check przechodzą — 48ab761
 
 #### Manual
 
-- [x] 1.6 Produkcyjny postgres ma DELETE na auth.users
+- [x] 1.6 Produkcyjny postgres ma DELETE na auth.users — 48ab761
 
 ### Phase 2: Endpoint i UI
 
 #### Automated
 
-- [ ] 2.1 Lint, typy i build przechodzą
-- [ ] 2.2 POST /api/account/delete bez sesji przekierowuje na logowanie
-- [ ] 2.3 Usunięcie agenta przez endpoint czyści sesję i przywraca ofertę
-- [ ] 2.4 Strony konta dostępne tylko dla właściwej roli
-- [ ] 2.5 Smoke przechodzi bez zmian
+- [x] 2.1 Lint, typy i build przechodzą
+- [x] 2.2 POST /api/account/delete bez sesji przekierowuje na logowanie
+- [x] 2.3 Usunięcie agenta przez endpoint czyści sesję i przywraca ofertę
+- [x] 2.4 Strony konta dostępne tylko dla właściwej roli
+- [x] 2.5 Smoke przechodzi bez zmian
 
 #### Manual
 
-- [ ] 2.6 Strony konta: wygląd, motywy, 360 px, aktywna nawigacja
-- [ ] 2.7 Potwierdzenie: fokus, klawiatura, stan wysyłania
-- [ ] 2.8 Po usunięciu: komunikat na /, brak dostępu, logowanie nieudane
+- [x] 2.6 Strony konta: wygląd, motywy, 360 px, aktywna nawigacja
+- [x] 2.7 Potwierdzenie: fokus, klawiatura, stan wysyłania
+- [x] 2.8 Po usunięciu: komunikat na /, brak dostępu, logowanie nieudane
 
 ### Phase 3: Smoke i produkcja
 

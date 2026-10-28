@@ -1,12 +1,24 @@
 ---
+import { CircleCheck } from "lucide-react";
 import PublicLayout from "@/layouts/PublicLayout.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const user = Astro.locals.user;
+// Set by POST /api/account/delete; a signed-in visitor cannot have just deleted their account.
+const deleted = !user && Astro.url.searchParams.get("deleted") === "1";
 ---
 
 <PublicLayout>
+  {deleted && (
+    <p
+      role="status"
+      class="mb-[18px] flex items-center gap-2 rounded-control border border-[color-mix(in_oklab,var(--rs-success)_30%,transparent)] bg-rs-success-soft px-3 py-2 text-[13px] font-semibold text-rs-success-fg"
+    >
+      <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
+      Konto zostało usunięte razem z Twoimi danymi.
+    </p>
+  )}
   <section class="rounded-card px-5 py-10 text-rs-accent-on [background:var(--rs-grad-brand)] tablet:px-10 tablet:py-16">
     <h1 class="page-title max-w-2xl">Znajdź agenta dopasowanego do Twojej nieruchomości</h1>
     <p class="mt-4 max-w-2xl text-[15px]">
