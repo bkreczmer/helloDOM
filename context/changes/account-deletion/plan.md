@@ -312,12 +312,12 @@ Trigger wykonuje jeden `update` po kluczu głównym na każde usunięte zaprosze
 
 #### Automated
 
-- [x] 3.1 Smoke z krokami usunięcia konta przechodzi lokalnie
-- [ ] 3.2 CI zielone na PR
-- [ ] 3.3 Deploy na main zielony
+- [x] 3.1 Smoke z krokami usunięcia konta przechodzi lokalnie — e124d76
+- [x] 3.2 CI zielone na PR
+- [x] 3.3 Deploy na main zielony
 
 #### Manual
 
-- [ ] 3.4 db push --dry-run pokazuje tylko migrację account_deletion
-- [ ] 3.5 Brak osieroconych ofert na produkcji po db push
-- [ ] 3.6 Usunięcie konta agenta i właściciela działa na produkcji
+- [x] 3.4 db push --dry-run pokazuje tylko migrację account_deletion
+- [x] 3.5 Brak osieroconych ofert na produkcji po db push
+- [x] 3.6 Usunięcie konta agenta i właściciela działa na produkcji
