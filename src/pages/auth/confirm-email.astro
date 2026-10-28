@@ -1,36 +1,20 @@
 ---
-import { CircleCheck, MailCheck } from "lucide-react";
+import { MailCheck } from "lucide-react";
 import PublicLayout from "@/layouts/PublicLayout.astro";
 import Card from "@/components/ui/Card.astro";
-
-const isAutoConfirmed = import.meta.env.DEV;
-
-const content = isAutoConfirmed
-  ? {
-      Icon: CircleCheck,
-      heading: "Konto utworzone",
-      description: "Twoje konto zostało utworzone. Możesz się teraz zalogować.",
-      linkText: "Przejdź do logowania",
-    }
-  : {
-      Icon: MailCheck,
-      heading: "Sprawdź skrzynkę",
-      description: "Wysłaliśmy link potwierdzający na Twój adres e-mail. Kliknij go, aby aktywować konto.",
-      linkText: "Wróć do logowania",
-    };
-
-const { Icon } = content;
 ---
 
-<PublicLayout title={content.heading}>
+<PublicLayout title="Sprawdź skrzynkę">
   <div class="mx-auto w-full max-w-sm">
-    <h1 class="page-title mb-[18px] text-center">{content.heading}</h1>
+    <h1 class="page-title mb-[18px] text-center">Sprawdź skrzynkę</h1>
     <Card>
       <div class="flex flex-col items-center py-4 text-center">
-        <Icon className="mb-4 size-12 text-rs-accent" aria-hidden="true" />
-        <p class="mb-6 text-rs-fg-2">{content.description}</p>
+        <MailCheck className="mb-4 size-12 text-rs-accent" aria-hidden="true" />
+        <p class="mb-6 text-rs-fg-2">
+          Wysłaliśmy link potwierdzający na Twój adres e-mail. Kliknij go, aby aktywować konto.
+        </p>
         <a href="/auth/signin" class="text-[13px] font-semibold text-rs-accent-fg hover:underline">
-          {content.linkText}
+          Wróć do logowania
         </a>
       </div>
     </Card>

@@ -41,7 +41,14 @@ const steps = [
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password, role: "owner" } }),
-    { status: 302, location: "/auth/confirm-email" },
+    { status: 302, location: "/dashboard" },
+  ],
+  ["signup session reaches dashboard", () => request("/dashboard"), { status: 200 }],
+  ["signout after signup", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
+  [
+    "signup without role is rejected",
+    () => request("/api/auth/signup", { method: "POST", form: { email: `norole-${email}`, password } }),
+    { status: 302, location: "/auth/signup?error=invalid_input" },
   ],
   [
     "signin rejects wrong password",
@@ -51,7 +58,7 @@ const steps = [
   [
     "signin accepts correct password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
-    { status: 302, location: "/" },
+    { status: 302, location: "/dashboard" },
   ],
   ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],

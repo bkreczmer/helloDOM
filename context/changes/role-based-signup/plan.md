@@ -512,31 +512,31 @@ Jedno dodatkowe zapytanie `profiles` (po kluczu głównym, objęte RLS) na żąd
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się na czystej bazie: `npx supabase db reset`
-- [x] 1.2 Typy się generują i są aktualne: `npm run db:types && git diff --exit-code src/db/database.types.ts`
-- [x] 1.3 Lint, typy i build przechodzą: `npm run lint && npx astro check && npm run build`
-- [x] 1.4 Smoke przechodzi na lokalnym Supabase: `npm run smoke`
+- [x] 1.1 Migracja stosuje się na czystej bazie: `npx supabase db reset` — 33c2e5d
+- [x] 1.2 Typy się generują i są aktualne: `npm run db:types && git diff --exit-code src/db/database.types.ts` — 33c2e5d
+- [x] 1.3 Lint, typy i build przechodzą: `npm run lint && npx astro check && npm run build` — 33c2e5d
+- [x] 1.4 Smoke przechodzi na lokalnym Supabase: `npm run smoke` — 33c2e5d
 
 #### Manual
 
-- [x] 1.5 W Studio wiersz `profiles` z `role = owner` dla konta smoke, RLS włączony, jedna polityka select
-- [x] 1.6 Signup bez `role` przez curl daje `?error=` i nie tworzy użytkownika
+- [x] 1.5 W Studio wiersz `profiles` z `role = owner` dla konta smoke, RLS włączony, jedna polityka select — 33c2e5d
+- [x] 1.6 Signup bez `role` przez curl daje `?error=` i nie tworzy użytkownika — 33c2e5d
 
 ### Phase 2: Endpointy auth
 
 #### Automated
 
-- [ ] 2.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [ ] 2.2 Smoke przechodzi: `npm run smoke`
-- [ ] 2.3 Żaden endpoint nie przekazuje tekstu w `?error=` (grep `encodeURIComponent` pusty)
-- [ ] 2.4 Brak gałęzi DEV w confirm-email (grep `import.meta.env.DEV` pusty)
+- [x] 2.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
+- [x] 2.2 Smoke przechodzi: `npm run smoke`
+- [x] 2.3 Żaden endpoint nie przekazuje tekstu w `?error=` (grep `encodeURIComponent` pusty)
+- [x] 2.4 Brak gałęzi DEV w confirm-email (grep `import.meta.env.DEV` pusty)
 
 #### Manual
 
-- [ ] 2.5 `?error=` z dowolnym tekstem pokazuje ogólny komunikat
-- [ ] 2.6 `?error=invalid_credentials` pokazuje „Nieprawidłowy e-mail lub hasło”
-- [ ] 2.7 POST z JSON `{}` na signin daje 302 `?error=invalid_input`, nie 500
-- [ ] 2.8 Logowanie złym hasłem w przeglądarce pokazuje polski komunikat z mapy
+- [x] 2.5 `?error=` z dowolnym tekstem pokazuje ogólny komunikat
+- [x] 2.6 `?error=invalid_credentials` pokazuje „Nieprawidłowy e-mail lub hasło”
+- [x] 2.7 POST z JSON `{}` na signin daje 302 `?error=invalid_input`, nie 500
+- [x] 2.8 Logowanie złym hasłem w przeglądarce pokazuje polski komunikat z mapy
 
 ### Phase 3: Middleware i panele ról
 

@@ -1,16 +1,17 @@
 ---
+import { authErrorMessage } from "@/lib/services/auth-errors";
 import PublicLayout from "@/layouts/PublicLayout.astro";
 import Card from "@/components/ui/Card.astro";
 import SignInForm from "@/components/auth/SignInForm";
 
-const error = Astro.url.searchParams.get("error");
+const serverError = authErrorMessage(Astro.url.searchParams.get("error"));
 ---
 
 <PublicLayout title="Logowanie">
   <div class="mx-auto w-full max-w-sm">
     <h1 class="page-title mb-[18px] text-center">Logowanie</h1>
     <Card>
-      <SignInForm serverError={error} client:load />
+      <SignInForm serverError={serverError} client:load />
     </Card>
     <p class="mt-4 text-center text-[13px] text-rs-fg-2">
       Nie masz konta?{" "}
