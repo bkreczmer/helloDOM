@@ -367,4 +367,4 @@ Nowa tabela, polityka i funkcja, bez zmian istniejących danych. Na produkcję p
 
 - [x] 3.5 Panel agenta z zaproszeniem i bez: lista, pill, stan pusty; light/dark, 360 px, fokus — 74a1d50
 - [x] 3.6 Strona oferty agenta bez danych właściciela i 404 bez zaproszenia — 74a1d50
-- [ ] 3.7 Na produkcji właściciel zaprasza agenta, a agent widzi zaproszenie i ofertę
+- [x] 3.7 Na produkcji właściciel zaprasza agenta, a agent widzi zaproszenie i ofertę — 74a1d50

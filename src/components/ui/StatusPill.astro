@@ -5,6 +5,7 @@
 //   because accent-soft stays near-white in dark;
 // - info: there are no info-soft / info-fg tokens, so fg on surface-2 (as Badge "secondary").
 // The dot takes the text colour (bg-current), so it carries the same contrast as the label.
+import { cn } from "@/lib/utils";
 import type { StatusTone } from "@/types";
 
 interface Props {
@@ -25,11 +26,11 @@ const TONE_CLASSES: Record<StatusTone, string> = {
 
 <span
   data-status={tone}
-  class:list={[
+  class:list={cn(
     "inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full px-2.5 py-[3px] font-display text-[11.5px] font-semibold whitespace-nowrap",
     TONE_CLASSES[tone],
     className,
-  ]}
+  )}
 >
   <span aria-hidden="true" class="size-1.5 shrink-0 rounded-full bg-current"></span>
   <slot />
