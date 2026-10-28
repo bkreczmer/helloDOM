@@ -1,4 +1,4 @@
-import { LayoutDashboard, UserRound, type LucideIcon } from "lucide-react";
+import { FilePlus2, LayoutDashboard, UserRound, type LucideIcon } from "lucide-react";
 import { ROLE_PREFIXES, homeFor, matchesPrefix } from "@/lib/route-guard";
 import type { Role } from "@/types";
 
@@ -14,7 +14,7 @@ export function navFor(role: Role): NavItem[] {
   if (role === "agent") {
     return [home, { href: "/agent/profile", label: "Profil", icon: UserRound }];
   }
-  return [home];
+  return [home, { href: "/owner/offers/new", label: "Nowa oferta", icon: FilePlus2 }];
 }
 
 /** The dock fits at most this many items (design-system.md, Layout). */

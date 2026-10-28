@@ -5,6 +5,7 @@ const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
 const agentEmail = `smoke-agent-${Date.now()}@example.com`;
+const otherOwnerEmail = `smoke-other-${Date.now()}@example.com`;
 
 // Written out on purpose (the smoke does not import TS): a second, independent copy of the
 // dictionary, so a drift between src/lib/dictionaries.ts and the SQL check fails here.
@@ -56,8 +57,10 @@ function offerForm(overrides = {}) {
   };
 }
 const OFFER_CREATED = /^\/owner\/offers\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\?created=1$/;
-// Id of the offer saved by the owner, taken from the Location header (for the offer page steps).
+// Id of the offer saved by the owner, taken from the Location header.
 let offerId = null;
+// Id of the offer saved after the smoke agent's profile is complete (for the ranking page steps).
+let rankedOfferId = null;
 
 // One cookie jar per user, so owner and agent sessions never leak into each other.
 function session() {
@@ -89,12 +92,14 @@ function session() {
       body: form ? new URLSearchParams(form).toString() : undefined,
     });
     storeCookies(response);
-    return { status: response.status, location: response.headers.get("location") ?? "" };
+    return { status: response.status, location: response.headers.get("location") ?? "", body: await response.text() };
   };
 }
 
 const request = session();
 const agent = session();
+const otherOwner = session();
+const anonymous = session();
 
 const steps = [
   ["home renders", () => request("/"), { status: 200 }],
@@ -244,6 +249,70 @@ const steps = [
     { status: 302, location: "/agent/profile?error=invalid_input" },
   ],
   [
+    "agent saves a full profile for the ranking",
+    () => agent("/api/agent/profile", { method: "POST", form: validProfile }),
+    { status: 302, location: "/agent/profile?saved=1" },
+  ],
+  [
+    "owner signs in again",
+    () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
+    { status: 302, location: "/dashboard" },
+  ],
+  [
+    "owner saves an offer matching the smoke agent",
+    async () => {
+      const response = await request("/api/owner/offers", {
+        method: "POST",
+        form: offerForm({ city: "warszawa", propertyType: "apartment", price: "500000" }),
+      });
+      rankedOfferId = OFFER_CREATED.exec(response.location)?.[1] ?? null;
+      return response;
+    },
+    { status: 302, locationMatch: OFFER_CREATED },
+  ],
+  [
+    // No exact score: local dev agents may outrank the smoke agent.
+    "offer page shows the ranking without agent e-mail",
+    () => request(`/owner/offers/${rankedOfferId}?created=1`),
+    { status: 200, bodyIncludes: ["Agent 1", "/100", "Zapisano ofertę"], bodyExcludes: [agentEmail] },
+  ],
+  [
+    "owner panel lists the offer",
+    () => request("/owner"),
+    { status: 200, bodyIncludes: ["Dodaj ofertę", () => `/owner/offers/${rankedOfferId}`] },
+  ],
+  ["offer page rejects a malformed id", () => request("/owner/offers/not-a-uuid"), { status: 404 }],
+  [
+    "second owner signup creates account",
+    () =>
+      otherOwner("/api/auth/signup", {
+        method: "POST",
+        form: { email: otherOwnerEmail, password, role: "owner" },
+      }),
+    { status: 302, location: "/dashboard" },
+  ],
+  [
+    "second owner gets 404 for someone else's offer",
+    () => otherOwner(`/owner/offers/${rankedOfferId}`),
+    { status: 404, bodyIncludes: ["Nie znaleziono oferty"], bodyExcludes: ["Agent 1"] },
+  ],
+  [
+    "agent is redirected from offer page",
+    () => agent(`/owner/offers/${rankedOfferId}`),
+    { status: 302, location: "/agent" },
+  ],
+  [
+    "anonymous user is redirected from offer page",
+    () => anonymous(`/owner/offers/${rankedOfferId}`),
+    { status: 302, location: "/auth/signin" },
+  ],
+  ["second owner signout", () => otherOwner("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
+  [
+    "owner signout after ranking checks",
+    () => request("/api/auth/signout", { method: "POST" }),
+    { status: 302, location: "/" },
+  ],
+  [
     "agent signout clears session",
     () => agent("/api/auth/signout", { method: "POST" }),
     { status: 302, location: "/" },
@@ -276,21 +345,30 @@ const steps = [
   ],
 ];
 
+// Body expectations may be functions, resolved when the step runs (ids captured by earlier steps).
+const resolve = (texts = []) => texts.map((text) => (typeof text === "function" ? text() : text));
+
 let failed = 0;
 for (const [name, run, expected] of steps) {
   const actual = await run();
+  const missing = resolve(expected.bodyIncludes).filter((text) => !actual.body.includes(text));
+  const leaked = resolve(expected.bodyExcludes).filter((text) => actual.body.includes(text));
   const ok =
     actual.status === expected.status &&
     (expected.location === undefined || actual.location === expected.location) &&
-    (expected.locationMatch === undefined || expected.locationMatch.test(actual.location));
+    (expected.locationMatch === undefined || expected.locationMatch.test(actual.location)) &&
+    missing.length === 0 &&
+    leaked.length === 0;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
     console.log(`      expected ${expected.status} ${expected.location ?? expected.locationMatch ?? ""}`);
+    if (missing.length) console.log(`      body is missing: ${missing.join(" | ")}`);
+    if (leaked.length) console.log(`      body must not contain: ${leaked.join(" | ")}`);
   }
 }
 
-if (offerId === null) {
+if (offerId === null || rankedOfferId === null) {
   failed++;
   console.log("FAIL  offer id was not captured from the Location header");
 }

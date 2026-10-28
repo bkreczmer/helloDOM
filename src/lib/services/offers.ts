@@ -2,7 +2,7 @@ import { z } from "astro/zod";
 import type { Database } from "@/db/database.types";
 import { CITIES, PROPERTY_TYPES, TRANSACTIONS } from "@/lib/dictionaries";
 import { MAX_PRICE } from "@/lib/services/agent-profile";
-import { OFFER_STATUSES, type City, type Offer, type RankedAgent } from "@/types";
+import { OFFER_STATUSES, type City, type Offer, type OfferListItem, type RankedAgent } from "@/types";
 
 // Limits mirror the checks in supabase/migrations/20261028140000_create_offers.sql.
 // price is a Postgres integer > 0: upper bound MAX_PRICE, shared with the agent's price range.
@@ -78,6 +78,8 @@ type OfferRow = Pick<
   | "created_at"
 >;
 
+type OfferListRow = Pick<OfferRow, "id" | "city" | "property_type" | "transaction" | "price" | "created_at">;
+
 type RankedAgentRow = Database["public"]["Functions"]["rank_agents_for_offer"]["Returns"][number];
 
 const isCity = (value: string): value is City => (CITIES as readonly string[]).includes(value);
@@ -104,6 +106,18 @@ export function toOffer(row: OfferRow): Offer {
   };
 }
 
+/** Maps a row of the owner's offer list to the DTO. */
+export function toOfferListItem(row: OfferListRow): OfferListItem {
+  return {
+    id: row.id,
+    city: oneOf(CITIES, row.city, "city"),
+    propertyType: oneOf(PROPERTY_TYPES, row.property_type, "property_type"),
+    transaction: oneOf(TRANSACTIONS, row.transaction, "transaction"),
+    price: row.price,
+    createdAt: row.created_at,
+  };
+}
+
 /** Maps a rank_agents_for_offer row to the DTO. The profiles check keeps cities within the dictionary; the filter narrows the type. */
 export function toRankedAgent(row: RankedAgentRow): RankedAgent {
   return {
@@ -112,6 +126,40 @@ export function toRankedAgent(row: RankedAgentRow): RankedAgent {
     experienceYears: row.experience_years,
     cities: row.cities.filter(isCity),
   };
+}
+
+/** Offer id from the URL: a bad format would make Postgres fail with 22P02, so it is rejected (404) before the query. */
+export function parseOfferId(value: string | undefined): string | null {
+  const result = z.uuid().safeParse(value);
+  return result.success ? result.data : null;
+}
+
+const priceFormat = new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN", maximumFractionDigits: 0 });
+const areaFormat = new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 2 });
+const dateFormat = new Intl.DateTimeFormat("pl-PL", { dateStyle: "medium", timeZone: "Europe/Warsaw" });
+
+/** Whole złoty amount, e.g. "500 000 zł". */
+export function formatPrice(value: number): string {
+  return priceFormat.format(value);
+}
+
+/** Area with a decimal comma, e.g. "54,5 m²". */
+export function formatArea(value: number): string {
+  return `${areaFormat.format(value)} m²`;
+}
+
+/** Offer creation date in the Polish calendar, e.g. "28 paź 2026". */
+export function formatOfferDate(iso: string): string {
+  return dateFormat.format(new Date(iso));
+}
+
+/** Years of experience with Polish plural forms: 1 rok, 2–4 lata (except 12–14), otherwise lat. */
+export function formatExperience(years: number): string {
+  if (years === 1) return "1 rok";
+  const lastDigit = years % 10;
+  const lastTwo = years % 100;
+  const few = lastDigit >= 2 && lastDigit <= 4 && !(lastTwo >= 12 && lastTwo <= 14);
+  return `${years} ${few ? "lata" : "lat"}`;
 }
 
 export const OFFER_ERROR_CODES = ["invalid_input", "unavailable", "unknown"] as const;

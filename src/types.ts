@@ -47,6 +47,9 @@ export interface Offer {
   createdAt: string;
 }
 
+// One row of the owner's offer list on /owner (a subset of Offer).
+export type OfferListItem = Pick<Offer, "id" | "city" | "propertyType" | "transaction" | "price" | "createdAt">;
+
 // One row of rank_agents_for_offer: anonymous on purpose (no e-mail or name), position comes from the order.
 export interface RankedAgent {
   agentId: string;

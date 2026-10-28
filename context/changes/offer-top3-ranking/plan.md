@@ -283,27 +283,27 @@ Nowa tabela i funkcja, bez zmian istniejących danych. Na produkcję przed merge
 
 #### Automated
 
-- [x] 2.1 Typy i lint przechodzą
-- [x] 2.2 Build przechodzi
-- [x] 2.3 Smoke przechodzi na podglądzie
+- [x] 2.1 Typy i lint przechodzą — 5b8600f
+- [x] 2.2 Build przechodzi — 5b8600f
+- [x] 2.3 Smoke przechodzi na podglądzie — 5b8600f
 
 #### Manual
 
-- [x] 2.4 Wiersz oferty smoke ma status seeking_agent i owner_id właściciela
-- [x] 2.5 Formularz oferty: walidacja, fokus, klawiatura, 360 px, light/dark
+- [x] 2.4 Wiersz oferty smoke ma status seeking_agent i owner_id właściciela — 5b8600f
+- [x] 2.5 Formularz oferty: walidacja, fokus, klawiatura, 360 px, light/dark — 5b8600f
 
 ### Phase 3: Ranking i panel
 
 #### Automated
 
-- [ ] 3.1 Typy i lint przechodzą
-- [ ] 3.2 Build przechodzi
-- [ ] 3.3 Smoke przechodzi na podglądzie (ranking bez e-maila agenta)
-- [ ] 3.4 Test SQL rankingu nadal przechodzi
+- [x] 3.1 Typy i lint przechodzą
+- [x] 3.2 Build przechodzi
+- [x] 3.3 Smoke przechodzi na podglądzie (ranking bez e-maila agenta)
+- [x] 3.4 Test SQL rankingu nadal przechodzi
 
 #### Manual
 
-- [ ] 3.5 Ranking 4 agentów: właściwi 3, kolejność i wyniki zgodne z regułą
-- [ ] 3.6 Komunikaty przy 1 i 0 dopasowanych agentach
-- [ ] 3.7 Strona oferty i panel: light/dark, 360 px, fokus, klawiatura
+- [x] 3.5 Ranking 4 agentów: właściwi 3, kolejność i wyniki zgodne z regułą
+- [x] 3.6 Komunikaty przy 1 i 0 dopasowanych agentach
+- [x] 3.7 Strona oferty i panel: light/dark, 360 px, fokus, klawiatura
 - [ ] 3.8 Produkcja: właściciel dodaje ofertę i widzi ranking
