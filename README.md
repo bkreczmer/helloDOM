@@ -62,7 +62,7 @@ npm run build
 npx wrangler deploy
 ```
 
-`SUPABASE_URL` i `SUPABASE_KEY` ustaw jako sekrety w Cloudflare (`npx wrangler secret put <NAZWA>`).
+`SUPABASE_URL` i `SUPABASE_KEY` ustaw jako sekrety w Cloudflare (`npx wrangler secret put <NAZWA>`). Tak samo ustaw `SITE_URL=https://hellodom.hellodom.workers.dev`: link potwierdzający w e-mailu wraca wtedy zawsze na tę domenę, a nie na host z nagłówka żądania. Bez `SITE_URL` aplikacja używa originu żądania (wystarcza lokalnie).
 
 ### Migracje bazy na produkcji
 

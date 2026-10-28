@@ -96,6 +96,7 @@ The team shipped helloDOM on the Workers Free plan because "it fits". Local deve
 | Confirmation e-mail links point at the wrong host | Production bug 2026-10-28 | — | H | Resolved 2026-10-28: `emailRedirectTo` + `/auth/callback`, Site URL and Redirect URLs set in the production project. Re-check both lists whenever the domain changes. |
 | Daily free limit exceeded (UTC reset) | Unknown unknowns | L | M | Watch request counts in the dashboard; upgrade to Paid if traffic approaches 100k/day. |
 | `Astro.session` used without planning for KV limits | Devil's advocate | L | M | Keep auth state in Supabase cookies; if sessions are needed, budget for KV write limits. |
+| Built-in Supabase SMTP sends only ~2 e-mails per hour | Production bug 2026-10-28 | H | H | Signup already hit `over_email_send_rate_limit` in production; the UI now shows „Za dużo prób…” instead of a generic error. Before real traffic, configure custom SMTP (e.g. Resend) in Authentication → SMTP Settings and raise the e-mail rate limit. |
 | Adapter version drift (14.3.1 vs 14.4.2) | Research finding | M | L | Upgrade `@astrojs/cloudflare` in a dedicated change and re-run `npm run smoke`. |
 
 ## Getting Started

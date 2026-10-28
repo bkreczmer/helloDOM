@@ -68,7 +68,7 @@ const steps = [
   [
     "signin rejects wrong password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password: "wrong" } }),
-    { status: 302, location: "/auth/signin?error=" },
+    { status: 302, location: "/auth/signin?error=invalid_credentials" },
   ],
   [
     "signin accepts correct password",
@@ -109,8 +109,7 @@ let failed = 0;
 for (const [name, run, expected] of steps) {
   const actual = await run();
   const ok =
-    actual.status === expected.status &&
-    (expected.location === undefined || actual.location.startsWith(expected.location));
+    actual.status === expected.status && (expected.location === undefined || actual.location === expected.location);
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
