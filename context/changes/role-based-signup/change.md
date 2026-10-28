@@ -3,7 +3,7 @@ change_id: role-based-signup
 title: Role based signup
 status: implementing
 created: 2026-10-27
-updated: 2026-10-27
+updated: 2026-10-28
 archived_at: null
 ---
 

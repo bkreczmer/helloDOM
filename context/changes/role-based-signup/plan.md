@@ -526,32 +526,32 @@ Jedno dodatkowe zapytanie `profiles` (po kluczu głównym, objęte RLS) na żąd
 
 #### Automated
 
-- [x] 2.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [x] 2.2 Smoke przechodzi: `npm run smoke`
-- [x] 2.3 Żaden endpoint nie przekazuje tekstu w `?error=` (grep `encodeURIComponent` pusty)
-- [x] 2.4 Brak gałęzi DEV w confirm-email (grep `import.meta.env.DEV` pusty)
+- [x] 2.1 Lint, typy i build: `npm run lint && npx astro check && npm run build` — 0ea9e56
+- [x] 2.2 Smoke przechodzi: `npm run smoke` — 0ea9e56
+- [x] 2.3 Żaden endpoint nie przekazuje tekstu w `?error=` (grep `encodeURIComponent` pusty) — 0ea9e56
+- [x] 2.4 Brak gałęzi DEV w confirm-email (grep `import.meta.env.DEV` pusty) — 0ea9e56
 
 #### Manual
 
-- [x] 2.5 `?error=` z dowolnym tekstem pokazuje ogólny komunikat
-- [x] 2.6 `?error=invalid_credentials` pokazuje „Nieprawidłowy e-mail lub hasło”
-- [x] 2.7 POST z JSON `{}` na signin daje 302 `?error=invalid_input`, nie 500
-- [x] 2.8 Logowanie złym hasłem w przeglądarce pokazuje polski komunikat z mapy
+- [x] 2.5 `?error=` z dowolnym tekstem pokazuje ogólny komunikat — 0ea9e56
+- [x] 2.6 `?error=invalid_credentials` pokazuje „Nieprawidłowy e-mail lub hasło” — 0ea9e56
+- [x] 2.7 POST z JSON `{}` na signin daje 302 `?error=invalid_input`, nie 500 — 0ea9e56
+- [x] 2.8 Logowanie złym hasłem w przeglądarce pokazuje polski komunikat z mapy — 0ea9e56
 
 ### Phase 3: Middleware i panele ról
 
 #### Automated
 
-- [ ] 3.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
-- [ ] 3.2 Smoke przechodzi: `npm run smoke`
-- [ ] 3.3 `PROTECTED_ROUTES` nie istnieje (grep w src, CLAUDE.md, AGENTS.md pusty)
+- [x] 3.1 Lint, typy i build: `npm run lint && npx astro check && npm run build`
+- [x] 3.2 Smoke przechodzi: `npm run smoke`
+- [x] 3.3 `PROTECTED_ROUTES` nie istnieje (grep w src, CLAUDE.md, AGENTS.md pusty)
 
 #### Manual
 
-- [ ] 3.4 Owner: `/dashboard`, `/agent` i `/agent/cokolwiek` prowadzą na `/owner`
-- [ ] 3.5 `/ownerx` daje 404 i nie jest bramkowane
-- [ ] 3.6 Usunięty profil: wylogowanie, komunikat `no_profile`, sesja wyczyszczona
-- [ ] 3.7 Sidebar, Dock i MobileNav z aktywną pozycją „Panel” na `/owner` w obu motywach, 360px i desktop
+- [x] 3.4 Owner: `/dashboard`, `/agent` i `/agent/cokolwiek` prowadzą na `/owner`
+- [x] 3.5 `/ownerx` daje 404 i nie jest bramkowane
+- [x] 3.6 Usunięty profil: wylogowanie, komunikat `no_profile`, sesja wyczyszczona
+- [x] 3.7 Sidebar, Dock i MobileNav z aktywną pozycją „Panel” na `/owner` w obu motywach, 360px i desktop
 
 ### Phase 4: Formularz rejestracji
 

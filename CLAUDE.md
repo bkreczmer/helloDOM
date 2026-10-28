@@ -23,7 +23,7 @@ Pre-commit: husky + lint-staged (`@package.json`).
 ### Auth flow
 
 - `src/lib/supabase.ts` — Supabase SSR client (`@supabase/ssr`, cookie sessions); secrets via `astro:env/server`.
-- `src/middleware.ts` — sets `context.locals.user`; redirects anonymous users from `PROTECTED_ROUTES` to `/auth/signin`. Add every new gated route there.
+- `src/middleware.ts` — sets `context.locals.user` and `context.locals.profile`; gated prefixes and their roles live in `src/lib/route-guard.ts`. A new page in the app shell must live under `/owner/*` or `/agent/*`.
 - Endpoints: `src/pages/api/auth/{signin,signup,signout}.ts`; pages: `src/pages/auth/`.
 
 ### Key conventions

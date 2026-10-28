@@ -43,7 +43,8 @@ const steps = [
     () => request("/api/auth/signup", { method: "POST", form: { email, password, role: "owner" } }),
     { status: 302, location: "/dashboard" },
   ],
-  ["signup session reaches dashboard", () => request("/dashboard"), { status: 200 }],
+  ["signup session routes dashboard to owner panel", () => request("/dashboard"), { status: 302, location: "/owner" }],
+  ["signup session reaches owner panel", () => request("/owner"), { status: 200 }],
   ["signout after signup", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
     "signup without role is rejected",
@@ -60,7 +61,8 @@ const steps = [
     () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
     { status: 302, location: "/dashboard" },
   ],
-  ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }],
+  ["dashboard routes signed-in owner to owner panel", () => request("/dashboard"), { status: 302, location: "/owner" }],
+  ["owner panel renders for signed-in owner", () => request("/owner"), { status: 200 }],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
 ];

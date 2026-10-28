@@ -1,24 +1,27 @@
 ---
 import { cn } from "@/lib/utils";
-import { isActive, navConfig } from "@/components/shell/nav";
+import { isActive, navFor } from "@/components/shell/nav";
+import { homeFor } from "@/lib/route-guard";
+import type { Role } from "@/types";
 
 interface Props {
   pathname: string;
+  role: Role;
 }
 
-const { pathname } = Astro.props;
+const { pathname, role } = Astro.props;
 ---
 
 <aside class="sticky top-0 hidden h-screen flex-col gap-6 border-r border-rs-line bg-rs-surface px-3.5 py-[22px] tablet:flex">
   <a
-    href="/dashboard"
+    href={homeFor(role)}
     class="hidden px-2.5 font-display text-[18px] font-bold text-rs-accent-fg desktop:block dark:text-rs-fg"
   >
     helloDOM
   </a>
   <nav aria-label="Główna nawigacja">
     <ul class="flex flex-col gap-1">
-      {navConfig.map(({ href, label, icon: Icon }) => {
+      {navFor(role).map(({ href, label, icon: Icon }) => {
         const active = isActive(pathname, href);
         return (
           <li>
