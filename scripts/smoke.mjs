@@ -72,6 +72,11 @@ let rankedOfferId = null;
 let smokeAgentId = null;
 const AGENT_ID_FIELD = /name="agentId" value="([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"/;
 const inviteForm = (agentId) => ({ offerId: rankedOfferId, ...(agentId ? { agentId } : {}) });
+// Offer A is rankedOfferId (rejected by the smoke agent); offer B is saved after that and accepted.
+let acceptedOfferId = null;
+// Agent id from the "Zaproś" form on offer B.
+let acceptedAgentId = null;
+const respondForm = (offerId, response) => ({ offerId, response });
 
 // One cookie jar per user, so owner and agent sessions never leak into each other.
 function session() {
@@ -394,6 +399,100 @@ const steps = [
     () => anonymous(`/agent/offers/${rankedOfferId}`),
     { status: 302, location: "/auth/signin" },
   ],
+  [
+    "owner cannot respond to an invitation",
+    () => request("/api/agent/invitations", { method: "POST", form: respondForm(rankedOfferId, "reject") }),
+    { status: 403 },
+  ],
+  [
+    "agent gets 404 when responding to an offer without an invitation",
+    () => agent("/api/agent/invitations", { method: "POST", form: respondForm(randomUUID(), "reject") }),
+    { status: 404 },
+  ],
+  [
+    "agent rejects the invitation",
+    () => agent("/api/agent/invitations", { method: "POST", form: respondForm(rankedOfferId, "reject") }),
+    { status: 302, location: "/agent?rejected=1" },
+  ],
+  [
+    "agent gets 404 for the rejected offer",
+    () => agent(`/agent/offers/${rankedOfferId}`),
+    { status: 404, bodyIncludes: ["Nie znaleziono oferty"], bodyExcludes: ["Podsumowanie oferty"] },
+  ],
+  [
+    "agent panel confirms the rejection",
+    () => agent("/agent?rejected=1"),
+    { status: 200, bodyIncludes: ["Odrzucono zaproszenie", "Odrzucone"] },
+  ],
+  [
+    "second response to the same invitation is rejected",
+    () => agent("/api/agent/invitations", { method: "POST", form: respondForm(rankedOfferId, "reject") }),
+    { status: 302, location: "/agent?error=already_responded" },
+  ],
+  [
+    "agent panel shows the already-responded message",
+    () => agent("/agent?error=already_responded"),
+    { status: 200, bodyIncludes: ["Na to zaproszenie już odpowiedziano."] },
+  ],
+  [
+    "owner saves a second offer matching the smoke agent",
+    async () => {
+      const response = await request("/api/owner/offers", {
+        method: "POST",
+        form: offerForm({ city: "warszawa", propertyType: "apartment", price: rankedPrice }),
+      });
+      acceptedOfferId = OFFER_CREATED.exec(response.location)?.[1] ?? null;
+      return response;
+    },
+    { status: 302, locationMatch: OFFER_CREATED },
+  ],
+  [
+    "second offer page shows the ranking with the smoke agent",
+    async () => {
+      const response = await request(`/owner/offers/${acceptedOfferId}`);
+      acceptedAgentId = AGENT_ID_FIELD.exec(response.body)?.[1] ?? null;
+      return response;
+    },
+    { status: 200, bodyIncludes: ["Agent 1", "100/100", "Zaproś"] },
+  ],
+  [
+    "owner invites the smoke agent to the second offer",
+    () =>
+      request("/api/owner/invitations", {
+        method: "POST",
+        form: { offerId: acceptedOfferId, agentId: acceptedAgentId },
+      }),
+    { status: 302, location: () => `/owner/offers/${acceptedOfferId}?invited=1` },
+  ],
+  [
+    "agent accepts the invitation",
+    () => agent("/api/agent/invitations", { method: "POST", form: respondForm(acceptedOfferId, "accept") }),
+    { status: 302, location: () => `/agent/offers/${acceptedOfferId}?accepted=1` },
+  ],
+  [
+    "agent offer page confirms the acceptance without response actions",
+    () => agent(`/agent/offers/${acceptedOfferId}?accepted=1`),
+    {
+      status: 200,
+      bodyIncludes: ["Przyjęto zaproszenie", "Oferta jest w obsłudze"],
+      bodyExcludes: ['name="response"'],
+    },
+  ],
+  [
+    "owner offer page shows the rejection above the ranking",
+    () => request(`/owner/offers/${rankedOfferId}`),
+    { status: 200, bodyIncludes: ["Agent odrzucił zaproszenie"], bodyExcludes: [() => smokeAgentId] },
+  ],
+  [
+    "owner cannot re-invite the agent who rejected the offer",
+    () => request("/api/owner/invitations", { method: "POST", form: inviteForm(smokeAgentId) }),
+    { status: 302, location: () => `/owner/offers/${rankedOfferId}?error=agent_not_ranked` },
+  ],
+  [
+    "owner offer page shows the accepted invitation",
+    () => request(`/owner/offers/${acceptedOfferId}`),
+    { status: 200, bodyIncludes: ["W obsłudze", "Agent przyjął zaproszenie"], bodyExcludes: ["Zaproś"] },
+  ],
   ["second owner signout", () => otherOwner("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
     "owner signout after ranking checks",
@@ -463,7 +562,12 @@ if (offerId === null || rankedOfferId === null) {
   console.log("FAIL  offer id was not captured from the Location header");
 }
 
-if (smokeAgentId === null) {
+if (acceptedOfferId === null) {
+  failed++;
+  console.log("FAIL  second offer id was not captured from the Location header");
+}
+
+if (smokeAgentId === null || acceptedAgentId === null) {
   failed++;
   console.log("FAIL  agent id was not captured from the invitation form");
 }

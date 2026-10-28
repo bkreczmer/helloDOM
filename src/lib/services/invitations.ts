@@ -59,6 +59,52 @@ export function invitationErrorMessage(code: string | null): string | null {
   return isInvitationErrorCode(code) ? INVITATION_ERROR_MESSAGES[code] : INVITATION_ERROR_MESSAGES.unknown;
 }
 
+// Hidden fields of the confirmation form in src/components/agent/InvitationResponse.tsx.
+export const respondSchema = z.object({
+  offerId: z.uuid(),
+  response: z.enum(["accept", "reject"]),
+});
+
+export type RespondInput = z.output<typeof respondSchema>;
+
+export function parseRespondForm(formData: FormData) {
+  return respondSchema.safeParse({
+    offerId: formData.get("offerId"),
+    response: formData.get("response"),
+  });
+}
+
+// Return values of public.respond_to_invitation in supabase/migrations/20261028200000_invitation_response.sql;
+// keep both lists in sync.
+export const RESPOND_RESULTS = ["ok", "not_found", "already_responded", "invalid_response"] as const;
+
+export type RespondResult = (typeof RESPOND_RESULTS)[number];
+
+export function isRespondResult(value: unknown): value is RespondResult {
+  return typeof value === "string" && (RESPOND_RESULTS as readonly string[]).includes(value);
+}
+
+export const RESPONSE_ERROR_CODES = ["invalid_input", "unavailable", "unknown", "already_responded"] as const;
+
+export type ResponseErrorCode = (typeof RESPONSE_ERROR_CODES)[number];
+
+const RESPONSE_ERROR_MESSAGES: Record<ResponseErrorCode, string> = {
+  invalid_input: "Nie udało się odczytać odpowiedzi. Spróbuj ponownie.",
+  unavailable: "Odpowiadanie na zaproszenia jest chwilowo niedostępne. Spróbuj ponownie za chwilę.",
+  unknown: "Nie udało się zapisać odpowiedzi. Spróbuj ponownie.",
+  already_responded: "Na to zaproszenie już odpowiedziano.",
+};
+
+function isResponseErrorCode(value: string): value is ResponseErrorCode {
+  return (RESPONSE_ERROR_CODES as readonly string[]).includes(value);
+}
+
+/** Agent pages: maps a `?error=` value to a Polish message. Arbitrary URL text never reaches the UI. */
+export function invitationResponseErrorMessage(code: string | null): string | null {
+  if (code === null) return null;
+  return isResponseErrorCode(code) ? RESPONSE_ERROR_MESSAGES[code] : RESPONSE_ERROR_MESSAGES.unknown;
+}
+
 type InvitationRow = Database["public"]["Tables"]["invitations"]["Row"];
 type OfferRow = Database["public"]["Tables"]["offers"]["Row"];
 

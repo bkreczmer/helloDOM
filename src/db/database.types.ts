@@ -41,6 +41,7 @@ export type Database = {
           id: string
           offer_id: string
           owner_id: string
+          responded_at: string | null
           status: string
         }
         Insert: {
@@ -49,6 +50,7 @@ export type Database = {
           id?: string
           offer_id: string
           owner_id: string
+          responded_at?: string | null
           status?: string
         }
         Update: {
@@ -57,6 +59,7 @@ export type Database = {
           id?: string
           offer_id?: string
           owner_id?: string
+          responded_at?: string | null
           status?: string
         }
         Relationships: [
@@ -186,6 +189,10 @@ export type Database = {
           experience_years: number
           score: number
         }[]
+      }
+      respond_to_invitation: {
+        Args: { p_offer_id: string; p_response: string }
+        Returns: string
       }
     }
     Enums: {

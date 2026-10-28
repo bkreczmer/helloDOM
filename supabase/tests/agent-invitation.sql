@@ -229,7 +229,7 @@ exception when insufficient_privilege then null; end $$;
 -- ---------------------------------------------------------------------------------------------
 
 reset role;
-update public.invitations set status = 'rejected'
+update public.invitations set status = 'rejected', responded_at = now()
   where offer_id = '00000000-0000-0000-0004-000000000001' and agent_id = '00000000-0000-0000-0003-000000000012';
 set local role authenticated;
 
@@ -259,8 +259,8 @@ do $$ begin
 exception when unique_violation then null; end $$;
 
 do $$ begin
-  insert into public.invitations (offer_id, agent_id, owner_id, status)
-    values ('00000000-0000-0000-0004-000000000002', '00000000-0000-0000-0003-000000000011', '00000000-0000-0000-0003-000000000001', 'accepted');
+  insert into public.invitations (offer_id, agent_id, owner_id, status, responded_at)
+    values ('00000000-0000-0000-0004-000000000002', '00000000-0000-0000-0003-000000000011', '00000000-0000-0000-0003-000000000001', 'accepted', now());
   raise exception 'expected failure: accepted next to a pending invitation';
 exception when unique_violation then null; end $$;
 
@@ -270,8 +270,8 @@ insert into public.invitations (offer_id, agent_id, owner_id)
 
 -- The same agent twice for one offer is rejected by unique (offer_id, agent_id).
 do $$ begin
-  insert into public.invitations (offer_id, agent_id, owner_id, status)
-    values ('00000000-0000-0000-0004-000000000001', '00000000-0000-0000-0003-000000000012', '00000000-0000-0000-0003-000000000001', 'rejected');
+  insert into public.invitations (offer_id, agent_id, owner_id, status, responded_at)
+    values ('00000000-0000-0000-0004-000000000001', '00000000-0000-0000-0003-000000000012', '00000000-0000-0000-0003-000000000001', 'rejected', now());
   raise exception 'expected failure: same agent twice for one offer';
 exception when unique_violation then null; end $$;
 
