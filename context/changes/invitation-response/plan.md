@@ -378,12 +378,12 @@ Wykluczenie w rankingu to `not exists` na `invitations` po `(offer_id, agent_id)
 
 #### Automated
 
-- [x] 3.1 `npx astro check`, `npm run lint` i `npm run build` bez błędów
-- [x] 3.2 Smoke przechodzi na lokalnym serwerze
-- [ ] 3.3 CI na PR zielone
+- [x] 3.1 `npx astro check`, `npm run lint` i `npm run build` bez błędów — 6b78e78
+- [x] 3.2 Smoke przechodzi na lokalnym serwerze — 6b78e78
+- [x] 3.3 CI na PR zielone — 6b78e78
 
 #### Manual
 
-- [x] 3.4 Informacja o odrzuceniu nad rankingiem bez odrzucającego agenta, light/dark, 360 px
-- [x] 3.5 Karta „W obsłudze” z datą, bez rankingu i „Zaproś”
-- [ ] 3.6 Pełny przepływ na produkcji po `db push` i merge
+- [x] 3.4 Informacja o odrzuceniu nad rankingiem bez odrzucającego agenta, light/dark, 360 px — 6b78e78
+- [x] 3.5 Karta „W obsłudze” z datą, bez rankingu i „Zaproś” — 6b78e78
+- [x] 3.6 Pełny przepływ na produkcji po `db push` i merge
