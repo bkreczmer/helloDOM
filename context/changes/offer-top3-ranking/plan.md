@@ -296,14 +296,14 @@ Nowa tabela i funkcja, bez zmian istniejących danych. Na produkcję przed merge
 
 #### Automated
 
-- [x] 3.1 Typy i lint przechodzą
-- [x] 3.2 Build przechodzi
-- [x] 3.3 Smoke przechodzi na podglądzie (ranking bez e-maila agenta)
-- [x] 3.4 Test SQL rankingu nadal przechodzi
+- [x] 3.1 Typy i lint przechodzą — 317dcad
+- [x] 3.2 Build przechodzi — 317dcad
+- [x] 3.3 Smoke przechodzi na podglądzie (ranking bez e-maila agenta) — 317dcad
+- [x] 3.4 Test SQL rankingu nadal przechodzi — 317dcad
 
 #### Manual
 
-- [x] 3.5 Ranking 4 agentów: właściwi 3, kolejność i wyniki zgodne z regułą
-- [x] 3.6 Komunikaty przy 1 i 0 dopasowanych agentach
-- [x] 3.7 Strona oferty i panel: light/dark, 360 px, fokus, klawiatura
+- [x] 3.5 Ranking 4 agentów: właściwi 3, kolejność i wyniki zgodne z regułą — 317dcad
+- [x] 3.6 Komunikaty przy 1 i 0 dopasowanych agentach — 317dcad
+- [x] 3.7 Strona oferty i panel: light/dark, 360 px, fokus, klawiatura — 317dcad
 - [ ] 3.8 Produkcja: właściciel dodaje ofertę i widzi ranking
