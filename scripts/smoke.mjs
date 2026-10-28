@@ -6,6 +6,42 @@ const email = `smoke-${Date.now()}@example.com`;
 const password = "Smoke-Test-Passw0rd!";
 const agentEmail = `smoke-agent-${Date.now()}@example.com`;
 
+// Written out on purpose (the smoke does not import TS): a second, independent copy of the
+// dictionary, so a drift between src/lib/dictionaries.ts and the SQL check fails here.
+const ALL_CITIES = [
+  "bialystok",
+  "bydgoszcz",
+  "gdansk",
+  "gorzow-wielkopolski",
+  "katowice",
+  "kielce",
+  "krakow",
+  "lublin",
+  "lodz",
+  "olsztyn",
+  "opole",
+  "poznan",
+  "rzeszow",
+  "szczecin",
+  "torun",
+  "warszawa",
+  "wroclaw",
+  "zielona-gora",
+];
+const ALL_PROPERTY_TYPES = ["apartment", "house", "plot"];
+
+// Profile form as [name, value] pairs, so checkbox groups can repeat a name.
+function profileForm({ cities = ["warszawa"], propertyTypes = ["apartment"], priceMin, priceMax, experienceYears }) {
+  return [
+    ...cities.map((city) => ["cities", city]),
+    ...propertyTypes.map((type) => ["propertyTypes", type]),
+    ["priceMin", priceMin],
+    ["priceMax", priceMax],
+    ["experienceYears", experienceYears],
+  ];
+}
+const validProfile = profileForm({ priceMin: "100000", priceMax: "900000", experienceYears: "5" });
+
 // One cookie jar per user, so owner and agent sessions never leak into each other.
 function session() {
   const jar = new Map();
@@ -77,6 +113,11 @@ const steps = [
   ],
   ["dashboard routes signed-in owner to owner panel", () => request("/dashboard"), { status: 302, location: "/owner" }],
   ["owner panel renders for signed-in owner", () => request("/owner"), { status: 200 }],
+  [
+    "owner cannot save an agent profile",
+    () => request("/api/agent/profile", { method: "POST", form: validProfile }),
+    { status: 403 },
+  ],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
   [
@@ -88,11 +129,67 @@ const steps = [
   ["agent panel renders for agent", () => agent("/agent"), { status: 200 }],
   ["agent is redirected from owner panel", () => agent("/owner"), { status: 302, location: "/agent" }],
   [
+    "agent saves profile with the full dictionary",
+    () =>
+      agent("/api/agent/profile", {
+        method: "POST",
+        form: profileForm({
+          cities: ALL_CITIES,
+          propertyTypes: ALL_PROPERTY_TYPES,
+          priceMin: "0",
+          priceMax: "2000000",
+          experienceYears: "0",
+        }),
+      }),
+    { status: 302, location: "/agent/profile?saved=1" },
+  ],
+  [
+    "agent saves an incomplete profile",
+    () =>
+      agent("/api/agent/profile", {
+        method: "POST",
+        form: profileForm({ cities: ["krakow"], propertyTypes: [], priceMin: "", priceMax: "", experienceYears: "" }),
+      }),
+    { status: 302, location: "/agent/profile?saved=1" },
+  ],
+  [
+    "agent profile rejects unknown city",
+    () =>
+      agent("/api/agent/profile", {
+        method: "POST",
+        form: profileForm({ cities: ["atlantis"], priceMin: "100000", priceMax: "900000", experienceYears: "5" }),
+      }),
+    { status: 302, location: "/agent/profile?error=invalid_input" },
+  ],
+  [
+    "agent profile rejects price min above max",
+    () =>
+      agent("/api/agent/profile", {
+        method: "POST",
+        form: profileForm({ priceMin: "900000", priceMax: "100000", experienceYears: "5" }),
+      }),
+    { status: 302, location: "/agent/profile?error=invalid_input" },
+  ],
+  [
+    "agent profile rejects experience above 60 years",
+    () =>
+      agent("/api/agent/profile", {
+        method: "POST",
+        form: profileForm({ priceMin: "100000", priceMax: "900000", experienceYears: "61" }),
+      }),
+    { status: 302, location: "/agent/profile?error=invalid_input" },
+  ],
+  [
     "agent signout clears session",
     () => agent("/api/auth/signout", { method: "POST" }),
     { status: 302, location: "/" },
   ],
   ["agent panel redirects after signout", () => agent("/agent"), { status: 302, location: "/auth/signin" }],
+  [
+    "anonymous profile save redirects to signin",
+    () => agent("/api/agent/profile", { method: "POST", form: validProfile }),
+    { status: 302, location: "/auth/signin" },
+  ],
   [
     "expired confirmation link lands on signin",
     () => request("/auth/callback?error=access_denied&error_code=otp_expired"),
