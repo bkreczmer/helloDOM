@@ -1,10 +1,10 @@
 ---
 change_id: testing-ranking-and-isolation
 title: Testy rankingu top 3 i izolacji danych (etap 1 planu testów)
-status: impl_reviewed
+status: archived
 created: 2026-10-29
 updated: 2026-10-29
-archived_at: null
+archived_at: 2026-10-29T12:36:46Z
 ---
 
 ## Notes
