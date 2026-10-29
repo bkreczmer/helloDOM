@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { SITE_URL } from "astro:env/server";
 import { createClient } from "@/lib/supabase";
 import { reportError } from "@/lib/report-error";
-import { toAuthErrorCode, type AuthErrorCode } from "@/lib/services/auth-errors";
+import { authErrorLogLevel, toAuthErrorCode, type AuthErrorCode } from "@/lib/services/auth-errors";
 import { signUpSchema } from "@/lib/services/auth-schemas";
 
 export const POST: APIRoute = async (context) => {
@@ -37,12 +37,8 @@ export const POST: APIRoute = async (context) => {
     });
     if (error) {
       const code = toAuthErrorCode(error);
-      // Ordinary user errors (wrong password, existing account) stay out of the log.
-      if (code === "unknown" || code === "unavailable" || (error.status ?? 0) >= 500) {
-        reportError("error", "auth.signup", error, context);
-      } else if (code === "rate_limited") {
-        reportError("warn", "auth.signup", error, context);
-      }
+      const level = authErrorLogLevel(code, error.status);
+      if (level) reportError(level, "auth.signup", error, context);
       return fail(code);
     }
     hasSession = data.session !== null;

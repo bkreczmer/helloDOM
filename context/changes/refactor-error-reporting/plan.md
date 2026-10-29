@@ -323,6 +323,8 @@ Brak migracji i zmian w schemacie; wycofanie = revert commitów (Worker przez `w
 - **Faza 4:** oba odczyty dat zaproszeń na stronie oferty właściciela logują `warn` pod wspólnym `op: owner.offer.invitation`, tak jak nazwał je plan.
 - **Krok 2.5:** awarię Auth wywołano zatrzymaniem kontenera `supabase_kong_*` (a nie `npx supabase stop`). Szybsze i nie rusza bazy; kontener wystartowany z powrotem, Auth `health` 200.
 - **Krok 3.6:** `delete_own_account` podmieniona przez psql na wersję zwracającą `not_found` (definicja z `pg_get_functiondef`), po teście przywrócona; `diff` z oryginałem pusty.
+- **Nazwy `op`:** poza nazwami bazowymi z planu kod używa przyrostków gałęzi: `.config` (brak klienta Supabase), `.role` (odczyt roli), `.read`, `.not_found` (0 wierszy / `not_found` po weryfikacji roli), `.signOut`; konwencja opisana w `src/lib/report-error.ts`. `agent.profile.save` loguje 0 zaktualizowanych wierszy jako `error` (anomalia RLS, ta sama gałąź co błąd zapisu).
+- **Impl-review (F1–F7):** poprawki w osobnym PR — stack bez linii 1, `authErrorLogLevel` w `services/auth-errors.ts`, `extra` przed polami kontekstu, testy (`tests/unit`: 24).
 - **Krok 4.7:** zamiast `docker pause` bazy (zatrzymałby też Auth i odczyt profilu w middleware, więc żądanie kończyłoby się `?error=unavailable` przed renderem strony) tabela `offers` została chwilowo przemianowana z `notify pgrst, 'reload schema'`. Wynik: `/owner` i `/owner/offers/<id>` → 503 z niezmienionym widokiem, logi `owner.offers.list` i `owner.offer.read`; tabela przywrócona (`to_regclass`), strony znów 200.
 
 ## Progress
@@ -372,14 +374,14 @@ Brak migracji i zmian w schemacie; wycofanie = revert commitów (Worker przez `w
 
 #### Automated
 
-- [x] 4.1 Lint i typy
-- [x] 4.2 Testy
-- [x] 4.3 Smoke na lokalnym preview
-- [x] 4.4 E2E
-- [x] 4.5 Brak catch {} bez bindingu w src/pages poza formData
-- [ ] 4.6 CI na PR zielone
+- [x] 4.1 Lint i typy — 0fdd733
+- [x] 4.2 Testy — 0fdd733
+- [x] 4.3 Smoke na lokalnym preview — 0fdd733
+- [x] 4.4 E2E — 0fdd733
+- [x] 4.5 Brak catch {} bez bindingu w src/pages poza formData — 0fdd733
+- [x] 4.6 CI na PR zielone — 0fdd733
 
 #### Manual
 
-- [x] 4.7 Symulowana awaria bazy daje 503 i logi
+- [x] 4.7 Symulowana awaria bazy daje 503 i logi — 0fdd733
 - [ ] 4.8 Linia logu z indeksowanymi polami w Workers Logs na produkcji

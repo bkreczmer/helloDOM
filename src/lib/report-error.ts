@@ -65,7 +65,13 @@ export function describeError(err: unknown): ErrorDescription {
     return { kind: "postgrest", code, message: truncate(err.message) };
   }
   if (err instanceof Error) {
-    const stack = err.stack ? err.stack.split("\n").slice(0, MAX_STACK_LINES).join("\n") : null;
+    // Line 1 of a V8 stack is "Name: message"; drop it so the untruncated message cannot leak through.
+    const stack = err.stack
+      ? err.stack
+          .split("\n")
+          .slice(1, MAX_STACK_LINES + 1)
+          .join("\n")
+      : null;
     return { kind: "exception", name: err.name, message: truncate(err.message), stack };
   }
   // A value that broke an RPC contract (e.g. an unexpected status string, or null).
@@ -75,7 +81,12 @@ export function describeError(err: unknown): ErrorDescription {
   return { kind: "result", value: typeof err };
 }
 
-/** Writes one structured log line; `warn` for expected-but-notable states, `error` for failures. */
+/**
+ * Writes one structured log line; `warn` for expected-but-notable states, `error` for failures.
+ * `op` names the flow (`owner.offers.update`, `middleware.getUser`); suffixes name the branch:
+ * `.config` (no Supabase client), `.role` (role read), `.read`, `.not_found` (0 rows / RPC not_found
+ * after the role check), `.signOut`.
+ */
 export function reportError(
   level: "error" | "warn",
   op: string,
@@ -83,7 +94,8 @@ export function reportError(
   ctx: ReportContext,
   extra?: ReportExtra,
 ): void {
-  const line = { level, op, ...requestContext(ctx), ...extra, error: describeError(err) };
+  // extra first, so it can never overwrite the context fields.
+  const line = { ...extra, level, op, ...requestContext(ctx), error: describeError(err) };
   if (level === "error") {
     // eslint-disable-next-line no-console
     console.error(line);
