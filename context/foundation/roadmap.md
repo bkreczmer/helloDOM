@@ -3,7 +3,7 @@ project: helloDOM
 version: 1
 status: draft                    # draft | active | locked
 created: 2026-10-27
-updated: 2026-10-28
+updated: 2026-10-29
 prd_version: 1
 main_goal: speed
 top_blocker: time
@@ -48,7 +48,7 @@ Właściciel nieruchomości, który chce ją sprzedać lub wynająć, nie wie, k
 | S-01 | role-based-signup          | użytkownik rejestruje się jako właściciel albo agent i trafia na swój panel           | F-01          | FR-001, FR-002                  | done |
 | S-02 | agent-profile              | agent uzupełnia profil: miasta, typy, przedział cen, lata doświadczenia              | S-01          | FR-007                          | done |
 | S-03 | offer-top3-ranking         | właściciel zapisuje ofertę i widzi top 3 agentów z wynikiem 0–100                    | S-01, S-02    | US-01, FR-003, FR-008           | done |
-| S-04 | owner-offer-management     | właściciel przegląda swoje oferty ze statusem, edytuje je i usuwa                    | S-03          | FR-004, FR-005, FR-006          | proposed |
+| S-04 | owner-offer-management     | właściciel przegląda swoje oferty ze statusem, edytuje je i usuwa                    | S-03          | FR-004, FR-005, FR-006          | planning |
 | S-05 | agent-invitation           | właściciel zaprasza agenta z top 3, a agent widzi zaproszenie i ofertę               | S-03          | FR-009, FR-010                  | done |
 | S-06 | invitation-response        | agent przyjmuje albo odrzuca zaproszenie, a status oferty się zmienia                | S-05          | FR-011                          | done |
 | S-07 | account-deletion           | użytkownik usuwa konto razem ze wszystkimi swoimi danymi                             | S-06          | FR-012                          | in-progress |
@@ -134,7 +134,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Poza ścieżką gwiazdy przewodniej, więc może iść równolegle; blokada edycji po zaproszeniu zależy od statusów wprowadzanych w S-05, więc trzeba uzgodnić zestaw statusów.
-- **Status:** proposed
+- **Status:** planning
 
 ### S-05: Zaproszenie agenta
 
