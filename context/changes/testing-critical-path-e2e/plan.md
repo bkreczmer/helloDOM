@@ -384,10 +384,10 @@ Nie dotyczy: brak zmian schematu i danych produkcyjnych.
 #### Automated
 
 - [x] 3.1 Składnia workflow poprawna
-- [ ] 3.2 Job smoke na PR zielony z critical-path.spec.ts w logu
+- [x] 3.2 Job smoke na PR zielony z critical-path.spec.ts w logu — e687919
 - [x] 3.3 Lint, typy i build
 
 #### Manual
 
-- [ ] 3.4 Czerwony przebieg w CI wgrywa artefakt playwright-report
-- [ ] 3.5 Dokumenty zrozumiałe dla autora drugiego testu E2E
+- [x] 3.4 Czerwony przebieg w CI wgrywa artefakt playwright-report — e687919
+- [x] 3.5 Dokumenty zrozumiałe dla autora drugiego testu E2E — e687919
