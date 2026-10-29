@@ -329,6 +329,14 @@ Migracja dodaje tylko granty i polityki, bez zmian danych. Wycofanie: SQL z blok
 - Wzorzec usuwania: `src/components/account/DeleteAccount.tsx`, `src/pages/api/account/delete.ts`
 - Decyzja o `draft`: `context/archive/2026-10-28-offer-top3-ranking/plan.md:33-34`
 
+## Addendum — odstępstwa od implementacji (impl-review 2026-10-29)
+
+- `DeleteOffer.tsx`: oprócz tekstów potwierdzenia jest `HINT_TEXT` zależny od statusu, widoczny przed kliknięciem „Usuń ofertę”. Strona renderowana na serwerze od razu mówi, co zabiera usunięcie; smoke sprawdza ten tekst („Po usunięciu zaproszony agent straci dostęp do oferty.”), bo tekst potwierdzenia pojawia się dopiero po kliknięciu.
+- Konwersja oferty na `initialValues` formularza (metraż z przecinkiem, `null` → `""`) to `toOfferFormValues` w `src/lib/services/offers.ts`, a nie kod strony; typ jest nazwany `OfferFormValues` w `src/types.ts`.
+- `isOfferEditable(status)` w `src/lib/services/offers.ts`: jedno źródło reguły `draft`/`seeking_agent` dla `edit.astro` i `[id].astro`.
+- `edit.astro` przekierowuje zablokowaną ofertę przez `Astro.response.status = 302` i nagłówek `Location` zamiast `return Astro.redirect()`: `return` na najwyższym poziomie frontmattera wywraca `@typescript-eslint/no-misused-promises` (ten sam obejście co `src/pages/dashboard.ts`).
+- Test SQL ma przypadki ponad plan: anon update, `has_column_privilege` dla `id`/`owner_id`/`status`/`created_at`, oferta drugiego właściciela, która przetrwa delete, oraz (po impl-review, F1) oferta `draft` edytowalna i cena oferty `in_progress` bez zmian.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
