@@ -337,25 +337,25 @@ Migracja dodaje tylko granty i polityki, bez zmian danych. Wycofanie: SQL z blok
 
 #### Automated
 
-- [x] 1.1 Migracja aplikuje się na czystej bazie: `npx supabase db reset`
-- [x] 1.2 Test SQL przechodzi: `supabase/tests/owner-offer-management.sql`
-- [x] 1.3 Pozostałe testy SQL przechodzą
-- [x] 1.4 Typy bez zmian: `npm run db:types && git diff --exit-code src/db/database.types.ts`
+- [x] 1.1 Migracja aplikuje się na czystej bazie: `npx supabase db reset` — 6ba94dd
+- [x] 1.2 Test SQL przechodzi: `supabase/tests/owner-offer-management.sql` — 6ba94dd
+- [x] 1.3 Pozostałe testy SQL przechodzą — 6ba94dd
+- [x] 1.4 Typy bez zmian: `npm run db:types && git diff --exit-code src/db/database.types.ts` — 6ba94dd
 
 ### Phase 2: Lista ze statusem i edycja
 
 #### Automated
 
-- [ ] 2.1 Lint przechodzi: `npm run lint`
-- [ ] 2.2 Typy przechodzą: `npx astro check`
-- [ ] 2.3 Build przechodzi: `npm run build`
-- [ ] 2.4 Smoke z krokami edycji przechodzi: `npm run smoke`
+- [x] 2.1 Lint przechodzi: `npm run lint`
+- [x] 2.2 Typy przechodzą: `npx astro check`
+- [x] 2.3 Build przechodzi: `npm run build`
+- [x] 2.4 Smoke z krokami edycji przechodzi: `npm run smoke`
 
 #### Manual
 
-- [ ] 2.5 `/owner`: pill statusu w każdym wierszu, light i dark, 360 px
-- [ ] 2.6 `/owner/offers/<id>/edit`: formularz wypełniony, walidacja, stan „Zapisywanie…”
-- [ ] 2.7 Strona oferty: „Edytuj” / tekst blokady, „Zapisano zmiany”, fokus i klawiatura
+- [x] 2.5 `/owner`: pill statusu w każdym wierszu, light i dark, 360 px
+- [x] 2.6 `/owner/offers/<id>/edit`: formularz wypełniony, walidacja, stan „Zapisywanie…”
+- [x] 2.7 Strona oferty: „Edytuj” / tekst blokady, „Zapisano zmiany”, fokus i klawiatura
 
 ### Phase 3: Usuwanie
 

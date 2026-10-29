@@ -82,6 +82,13 @@ let acceptedOfferId = null;
 // Agent id from the "Zaproś" form on offer B.
 let acceptedAgentId = null;
 const respondForm = (offerId, response) => ({ offerId, response });
+// Offer managed by the owner (S-04): edited here, and the smoke agent is invited to it before it is deleted.
+let managedOfferId = null;
+const editedDescription = "Smoke test offer after the edit";
+const updateForm = (offerId, overrides = {}) => ({
+  offerId,
+  ...offerForm({ city: "warszawa", propertyType: "apartment", price: rankedPrice, ...overrides }),
+});
 
 // One cookie jar per user, so owner and agent sessions never leak into each other.
 function session() {
@@ -499,6 +506,101 @@ const steps = [
     () => request(`/owner/offers/${acceptedOfferId}`),
     { status: 200, bodyIncludes: ["W obsłudze", "Agent przyjął zaproszenie"], bodyExcludes: ["Zaproś"] },
   ],
+  // Owner offer management (S-04). Runs while the owner, second owner and agent sessions are all active,
+  // and acceptedOfferId is stably in_progress (rankedOfferId is back to seeking_agent after the rejection).
+  [
+    "owner saves an offer to manage",
+    async () => {
+      const response = await request("/api/owner/offers", {
+        method: "POST",
+        form: offerForm({ city: "warszawa", propertyType: "apartment", price: rankedPrice }),
+      });
+      managedOfferId = OFFER_CREATED.exec(response.location)?.[1] ?? null;
+      return response;
+    },
+    { status: 302, locationMatch: OFFER_CREATED },
+  ],
+  [
+    "owner panel shows the offer status",
+    () => request("/owner"),
+    { status: 200, bodyIncludes: ["Szuka agenta", () => `/owner/offers/${managedOfferId}`] },
+  ],
+  [
+    "offer page links to the edit page",
+    () => request(`/owner/offers/${managedOfferId}`),
+    { status: 200, bodyIncludes: ["Zarządzanie ofertą", () => `/owner/offers/${managedOfferId}/edit`] },
+  ],
+  [
+    "edit page renders the form with the current values",
+    () => request(`/owner/offers/${managedOfferId}/edit`),
+    {
+      status: 200,
+      bodyIncludes: [
+        "Edycja oferty",
+        "Zapisz zmiany",
+        'action="/api/owner/offers/update"',
+        `value="${rankedPrice}"`,
+        'value="54,5"',
+        () => `name="offerId" value="${managedOfferId}"`,
+      ],
+    },
+  ],
+  [
+    "owner saves changes to the offer",
+    () =>
+      request("/api/owner/offers/update", {
+        method: "POST",
+        form: updateForm(managedOfferId, { description: editedDescription }),
+      }),
+    { status: 302, location: () => `/owner/offers/${managedOfferId}?updated=1` },
+  ],
+  [
+    "offer page shows the saved changes and the ranking",
+    () => request(`/owner/offers/${managedOfferId}?updated=1`),
+    { status: 200, bodyIncludes: ["Zapisano zmiany", editedDescription, "Agent 1", "100/100", "Zaproś"] },
+  ],
+  [
+    "offer update rejects an invalid price",
+    () => request("/api/owner/offers/update", { method: "POST", form: updateForm(managedOfferId, { price: "abc" }) }),
+    { status: 302, location: () => `/owner/offers/${managedOfferId}/edit?error=invalid_input` },
+  ],
+  [
+    "second owner gets 404 for the edit page of someone else's offer",
+    () => otherOwner(`/owner/offers/${managedOfferId}/edit`),
+    { status: 404, bodyIncludes: ["Nie znaleziono oferty"], bodyExcludes: [editedDescription] },
+  ],
+  [
+    "second owner gets 404 when updating someone else's offer",
+    () => otherOwner("/api/owner/offers/update", { method: "POST", form: updateForm(managedOfferId) }),
+    { status: 404 },
+  ],
+  [
+    "agent cannot update an offer",
+    () => agent("/api/owner/offers/update", { method: "POST", form: updateForm(managedOfferId) }),
+    { status: 403 },
+  ],
+  [
+    "owner cannot update an offer in progress",
+    () => request("/api/owner/offers/update", { method: "POST", form: updateForm(acceptedOfferId) }),
+    { status: 302, location: () => `/owner/offers/${acceptedOfferId}?error=edit_locked` },
+  ],
+  [
+    "edit page of an offer in progress redirects to the offer",
+    () => request(`/owner/offers/${acceptedOfferId}/edit`),
+    { status: 302, location: () => `/owner/offers/${acceptedOfferId}?error=edit_locked` },
+  ],
+  [
+    "offer page of an offer in progress shows the edit lock",
+    () => request(`/owner/offers/${acceptedOfferId}?error=edit_locked`),
+    {
+      status: 200,
+      bodyIncludes: [
+        "Edycja jest zablokowana, bo wysłano zaproszenie do agenta.",
+        "Tej oferty nie można już edytować, bo wysłano zaproszenie do agenta.",
+      ],
+      bodyExcludes: [() => `/owner/offers/${acceptedOfferId}/edit`],
+    },
+  ],
   ["second owner signout", () => otherOwner("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
     "owner signout after ranking checks",
@@ -647,6 +749,11 @@ if (offerId === null || rankedOfferId === null) {
 if (acceptedOfferId === null) {
   failed++;
   console.log("FAIL  second offer id was not captured from the Location header");
+}
+
+if (managedOfferId === null) {
+  failed++;
+  console.log("FAIL  managed offer id was not captured from the Location header");
 }
 
 if (smokeAgentId === null || acceptedAgentId === null) {

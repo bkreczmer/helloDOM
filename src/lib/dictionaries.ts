@@ -4,7 +4,7 @@
 // supabase/migrations/20261028100000_add_agent_profile.sql, and CITIES, PROPERTY_TYPES and
 // TRANSACTIONS with the checks in supabase/migrations/20261028140000_create_offers.sql.
 
-import type { City, InvitationStatus, OfferStatus, PropertyType, Transaction } from "@/types";
+import type { City, InvitationStatus, OfferStatus, PropertyType, StatusTone, Transaction } from "@/types";
 
 // Sorted by Polish name.
 export const CITIES = [
@@ -70,6 +70,14 @@ export const OFFER_STATUS_LABELS: Record<OfferStatus, string> = {
   seeking_agent: "Szuka agenta",
   invited: "Zaproszenie wysłane",
   in_progress: "W obsłudze",
+};
+
+// Pill colours of the offer status, shared by the offer summary and the owner's offer list.
+export const OFFER_STATUS_TONES: Record<OfferStatus, StatusTone> = {
+  draft: "info",
+  seeking_agent: "accent",
+  invited: "warn",
+  in_progress: "success",
 };
 
 export const INVITATION_STATUS_LABELS: Record<InvitationStatus, string> = {

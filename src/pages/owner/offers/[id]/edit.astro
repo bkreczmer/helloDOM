@@ -1,0 +1,110 @@
+---
+import { ArrowLeft } from "lucide-react";
+import AppLayout from "@/layouts/AppLayout.astro";
+import Card from "@/components/ui/Card.astro";
+import OfferForm from "@/components/owner/OfferForm";
+import { ServerError } from "@/components/auth/ServerError";
+import { createClient } from "@/lib/supabase";
+import { MAX_PRICE } from "@/lib/services/agent-profile";
+import {
+  AREA_M2_PATTERN,
+  MAX_DESCRIPTION_LENGTH,
+  MAX_ROOMS,
+  MIN_ROOMS,
+  isOfferEditable,
+  offerErrorMessage,
+  parseOfferId,
+  toOffer,
+  toOfferFormValues,
+} from "@/lib/services/offers";
+import type { Offer } from "@/types";
+
+// The middleware guarantees a signed-in owner on /owner/*.
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+const offerId = parseOfferId(Astro.params.id);
+
+// "missing": bad id, someone else's or no such offer (RLS hides other owners' rows) → 404, as on the offer page.
+let state: "found" | "missing" | "error" = "missing";
+let offer: Offer | null = null;
+
+if (offerId && supabase) {
+  try {
+    const { data, error } = await supabase
+      .from("offers")
+      .select("id, city, property_type, transaction, price, area_m2, rooms, description, status, created_at")
+      .eq("id", offerId)
+      .maybeSingle();
+    if (error) {
+      state = "error";
+    } else if (data) {
+      offer = toOffer(data);
+      state = "found";
+    }
+  } catch {
+    state = "error";
+  }
+} else if (offerId) {
+  state = "error";
+}
+
+// Once an invitation went out the offer is locked: back to the offer page with the reason.
+// Status and Location by hand, not `return Astro.redirect()`: a top-level return in frontmatter crashes
+// @typescript-eslint/no-misused-promises under astro-eslint-parser (see src/pages/dashboard.ts).
+const locked = offer !== null && !isOfferEditable(offer.status);
+if (locked && offer) {
+  Astro.response.status = 302;
+  Astro.response.headers.set("Location", `/owner/offers/${offer.id}?error=edit_locked`);
+} else if (state === "missing") {
+  Astro.response.status = 404;
+}
+
+const serverError = offerErrorMessage(Astro.url.searchParams.get("error"));
+---
+
+{!locked && (
+  <AppLayout title={state === "missing" ? "Nie znaleziono oferty" : "Edycja oferty"}>
+    <div class="flex w-full max-w-2xl flex-col gap-[18px]">
+      {state === "found" && offer ? (
+        <>
+          <a
+            href={`/owner/offers/${offer.id}`}
+            class="inline-flex items-center gap-1.5 self-start text-[13px] font-semibold text-rs-accent-fg hover:underline"
+          >
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            Wróć do oferty
+          </a>
+          <Card>
+            <OfferForm
+              client:load
+              action="/api/owner/offers/update"
+              submitLabel="Zapisz zmiany"
+              offerId={offer.id}
+              initialValues={toOfferFormValues(offer)}
+              limits={{
+                maxPrice: MAX_PRICE,
+                minRooms: MIN_ROOMS,
+                maxRooms: MAX_ROOMS,
+                maxDescriptionLength: MAX_DESCRIPTION_LENGTH,
+                areaM2Pattern: AREA_M2_PATTERN.source,
+              }}
+              serverError={serverError}
+            />
+          </Card>
+        </>
+      ) : state === "missing" ? (
+        <Card title="Nie znaleziono oferty">
+          <p class="text-[13px] leading-[1.6] text-rs-fg-2">Ta oferta nie istnieje albo nie należy do Twojego konta.</p>
+          <a
+            href="/owner"
+            class="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-rs-accent-fg hover:underline"
+          >
+            <ArrowLeft className="size-4" aria-hidden="true" />
+            Wróć do panelu
+          </a>
+        </Card>
+      ) : (
+        <ServerError message="Oferta jest chwilowo niedostępna. Odśwież stronę za chwilę." />
+      )}
+    </div>
+  </AppLayout>
+)}

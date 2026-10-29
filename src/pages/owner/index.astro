@@ -2,9 +2,16 @@
 import { ChevronRight, FilePlus2, Files } from "lucide-react";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
+import StatusPill from "@/components/ui/StatusPill.astro";
 import { buttonVariants } from "@/components/ui/button";
 import { ServerError } from "@/components/auth/ServerError";
-import { CITY_LABELS, PROPERTY_TYPE_LABELS, TRANSACTION_LABELS } from "@/lib/dictionaries";
+import {
+  CITY_LABELS,
+  OFFER_STATUS_LABELS,
+  OFFER_STATUS_TONES,
+  PROPERTY_TYPE_LABELS,
+  TRANSACTION_LABELS,
+} from "@/lib/dictionaries";
 import { createClient } from "@/lib/supabase";
 import { OWNER_OFFERS_LIMIT, formatOfferDate, formatPrice, toOfferListItem } from "@/lib/services/offers";
 import type { OfferListItem } from "@/types";
@@ -17,7 +24,7 @@ if (supabase) {
   try {
     const { data, error } = await supabase
       .from("offers")
-      .select("id, city, property_type, transaction, price, created_at")
+      .select("id, city, property_type, transaction, price, status, created_at")
       .order("created_at", { ascending: false })
       .limit(OWNER_OFFERS_LIMIT);
     if (!error) {
@@ -59,8 +66,12 @@ if (supabase) {
                     {CITY_LABELS[offer.city]} · {PROPERTY_TYPE_LABELS[offer.propertyType]} ·{" "}
                     {TRANSACTION_LABELS[offer.transaction]}
                   </span>
-                  <span class="text-[11.5px] text-rs-fg-2">
-                    Dodano <time datetime={offer.createdAt}>{formatOfferDate(offer.createdAt)}</time>
+                  {/* The pill sits under the title, so on narrow screens it never squeezes the price. */}
+                  <span class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <StatusPill tone={OFFER_STATUS_TONES[offer.status]}>{OFFER_STATUS_LABELS[offer.status]}</StatusPill>
+                    <span class="text-[11.5px] text-rs-fg-2">
+                      Dodano <time datetime={offer.createdAt}>{formatOfferDate(offer.createdAt)}</time>
+                    </span>
                   </span>
                 </span>
                 <span class="font-numeric text-[14px] font-bold whitespace-nowrap tabular-nums text-rs-fg">

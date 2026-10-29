@@ -2,7 +2,15 @@ import { z } from "astro/zod";
 import type { Database } from "@/db/database.types";
 import { CITIES, PROPERTY_TYPES, TRANSACTIONS } from "@/lib/dictionaries";
 import { MAX_PRICE } from "@/lib/services/agent-profile";
-import { OFFER_STATUSES, type City, type Offer, type OfferListItem, type RankedAgent } from "@/types";
+import {
+  OFFER_STATUSES,
+  type City,
+  type Offer,
+  type OfferFormValues,
+  type OfferListItem,
+  type OfferStatus,
+  type RankedAgent,
+} from "@/types";
 
 // Limits mirror the checks in supabase/migrations/20261028140000_create_offers.sql.
 // price is a Postgres integer > 0: upper bound MAX_PRICE, shared with the agent's price range.
@@ -11,7 +19,7 @@ export const AREA_M2_PATTERN = /^\d{1,5}([.,]\d{1,2})?$/;
 export const MIN_ROOMS = 1;
 export const MAX_ROOMS = 50;
 export const MAX_DESCRIPTION_LENGTH = 2000;
-// The owner panel shows the newest offers only; the full list with filters is S-04.
+// The owner panel shows the newest offers only; S-04 kept this limit (no paging or filters).
 export const OWNER_OFFERS_LIMIT = 50;
 
 // A missing key (`get` returns null) or a blank string means "not set".
@@ -80,7 +88,7 @@ type OfferRow = Pick<
   | "created_at"
 >;
 
-type OfferListRow = Pick<OfferRow, "id" | "city" | "property_type" | "transaction" | "price" | "created_at">;
+type OfferListRow = Pick<OfferRow, "id" | "city" | "property_type" | "transaction" | "price" | "status" | "created_at">;
 
 type RankedAgentRow = Database["public"]["Functions"]["rank_agents_for_offer"]["Returns"][number];
 
@@ -119,7 +127,21 @@ export function toOfferListItem(row: OfferListRow): OfferListItem {
     propertyType: oneOf(PROPERTY_TYPES, row.property_type, "offers.property_type"),
     transaction: oneOf(TRANSACTIONS, row.transaction, "offers.transaction"),
     price: row.price,
+    status: oneOf(OFFER_STATUSES, row.status, "offers.status"),
     createdAt: row.created_at,
+  };
+}
+
+/** Offer as the edit form shows it: area with a decimal comma (54.5 → "54,5"), null as "". */
+export function toOfferFormValues(offer: Offer): OfferFormValues {
+  return {
+    city: offer.city,
+    propertyType: offer.propertyType,
+    transaction: offer.transaction,
+    price: String(offer.price),
+    areaM2: offer.areaM2 === null ? "" : String(offer.areaM2).replace(".", ","),
+    rooms: offer.rooms === null ? "" : String(offer.rooms),
+    description: offer.description ?? "",
   };
 }
 
@@ -185,4 +207,30 @@ function isOfferErrorCode(value: string): value is OfferErrorCode {
 export function offerErrorMessage(code: string | null): string | null {
   if (code === null) return null;
   return isOfferErrorCode(code) ? OFFER_ERROR_MESSAGES[code] : OFFER_ERROR_MESSAGES.unknown;
+}
+
+export const OFFER_ACTION_ERROR_CODES = ["edit_locked", "delete_failed"] as const;
+
+export type OfferActionErrorCode = (typeof OFFER_ACTION_ERROR_CODES)[number];
+
+const OFFER_ACTION_ERROR_MESSAGES: Record<OfferActionErrorCode, string> = {
+  edit_locked: "Tej oferty nie można już edytować, bo wysłano zaproszenie do agenta.",
+  delete_failed: "Nie udało się usunąć oferty. Spróbuj ponownie.",
+};
+
+function isOfferActionErrorCode(value: string): value is OfferActionErrorCode {
+  return (OFFER_ACTION_ERROR_CODES as readonly string[]).includes(value);
+}
+
+/**
+ * Offer page side: maps an offer action `?error=` value (edit, delete) to a Polish message.
+ * Returns null for any other code, so the page can fall back to the invitation messages.
+ */
+export function offerActionErrorMessage(code: string | null): string | null {
+  return code !== null && isOfferActionErrorCode(code) ? OFFER_ACTION_ERROR_MESSAGES[code] : null;
+}
+
+/** Offer statuses in which the owner may still edit the offer (mirrors the offers_update_own_editable policy). */
+export function isOfferEditable(status: OfferStatus): boolean {
+  return status === "draft" || status === "seeking_agent";
 }
