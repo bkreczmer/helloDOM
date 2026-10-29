@@ -61,6 +61,7 @@ Najpierw czysty moduł z testami (faza 1), potem przepinanie wywołań od najbar
 - **Czysty moduł:** `src/lib/report-error.ts` nie może importować `astro:*` ani używać aliasu `@/` w importach wartości (Vitest bez konfiguracji Astro). Typy z `astro` i `@supabase/supabase-js` są dozwolone, a guardy z `@supabase/supabase-js` jako import wartości działają w Node.
 - **Klasyfikacja w middleware:** wyłącznie `isAuthRetryableFetchError(error)` oznacza awarię. `AuthSessionMissingError` i każde inne 4xx (np. JWT usuniętego użytkownika po nieudanym signOut) muszą zostać „brakiem sesji”, inaczej smoke (`:740`, `:775`) i strona główna anonimowo (`:134`) się wysypią albo powstanie pętla `unavailable`.
 - **Prywatność:** helper serializuje błędy sam. Dla `PostgrestError` loguje `code` i `message` skrócony do 200 znaków, bez `details` i `hint`. Dla `AuthError` loguje `name`, `status` i `code`, bez `message`. Dla innych `Error` loguje `name`, skrócony `message` i pierwsze 5 linii stacku. Nigdy nie loguje e-maila, body, ciasteczek ani adresu IP; `route` to `routePattern`, a nie `url.pathname`.
+- **Podwójny log przy 500:** Astro uruchamia middleware ponownie przy renderze strony 500 (`node_modules/astro/dist/core/errors/default-handler.js:80`), więc jedna awaria może dać dwie linie z tym samym `requestId`; to oczekiwane, nie dwa incydenty.
 - **Korelacja:** `requestId` = nagłówek `cf-ray`, a gdy go nie ma (lokalnie, smoke) — `crypto.randomUUID()`.
 
 ## Phase 1: Helper i testy jednostkowe
@@ -172,7 +173,7 @@ Middleware odróżnia awarię od braku sesji i loguje każdą gałąź błędu; 
 
 - Lint i typy: `npm run lint && npx astro check`
 - Testy jednostkowe: `npm run test:unit`
-- Smoke na lokalnym preview przechodzi bez zmian w oczekiwaniach: `npm run build && npx astro preview --port 4323` w tle, potem `BASE_URL=http://localhost:4323 npm run smoke`
+- Smoke na lokalnym preview przechodzi bez zmian w oczekiwaniach: `npm run build && ASTRO_PREVIEW_BACKGROUND=1 npx astro preview --port 4323` w tle, potem `BASE_URL=http://localhost:4323 npm run smoke`; po teście zatrzymać preview i potwierdzić wolny port (`lsof -nP -iTCP:4323 -sTCP:LISTEN` nic nie wypisuje; osierocony demon: `npx astro preview stop`)
 - E2E: `npm run test:e2e`
 
 #### Manual Verification:
@@ -225,7 +226,7 @@ Wszystkie endpointy ofert, zaproszeń, profilu agenta i usunięcia konta logują
 
 - Lint i typy: `npm run lint && npx astro check`
 - Testy jednostkowe i integracyjne: `npm run test:unit && npm run test:integration`
-- Smoke na lokalnym preview: `npm run build && npx astro preview --port 4323` w tle, potem `BASE_URL=http://localhost:4323 npm run smoke`
+- Smoke na lokalnym preview: `npm run build && ASTRO_PREVIEW_BACKGROUND=1 npx astro preview --port 4323` w tle, potem `BASE_URL=http://localhost:4323 npm run smoke`; po teście zatrzymać preview i potwierdzić wolny port (`lsof -nP -iTCP:4323 -sTCP:LISTEN` nic nie wypisuje; osierocony demon: `npx astro preview stop`)
 - E2E: `npm run test:e2e`
 - Brak `catch {}` bez bindingu w `src/pages/api/**` i `src/pages/auth/**` poza `formData()`: `grep -rn "catch {" src/pages/api src/pages/auth` zwraca tylko wiersze formData
 
@@ -267,7 +268,7 @@ Strony w stanie błędu odpowiadają 503 i logują przyczynę, w tym błąd RPC 
 
 - Lint i typy: `npm run lint && npx astro check`
 - Testy: `npm run test:unit && npm run test:integration`
-- Smoke na lokalnym preview: `npm run build && npx astro preview --port 4323` w tle, potem `BASE_URL=http://localhost:4323 npm run smoke`
+- Smoke na lokalnym preview: `npm run build && ASTRO_PREVIEW_BACKGROUND=1 npx astro preview --port 4323` w tle, potem `BASE_URL=http://localhost:4323 npm run smoke`; po teście zatrzymać preview i potwierdzić wolny port (`lsof -nP -iTCP:4323 -sTCP:LISTEN` nic nie wypisuje; osierocony demon: `npx astro preview stop`)
 - E2E: `npm run test:e2e`
 - Brak `catch {}` bez bindingu w `src/pages/**` poza `formData()`: `grep -rn "catch {" src/pages`
 - CI na PR zielone (ci + smoke)
