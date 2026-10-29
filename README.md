@@ -54,6 +54,8 @@ Supabase domyślnie wymaga potwierdzenia e-maila przed logowaniem. Na czas lokal
 - `npm run format` — Prettier
 - `npx astro check` — sprawdzenie typów
 - `npm run smoke` — smoke test przepływu auth na działającym serwerze (`BASE_URL`, domyślnie `http://localhost:4321`)
+- `npm run test:integration` — testy integracyjne (Vitest) na lokalnym Supabase
+- `npm run test:e2e` — testy E2E (Playwright, Chromium): same budują aplikację i uruchamiają podgląd; wymagają `npx supabase start` oraz `E2E_USERNAME` / `E2E_PASSWORD` w `.env` (lokalne konto z rolą `owner`), opcjonalnie `E2E_PORT`, gdy port 4321 jest zajęty
 
 ## Deploy
 
@@ -84,7 +86,7 @@ Merge do `main` zrób zaraz po `db push`, żeby produkcyjny kod nie rozjechał s
 GitHub Actions (`.github/workflows/ci.yml`) uruchamia przy każdym pushu i PR do `main`:
 
 - **ci** — lint, `astro check` i build.
-- **smoke** — stawia lokalny Supabase, buduje aplikację, serwuje podgląd produkcyjny i uruchamia `npm run smoke`.
+- **smoke** — stawia lokalny Supabase, uruchamia testy SQL i integracyjne, buduje aplikację, zakłada konto E2E i uruchamia `npm run test:e2e` (przy porażce raport i trace jako artefakt `playwright-report`), a na koniec serwuje podgląd produkcyjny i uruchamia `npm run smoke`.
 - **deploy** — tylko po pushu do `main` i po zielonych `ci` oraz `smoke`: `npx wrangler deploy` (sekrety repozytorium `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`), a potem sprawdzenie, że produkcja odpowiada.
 
 Produkcja: https://hellodom.hellodom.workers.dev
