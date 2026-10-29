@@ -1,10 +1,15 @@
 import { defineMiddleware } from "astro:middleware";
-import { createClient } from "@/lib/supabase";
+import type { APIContext, MiddlewareNext } from "astro";
+import { applyAuthCacheHeaders, createClient } from "@/lib/supabase";
 import { homeFor, isGated, requiredRole } from "@/lib/route-guard";
 import { isAuthOutage, reportError } from "@/lib/report-error";
 import type { Profile } from "@/types";
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  return applyAuthCacheHeaders(context.cookies, await guard(context, next));
+});
+
+async function guard(context: APIContext, next: MiddlewareNext): Promise<Response> {
   const supabase = createClient(context.request.headers, context.cookies);
   const { pathname } = context.url;
 
@@ -69,4 +74,4 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   return next();
-});
+}
