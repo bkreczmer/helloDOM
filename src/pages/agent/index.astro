@@ -5,6 +5,7 @@ import Card from "@/components/ui/Card.astro";
 import InvitationList from "@/components/agent/InvitationList.astro";
 import { ServerError } from "@/components/auth/ServerError";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import {
   AGENT_INVITATIONS_LIMIT,
   invitationResponseErrorMessage,
@@ -25,12 +26,21 @@ if (supabase) {
       .select("id, status, created_at, offers(id, city, property_type, transaction, price)")
       .order("created_at", { ascending: false })
       .limit(AGENT_INVITATIONS_LIMIT);
-    if (!error) {
+    if (error) {
+      reportError("error", "agent.invitations.list", error, Astro);
+    } else {
       invitations = data.map(toAgentInvitationItem);
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "agent.invitations.list", e, Astro);
     invitations = null;
   }
+} else {
+  reportError("error", "agent.invitations.list.config", undefined, Astro);
+}
+// The list renders its own error message; the 503 keeps a database failure out of the healthy-traffic metrics.
+if (invitations === null) {
+  Astro.response.status = 503;
 }
 
 // Set by POST /api/agent/invitations: a rejection, or an error with no offer page to return to.

@@ -316,6 +316,15 @@ Brak migracji i zmian w schemacie; wycofanie = revert commitów (Worker przez `w
 - Decyzje odwracane: `context/archive/2026-10-28-account-deletion/plan.md:140` (D1), zachowane: `context/archive/2026-10-27-role-based-signup/plan.md:67` (signOut przy `no_profile`), `context/archive/2026-10-27-role-based-signup/reviews/plan-review.md:25-32` (błąd bazy bez signOut)
 - Wzorzec map kodów błędów: `src/lib/services/auth-errors.ts:1-50`, `src/lib/services/account.ts:11-28`
 
+## Addendum — odstępstwa z implementacji
+
+- **Faza 3:** w `catch` endpointów zaproszeń (`api/owner/invitations.ts`, `api/agent/invitations.ts`) log nie ma `offerId`/`agentId`, bo są zadeklarowane wewnątrz `try`. Linia zawiera `rpc`, `route`, `requestId` i `userId`, co wystarcza do korelacji. W `update.ts` i `delete.ts` `offerId` jest w zasięgu wszędzie.
+- **Faza 3:** pozostałe `catch {}` w API (8) obejmują wyłącznie `formData()`, także dwa, w których `formData()` jest wywoływane wewnątrz parsera (`api/owner/offers.ts:39`, `api/agent/profile.ts:38`).
+- **Faza 4:** oba odczyty dat zaproszeń na stronie oferty właściciela logują `warn` pod wspólnym `op: owner.offer.invitation`, tak jak nazwał je plan.
+- **Krok 2.5:** awarię Auth wywołano zatrzymaniem kontenera `supabase_kong_*` (a nie `npx supabase stop`). Szybsze i nie rusza bazy; kontener wystartowany z powrotem, Auth `health` 200.
+- **Krok 3.6:** `delete_own_account` podmieniona przez psql na wersję zwracającą `not_found` (definicja z `pg_get_functiondef`), po teście przywrócona; `diff` z oryginałem pusty.
+- **Krok 4.7:** zamiast `docker pause` bazy (zatrzymałby też Auth i odczyt profilu w middleware, więc żądanie kończyłoby się `?error=unavailable` przed renderem strony) tabela `offers` została chwilowo przemianowana z `notify pgrst, 'reload schema'`. Wynik: `/owner` i `/owner/offers/<id>` → 503 z niezmienionym widokiem, logi `owner.offers.list` i `owner.offer.read`; tabela przywrócona (`to_regclass`), strony znów 200.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
@@ -349,28 +358,28 @@ Brak migracji i zmian w schemacie; wycofanie = revert commitów (Worker przez `w
 
 #### Automated
 
-- [x] 3.1 Lint i typy
-- [x] 3.2 Testy jednostkowe i integracyjne
-- [x] 3.3 Smoke na lokalnym preview
-- [x] 3.4 E2E
-- [x] 3.5 Brak catch {} bez bindingu w API i auth poza formData
+- [x] 3.1 Lint i typy — 1af986e
+- [x] 3.2 Testy jednostkowe i integracyjne — 1af986e
+- [x] 3.3 Smoke na lokalnym preview — 1af986e
+- [x] 3.4 E2E — 1af986e
+- [x] 3.5 Brak catch {} bez bindingu w API i auth poza formData — 1af986e
 
 #### Manual
 
-- [x] 3.6 D1 sprawdzone lokalnie z podmienioną funkcją RPC
+- [x] 3.6 D1 sprawdzone lokalnie z podmienioną funkcją RPC — 1af986e
 
 ### Phase 4: Strony
 
 #### Automated
 
-- [ ] 4.1 Lint i typy
-- [ ] 4.2 Testy
-- [ ] 4.3 Smoke na lokalnym preview
-- [ ] 4.4 E2E
-- [ ] 4.5 Brak catch {} bez bindingu w src/pages poza formData
+- [x] 4.1 Lint i typy
+- [x] 4.2 Testy
+- [x] 4.3 Smoke na lokalnym preview
+- [x] 4.4 E2E
+- [x] 4.5 Brak catch {} bez bindingu w src/pages poza formData
 - [ ] 4.6 CI na PR zielone
 
 #### Manual
 
-- [ ] 4.7 Symulowana awaria bazy daje 503 i logi
+- [x] 4.7 Symulowana awaria bazy daje 503 i logi
 - [ ] 4.8 Linia logu z indeksowanymi polami w Workers Logs na produkcji

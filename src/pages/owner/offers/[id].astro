@@ -9,6 +9,7 @@ import RankingList from "@/components/owner/RankingList.astro";
 import { DeleteOffer } from "@/components/owner/DeleteOffer";
 import { ServerError } from "@/components/auth/ServerError";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { invitationErrorMessage } from "@/lib/services/invitations";
 import {
   formatOfferDate,
@@ -32,6 +33,8 @@ let invitedAt: string | null = null;
 let respondedAt: string | null = null;
 // responded_at of the latest rejected invitation, shown above the ranking once the offer is back to seeking_agent.
 let rejectedAt: string | null = null;
+// A failed ranking still renders the offer (RankingList shows its own error), but the response is a 503.
+let rankingFailed = false;
 
 if (offerId && supabase) {
   try {
@@ -41,12 +44,14 @@ if (offerId && supabase) {
       .eq("id", offerId)
       .maybeSingle();
     if (error) {
+      reportError("error", "owner.offer.read", error, Astro, { offerId });
       state = "error";
     } else if (data) {
       offer = toOffer(data);
       state = "found";
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "owner.offer.read", e, Astro, { offerId });
     state = "error";
   }
 
@@ -55,9 +60,17 @@ if (offerId && supabase) {
   if (offer?.status === "seeking_agent") {
     try {
       const { data, error } = await supabase.rpc("rank_agents_for_offer", { p_offer_id: offer.id });
-      agents = error ? null : data.map(toRankedAgent);
-    } catch {
+      if (error) {
+        reportError("error", "owner.offer.rank", error, Astro, { offerId });
+        agents = null;
+        rankingFailed = true;
+      } else {
+        agents = data.map(toRankedAgent);
+      }
+    } catch (e) {
+      reportError("error", "owner.offer.rank", e, Astro, { offerId });
       agents = null;
+      rankingFailed = true;
     }
     // The latest rejection, read through RLS; a failed read only drops the notice.
     try {
@@ -69,8 +82,12 @@ if (offerId && supabase) {
         .order("responded_at", { ascending: false })
         .limit(1)
         .maybeSingle();
+      if (error) {
+        reportError("warn", "owner.offer.invitation", error, Astro, { offerId });
+      }
       rejectedAt = error ? null : (data?.responded_at ?? null);
-    } catch {
+    } catch (e) {
+      reportError("warn", "owner.offer.invitation", e, Astro, { offerId });
       rejectedAt = null;
     }
   } else if (offer) {
@@ -82,19 +99,27 @@ if (offerId && supabase) {
         .eq("offer_id", offer.id)
         .in("status", ["pending", "accepted"])
         .maybeSingle();
+      if (error) {
+        reportError("warn", "owner.offer.invitation", error, Astro, { offerId });
+      }
       invitedAt = error ? null : (data?.created_at ?? null);
       respondedAt = error ? null : (data?.responded_at ?? null);
-    } catch {
+    } catch (e) {
+      reportError("warn", "owner.offer.invitation", e, Astro, { offerId });
       invitedAt = null;
       respondedAt = null;
     }
   }
 } else if (offerId) {
+  reportError("error", "owner.offer.read.config", undefined, Astro, { offerId });
   state = "error";
 }
 
+// "missing" stays a 404; a database or config failure is a 503, so it does not look like healthy traffic.
 if (state === "missing") {
   Astro.response.status = 404;
+} else if (state === "error" || rankingFailed) {
+  Astro.response.status = 503;
 }
 
 const created = Astro.url.searchParams.get("created") === "1";
