@@ -324,26 +324,26 @@ Brak migracji i zmian w schemacie; wycofanie = revert commitów (Worker przez `w
 
 #### Automated
 
-- [x] 1.1 Testy jednostkowe przechodzą
-- [x] 1.2 Lint i typy
-- [x] 1.3 Celowe uszkodzenie czerwieni test prywatności
+- [x] 1.1 Testy jednostkowe przechodzą — d273e5a
+- [x] 1.2 Lint i typy — d273e5a
+- [x] 1.3 Celowe uszkodzenie czerwieni test prywatności — d273e5a
 
 #### Manual
 
-- [x] 1.4 Przegląd report-error.ts pod kątem danych osobowych
+- [x] 1.4 Przegląd report-error.ts pod kątem danych osobowych — d273e5a
 
 ### Phase 2: Bramka i auth
 
 #### Automated
 
-- [ ] 2.1 Lint i typy
-- [ ] 2.2 Testy jednostkowe
-- [ ] 2.3 Smoke na lokalnym preview bez zmian w oczekiwaniach
-- [ ] 2.4 E2E
+- [x] 2.1 Lint i typy
+- [x] 2.2 Testy jednostkowe
+- [x] 2.3 Smoke na lokalnym preview bez zmian w oczekiwaniach
+- [x] 2.4 E2E
 
 #### Manual
 
-- [ ] 2.5 Symulowana awaria Auth daje ?error=unavailable i log
+- [x] 2.5 Symulowana awaria Auth daje ?error=unavailable i log
 
 ### Phase 3: Endpointy biznesowe
 

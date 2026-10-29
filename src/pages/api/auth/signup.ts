@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { SITE_URL } from "astro:env/server";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { toAuthErrorCode, type AuthErrorCode } from "@/lib/services/auth-errors";
 import { signUpSchema } from "@/lib/services/auth-schemas";
 
@@ -23,6 +24,7 @@ export const POST: APIRoute = async (context) => {
   try {
     const supabase = createClient(context.request.headers, context.cookies);
     if (!supabase) {
+      reportError("error", "auth.signup.config", undefined, context);
       return fail("unavailable");
     }
     // The confirmation link must come back to this deployment, not to the Site URL configured in Supabase.
@@ -34,10 +36,18 @@ export const POST: APIRoute = async (context) => {
       options: { data: { role }, emailRedirectTo },
     });
     if (error) {
-      return fail(toAuthErrorCode(error));
+      const code = toAuthErrorCode(error);
+      // Ordinary user errors (wrong password, existing account) stay out of the log.
+      if (code === "unknown" || code === "unavailable" || (error.status ?? 0) >= 500) {
+        reportError("error", "auth.signup", error, context);
+      } else if (code === "rate_limited") {
+        reportError("warn", "auth.signup", error, context);
+      }
+      return fail(code);
     }
     hasSession = data.session !== null;
-  } catch {
+  } catch (e) {
+    reportError("error", "auth.signup", e, context);
     return fail("unknown");
   }
 
