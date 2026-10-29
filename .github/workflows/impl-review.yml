@@ -1,7 +1,8 @@
 # .github/workflows/impl-review.yml
 #
 # AI implementation review (10x-impl-review-ci) for plan-driven PRs.
-# Runs only on PRs labelled `impl-review`; needs the ANTHROPIC_API_KEY secret.
+# Runs only on PRs labelled `impl-review`; needs the CLAUDE_CODE_OAUTH_TOKEN secret
+# (`claude setup-token`; the API key path had no usable credits for Claude Code).
 # The skill is staged from `.claude/skills/10x-impl-review-ci/` on the base
 # branch (main). Verdict lands as the `impl-review-ci/verdict` commit status;
 # REJECTED blocks unless the PR has the `impl-review-override` label.
@@ -111,11 +112,10 @@ jobs:
           # Exposed to the skill's Bash steps for `gh pr comment` / `gh pr view`.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          # Belt-and-suspenders: claude-code-action@v1 reads ANTHROPIC_API_KEY
-          # from the process env, not only from the `anthropic_api_key` input.
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          # Claude subscription token instead of an API key: an ANTHROPIC_API_KEY
+          # in the env would take precedence, so it is deliberately not set.
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           # Use the job's GITHUB_TOKEN instead of the Claude GitHub App token,
           # which needs an OIDC exchange (`id-token: write`) and the app installed.
           # Pushes made with GITHUB_TOKEN never trigger workflows, so no loop.
