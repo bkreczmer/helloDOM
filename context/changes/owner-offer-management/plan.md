@@ -361,16 +361,16 @@ Migracja dodaje tylko granty i polityki, bez zmian danych. Wycofanie: SQL z blok
 
 #### Automated
 
-- [x] 3.1 Lint przechodzi: `npm run lint`
-- [x] 3.2 Typy przechodzą: `npx astro check`
-- [x] 3.3 Build przechodzi: `npm run build`
-- [x] 3.4 Smoke z krokami usuwania przechodzi: `npm run smoke`
+- [x] 3.1 Lint przechodzi: `npm run lint` — 689f73b
+- [x] 3.2 Typy przechodzą: `npx astro check` — 689f73b
+- [x] 3.3 Build przechodzi: `npm run build` — 689f73b
+- [x] 3.4 Smoke z krokami usuwania przechodzi: `npm run smoke` — 689f73b
 
 #### Manual
 
-- [x] 3.5 Potwierdzenie usuwania: tekst zależny od statusu, fokus, stan „Usuwanie…”
-- [x] 3.6 Usunięcie oferty z zaproszeniem: znika u właściciela i agenta
-- [x] 3.7 Light/dark i 360 px karty „Zarządzanie ofertą”
+- [x] 3.5 Potwierdzenie usuwania: tekst zależny od statusu, fokus, stan „Usuwanie…” — 689f73b
+- [x] 3.6 Usunięcie oferty z zaproszeniem: znika u właściciela i agenta — 689f73b
+- [x] 3.7 Light/dark i 360 px karty „Zarządzanie ofertą” — 689f73b
 
 ### Phase 4: Produkcja
 
