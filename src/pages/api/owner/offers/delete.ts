@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { parseOfferId } from "@/lib/services/offers";
 
 export const POST: APIRoute = async (context) => {
@@ -18,6 +19,7 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
+    reportError("error", "owner.offers.delete.config", undefined, context, { offerId });
     return fail();
   }
   // /api/* is not gated by the middleware: check the session and the role here.
@@ -33,6 +35,7 @@ export const POST: APIRoute = async (context) => {
       .eq("id", user.id)
       .maybeSingle();
     if (roleError) {
+      reportError("error", "owner.offers.delete.role", roleError, context, { offerId });
       return fail();
     }
     if (profile?.role !== "owner") {
@@ -48,13 +51,16 @@ export const POST: APIRoute = async (context) => {
     // or a missing offer deletes 0 rows without an error. Invitations go with it (on delete cascade).
     const { data, error } = await supabase.from("offers").delete().eq("id", offerId).select("id");
     if (error) {
+      reportError("error", "owner.offers.delete", error, context, { offerId });
       return fail();
     }
     if (data.length === 0) {
+      reportError("warn", "owner.offers.delete.not_found", undefined, context, { offerId });
       return notFound();
     }
     return context.redirect("/owner?deleted=1");
-  } catch {
+  } catch (e) {
+    reportError("error", "owner.offers.delete", e, context, { offerId });
     return fail();
   }
 };

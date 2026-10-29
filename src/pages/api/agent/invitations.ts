@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { isRespondResult, parseRespondForm, type ResponseErrorCode } from "@/lib/services/invitations";
 import { parseOfferId } from "@/lib/services/offers";
 
@@ -19,6 +20,7 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
+    reportError("error", "agent.respond.config", undefined, context);
     return fail("unavailable");
   }
   // /api/* is not gated by the middleware: check the session and the role here.
@@ -34,6 +36,7 @@ export const POST: APIRoute = async (context) => {
       .eq("id", user.id)
       .maybeSingle();
     if (roleError) {
+      reportError("error", "agent.respond.role", roleError, context);
       return fail("unavailable");
     }
     if (profile?.role !== "agent") {
@@ -52,6 +55,7 @@ export const POST: APIRoute = async (context) => {
       p_response: response,
     });
     if (error || !isRespondResult(data)) {
+      reportError("error", "agent.respond", error ?? data, context, { offerId, rpc: "respond_to_invitation" });
       return fail("unknown");
     }
     switch (data) {
@@ -60,14 +64,18 @@ export const POST: APIRoute = async (context) => {
         return context.redirect(response === "accept" ? `/agent/offers/${offerId}?accepted=1` : "/agent?rejected=1");
       case "not_found":
         // No invitation of this agent to the offer: the same 404 as the offer page, nothing to redirect to.
+        reportError("warn", "agent.respond.not_found", data, context, { offerId, rpc: "respond_to_invitation" });
         return new Response("Not Found", { status: 404 });
       case "already_responded":
         // A rejected offer's page is a 404, so the message is shown on the panel.
         return context.redirect("/agent?error=already_responded");
       case "invalid_response":
+        // The form schema only allows accept/reject, so the RPC rejecting it is a broken contract.
+        reportError("error", "agent.respond", data, context, { offerId, rpc: "respond_to_invitation" });
         return fail("unknown");
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "agent.respond", e, context, { rpc: "respond_to_invitation" });
     return fail("unknown");
   }
 };

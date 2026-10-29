@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { parseOfferForm, type OfferErrorCode } from "@/lib/services/offers";
 
 export const POST: APIRoute = async (context) => {
@@ -7,6 +8,7 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
+    reportError("error", "owner.offers.create.config", undefined, context);
     return fail("unavailable");
   }
   // /api/* is not gated by the middleware: check the session and the role here.
@@ -23,6 +25,7 @@ export const POST: APIRoute = async (context) => {
       .eq("id", user.id)
       .maybeSingle();
     if (roleError) {
+      reportError("error", "owner.offers.create.role", roleError, context);
       return fail("unavailable");
     }
     if (profile?.role !== "owner") {
@@ -57,10 +60,12 @@ export const POST: APIRoute = async (context) => {
       .single();
     if (error) {
       // Includes 23514 (check violation): the schema should have caught it, so it is not user input.
+      reportError("error", "owner.offers.create", error, context);
       return fail("unknown");
     }
     offerId = data.id;
-  } catch {
+  } catch (e) {
+    reportError("error", "owner.offers.create", e, context);
     return fail("unknown");
   }
 

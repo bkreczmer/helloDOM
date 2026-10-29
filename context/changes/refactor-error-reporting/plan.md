@@ -336,28 +336,28 @@ Brak migracji i zmian w schemacie; wycofanie = revert commitów (Worker przez `w
 
 #### Automated
 
-- [x] 2.1 Lint i typy
-- [x] 2.2 Testy jednostkowe
-- [x] 2.3 Smoke na lokalnym preview bez zmian w oczekiwaniach
-- [x] 2.4 E2E
+- [x] 2.1 Lint i typy — e51c113
+- [x] 2.2 Testy jednostkowe — e51c113
+- [x] 2.3 Smoke na lokalnym preview bez zmian w oczekiwaniach — e51c113
+- [x] 2.4 E2E — e51c113
 
 #### Manual
 
-- [x] 2.5 Symulowana awaria Auth daje ?error=unavailable i log
+- [x] 2.5 Symulowana awaria Auth daje ?error=unavailable i log — e51c113
 
 ### Phase 3: Endpointy biznesowe
 
 #### Automated
 
-- [ ] 3.1 Lint i typy
-- [ ] 3.2 Testy jednostkowe i integracyjne
-- [ ] 3.3 Smoke na lokalnym preview
-- [ ] 3.4 E2E
-- [ ] 3.5 Brak catch {} bez bindingu w API i auth poza formData
+- [x] 3.1 Lint i typy
+- [x] 3.2 Testy jednostkowe i integracyjne
+- [x] 3.3 Smoke na lokalnym preview
+- [x] 3.4 E2E
+- [x] 3.5 Brak catch {} bez bindingu w API i auth poza formData
 
 #### Manual
 
-- [ ] 3.6 D1 sprawdzone lokalnie z podmienioną funkcją RPC
+- [x] 3.6 D1 sprawdzone lokalnie z podmienioną funkcją RPC
 
 ### Phase 4: Strony
 

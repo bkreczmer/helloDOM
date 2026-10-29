@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { parseAgentProfileForm, type ProfileErrorCode } from "@/lib/services/agent-profile";
 
 export const POST: APIRoute = async (context) => {
@@ -7,6 +8,7 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
+    reportError("error", "agent.profile.save.config", undefined, context);
     return fail("unavailable");
   }
   // /api/* is not gated by the middleware: check the session and the role here.
@@ -22,6 +24,7 @@ export const POST: APIRoute = async (context) => {
       .eq("id", user.id)
       .maybeSingle();
     if (roleError) {
+      reportError("error", "agent.profile.save.role", roleError, context);
       return fail("unavailable");
     }
     if (profile?.role !== "agent") {
@@ -55,9 +58,11 @@ export const POST: APIRoute = async (context) => {
     if (error || updated.length === 0) {
       // Includes 23514 (check violation): the schema should have caught it, so it is not user input.
       // Zero rows means RLS filtered the update out; do not report it as saved.
+      reportError("error", "agent.profile.save", error ?? undefined, context, { updatedRows: updated?.length ?? 0 });
       return fail("unknown");
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "agent.profile.save", e, context);
     return fail("unknown");
   }
 
