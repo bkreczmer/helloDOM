@@ -376,11 +376,11 @@ Migracja dodaje tylko granty i polityki, bez zmian danych. Wycofanie: SQL z blok
 
 #### Automated
 
-- [ ] 4.1 CI zielone na PR: `gh pr checks`
-- [ ] 4.2 Deploy zielony po merge: `gh run list --branch main`
-- [ ] 4.3 Produkcja odpowiada: `curl -sI https://hellodom.hellodom.workers.dev/`
+- [x] 4.1 CI zielone na PR: `gh pr checks`
+- [x] 4.2 Deploy zielony po merge: `gh run list --branch main`
+- [x] 4.3 Produkcja odpowiada: `curl -sI https://hellodom.hellodom.workers.dev/`
 
 #### Manual
 
-- [ ] 4.4 `db push --dry-run` pokazuje tylko migrację `owner_offer_management`
-- [ ] 4.5 Na produkcji: lista ze statusem, edycja i usunięcie oferty
+- [x] 4.4 `db push --dry-run` pokazuje tylko migrację `owner_offer_management`
+- [x] 4.5 Na produkcji: lista ze statusem, edycja i usunięcie oferty
