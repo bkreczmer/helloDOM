@@ -51,7 +51,7 @@ Właściciel nieruchomości, który chce ją sprzedać lub wynająć, nie wie, k
 | S-04 | owner-offer-management     | właściciel przegląda swoje oferty ze statusem, edytuje je i usuwa                    | S-03          | FR-004, FR-005, FR-006          | done        |
 | S-05 | agent-invitation           | właściciel zaprasza agenta z top 3, a agent widzi zaproszenie i ofertę               | S-03          | FR-009, FR-010                  | done |
 | S-06 | invitation-response        | agent przyjmuje albo odrzuca zaproszenie, a status oferty się zmienia                | S-05          | FR-011                          | done |
-| S-07 | account-deletion           | użytkownik usuwa konto razem ze wszystkimi swoimi danymi                             | S-06          | FR-012                          | in-progress |
+| S-07 | account-deletion           | użytkownik usuwa konto razem ze wszystkimi swoimi danymi                             | S-06          | FR-012                          | done |
 
 ## Baseline
 
@@ -171,7 +171,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Unknowns:**
   - Usunięcie użytkownika z Supabase Auth wymaga uprawnień serwisowych; czy akceptujemy dodatkowy sekret Worker’a z takimi uprawnieniami? — Owner: user. Block: no.
 - **Risk:** Ostatni, bo musi sprzątać dane ze wszystkich wcześniejszych tabel (oferty, profile, zaproszenia); NFR wymaga, żeby po usunięciu nie zostały żadne dane konta. Kaskada `invitations.agent_id` kasuje też zaproszenie `pending`, a oferta zostaje w `invited` bez wyjścia: S-07 musi przywrócić `seeking_agent` każdej ofercie, której aktywne zaproszenie zniknęło (także po ręcznym usunięciu konta w panelu Supabase). Do tego czasu przy sprzątaniu kont testowych najpierw usuwaj ofertę (impl-review agent-invitation F1).
-- **Status:** in-progress
+- **Status:** done
 
 ## Backlog Handoff
 
@@ -184,7 +184,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 | S-04       | owner-offer-management | Lista, edycja i usuwanie ofert właściciela                  | no                    | Czeka na S-03 |
 | S-05       | agent-invitation       | Zaproszenie agenta z top 3 i widok zaproszeń agenta         | no                    | Czeka na S-03 |
 | S-06       | invitation-response    | Agent przyjmuje albo odrzuca zaproszenie                    | done                  | Zrobione (S-06) |
-| S-07       | account-deletion       | Usunięcie konta razem z danymi                              | yes                   | Run `/10x-plan account-deletion` |
+| S-07       | account-deletion       | Usunięcie konta razem z danymi                              | done                  | Zrobione (S-07) |
 
 ## Open Roadmap Questions
 
@@ -219,4 +219,5 @@ Brak otwartych pytań. Pytania o tokeny design systemu i o format miast/typów z
 - **S-03: zalogowany właściciel dodaje ofertę (wymagane: miasto, typ, cena, transakcja; opcjonalne: metraż, pokoje, opis) i po zapisaniu widzi do 3 agentów z wynikiem 0–100 albo komunikat, gdy dopasowanych agentów jest mniej niż 3.** — Archived 2026-10-28 → `context/archive/2026-10-28-offer-top3-ranking/`. Lesson: —.
 - **S-05: właściciel zaprasza jednego agenta z top 3 swojej oferty (oferta przechodzi w „zaproszenie wysłane”), a agent widzi swoje zaproszenia i tylko te oferty, do których go zaproszono.** — Archived 2026-10-28 → `context/archive/2026-10-28-agent-invitation/`. Lesson: —.
 - **S-06: agent przyjmuje zaproszenie (oferta przechodzi w „w obsłudze”) albo je odrzuca (oferta wraca do „szuka agenta”, a ten agent znika z jej rankingu).** — Archived 2026-10-28 → `context/archive/2026-10-28-invitation-response/`. Lesson: —.
+- **S-07: użytkownik usuwa konto razem ze wszystkimi swoimi danymi; gdy robi to agent z przyjętą ofertą, oferta wraca do „szuka agenta” bez przypisanego agenta.** — Archived 2026-10-29 → `context/archive/2026-10-28-account-deletion/`. Lesson: —.
 - **S-04: właściciel przegląda listę swoich ofert ze statusem, edytuje ofertę w statusie „szkic” albo „szuka agenta” i może usunąć ofertę.** — Archived 2026-10-29 → `context/archive/2026-10-29-owner-offer-management/`. Lesson: —.

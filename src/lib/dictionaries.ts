@@ -4,7 +4,7 @@
 // supabase/migrations/20261028100000_add_agent_profile.sql, and CITIES, PROPERTY_TYPES and
 // TRANSACTIONS with the checks in supabase/migrations/20261028140000_create_offers.sql.
 
-import type { City, InvitationStatus, OfferStatus, PropertyType, StatusTone, Transaction } from "@/types";
+import type { City, InvitationStatus, OfferStatus, PropertyType, Role, StatusTone, Transaction } from "@/types";
 
 // Sorted by Polish name.
 export const CITIES = [
@@ -85,3 +85,5 @@ export const INVITATION_STATUS_LABELS: Record<InvitationStatus, string> = {
   accepted: "Przyjęte",
   rejected: "Odrzucone",
 };
+
+export const ROLE_LABELS: Record<Role, string> = { owner: "Właściciel", agent: "Agent" };

@@ -27,14 +27,17 @@ insert into auth.users (id, email, raw_user_meta_data) values
 --   O3 (owner 1): invited, agent C rejected and agent D pending;
 --   O4 (owner 1): in_progress, agent E accepted (deleted through auth.users as postgres);
 --   O5 (owner 2): invited, agent D pending (owner 2 deletes the account);
---   O6 (owner 1): in_progress without any invitation (the repair query).
+--   O6 (owner 1): in_progress without any invitation (the repair query);
+--   O7 (owner 2): in_progress, agent D accepted (the cascade deletes the offer with the accepted
+--                 invitation, so the trigger's update hits no rows).
 insert into public.offers (id, owner_id, city, property_type, transaction, price, status) values
   ('00000000-0000-0000-0007-000000000101', '00000000-0000-0000-0007-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'in_progress'),
   ('00000000-0000-0000-0007-000000000102', '00000000-0000-0000-0007-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'invited'),
   ('00000000-0000-0000-0007-000000000103', '00000000-0000-0000-0007-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'invited'),
   ('00000000-0000-0000-0007-000000000104', '00000000-0000-0000-0007-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'in_progress'),
   ('00000000-0000-0000-0007-000000000105', '00000000-0000-0000-0007-000000000002', 'rzeszow', 'apartment', 'sale', 500000, 'invited'),
-  ('00000000-0000-0000-0007-000000000106', '00000000-0000-0000-0007-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'seeking_agent');
+  ('00000000-0000-0000-0007-000000000106', '00000000-0000-0000-0007-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'seeking_agent'),
+  ('00000000-0000-0000-0007-000000000107', '00000000-0000-0000-0007-000000000002', 'rzeszow', 'apartment', 'sale', 500000, 'in_progress');
 
 insert into public.invitations (offer_id, agent_id, owner_id, status, responded_at) values
   ('00000000-0000-0000-0007-000000000101', '00000000-0000-0000-0007-000000000011', '00000000-0000-0000-0007-000000000001', 'accepted', now()),
@@ -42,7 +45,8 @@ insert into public.invitations (offer_id, agent_id, owner_id, status, responded_
   ('00000000-0000-0000-0007-000000000103', '00000000-0000-0000-0007-000000000013', '00000000-0000-0000-0007-000000000001', 'rejected', now()),
   ('00000000-0000-0000-0007-000000000103', '00000000-0000-0000-0007-000000000014', '00000000-0000-0000-0007-000000000001', 'pending', null),
   ('00000000-0000-0000-0007-000000000104', '00000000-0000-0000-0007-000000000015', '00000000-0000-0000-0007-000000000001', 'accepted', now()),
-  ('00000000-0000-0000-0007-000000000105', '00000000-0000-0000-0007-000000000014', '00000000-0000-0000-0007-000000000002', 'pending', null);
+  ('00000000-0000-0000-0007-000000000105', '00000000-0000-0000-0007-000000000014', '00000000-0000-0000-0007-000000000002', 'pending', null),
+  ('00000000-0000-0000-0007-000000000107', '00000000-0000-0000-0007-000000000014', '00000000-0000-0000-0007-000000000002', 'accepted', now());
 
 set local role authenticated;
 
@@ -142,7 +146,7 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------------------------------------
--- Owner 2 (O5 with agent D pending) deletes the account.
+-- Owner 2 (O5 with agent D pending, O7 with agent D accepted) deletes the account.
 -- ---------------------------------------------------------------------------------------------
 
 set local role authenticated;
@@ -171,7 +175,7 @@ begin
   if exists (
     select 1 from public.invitations
     where owner_id = '00000000-0000-0000-0007-000000000002'
-       or offer_id = '00000000-0000-0000-0007-000000000105'
+       or offer_id in ('00000000-0000-0000-0007-000000000105', '00000000-0000-0000-0007-000000000107')
   ) then
     raise exception 'owner 2: invitations left';
   end if;
