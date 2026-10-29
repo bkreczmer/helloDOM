@@ -336,7 +336,7 @@ Każdy czerwony wynik to nieudana asercja `toEqual` na oczekiwanym przypadku (be
 
 #### Automated
 
-- [x] 3.1 BC1–BC4: każde zepsucie czerwone na oczekiwanym przypadku, przywrócenie zielone
-- [x] 3.2 Po break-checku testy integracyjne i `supabase/tests/*.sql` zielone
-- [x] 3.3 `npm run lint` bez błędów
-- [ ] 3.4 Na PR job `smoke` zielony z krokiem `Run integration tests`
+- [x] 3.1 BC1–BC4: każde zepsucie czerwone na oczekiwanym przypadku, przywrócenie zielone — e6b6eb0
+- [x] 3.2 Po break-checku testy integracyjne i `supabase/tests/*.sql` zielone — e6b6eb0
+- [x] 3.3 `npm run lint` bez błędów — e6b6eb0
+- [x] 3.4 Na PR job `smoke` zielony z krokiem `Run integration tests` — e6b6eb0
