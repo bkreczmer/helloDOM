@@ -1,7 +1,7 @@
 ---
 change_id: owner-offer-management
 title: Owner offer management
-status: plan_reviewed
+status: implementing
 created: 2026-10-29
 updated: 2026-10-29
 archived_at: null

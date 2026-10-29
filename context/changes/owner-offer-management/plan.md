@@ -337,10 +337,10 @@ Migracja dodaje tylko granty i polityki, bez zmian danych. Wycofanie: SQL z blok
 
 #### Automated
 
-- [ ] 1.1 Migracja aplikuje się na czystej bazie: `npx supabase db reset`
-- [ ] 1.2 Test SQL przechodzi: `supabase/tests/owner-offer-management.sql`
-- [ ] 1.3 Pozostałe testy SQL przechodzą
-- [ ] 1.4 Typy bez zmian: `npm run db:types && git diff --exit-code src/db/database.types.ts`
+- [x] 1.1 Migracja aplikuje się na czystej bazie: `npx supabase db reset`
+- [x] 1.2 Test SQL przechodzi: `supabase/tests/owner-offer-management.sql`
+- [x] 1.3 Pozostałe testy SQL przechodzą
+- [x] 1.4 Typy bez zmian: `npm run db:types && git diff --exit-code src/db/database.types.ts`
 
 ### Phase 2: Lista ze statusem i edycja
 
