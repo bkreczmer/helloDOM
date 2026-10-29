@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { isInviteResult, parseInviteForm, type InvitationErrorCode } from "@/lib/services/invitations";
 import { parseOfferId } from "@/lib/services/offers";
 
@@ -18,6 +19,7 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
+    reportError("error", "owner.invite.config", undefined, context);
     return fail("unavailable");
   }
   // /api/* is not gated by the middleware: check the session and the role here.
@@ -33,6 +35,7 @@ export const POST: APIRoute = async (context) => {
       .eq("id", user.id)
       .maybeSingle();
     if (roleError) {
+      reportError("error", "owner.invite.role", roleError, context);
       return fail("unavailable");
     }
     if (profile?.role !== "owner") {
@@ -48,6 +51,7 @@ export const POST: APIRoute = async (context) => {
     // invite_agent checks the owner, the offer status and the current top 3 in one transaction.
     const { data, error } = await supabase.rpc("invite_agent", { p_offer_id: offerId, p_agent_id: agentId });
     if (error || !isInviteResult(data)) {
+      reportError("error", "owner.invite", error ?? data, context, { offerId, agentId, rpc: "invite_agent" });
       return fail("unknown");
     }
     switch (data) {
@@ -55,12 +59,14 @@ export const POST: APIRoute = async (context) => {
         return context.redirect(`/owner/offers/${offerId}?invited=1`);
       case "not_found":
         // Someone else's or a missing offer: the same 404 as the offer page, nothing to redirect to.
+        reportError("warn", "owner.invite.not_found", data, context, { offerId, agentId, rpc: "invite_agent" });
         return new Response("Not Found", { status: 404 });
       case "offer_locked":
       case "agent_not_ranked":
         return fail(data);
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "owner.invite", e, context, { rpc: "invite_agent" });
     return fail("unknown");
   }
 };

@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { toAuthErrorCode, type AuthErrorCode } from "@/lib/services/auth-errors";
 import { signInSchema } from "@/lib/services/auth-schemas";
 
@@ -20,13 +21,22 @@ export const POST: APIRoute = async (context) => {
   try {
     const supabase = createClient(context.request.headers, context.cookies);
     if (!supabase) {
+      reportError("error", "auth.signin.config", undefined, context);
       return fail("unavailable");
     }
     const { error } = await supabase.auth.signInWithPassword(parsed.data);
     if (error) {
-      return fail(toAuthErrorCode(error));
+      const code = toAuthErrorCode(error);
+      // Ordinary user errors (wrong password, existing account) stay out of the log.
+      if (code === "unknown" || code === "unavailable" || (error.status ?? 0) >= 500) {
+        reportError("error", "auth.signin", error, context);
+      } else if (code === "rate_limited") {
+        reportError("warn", "auth.signin", error, context);
+      }
+      return fail(code);
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "auth.signin", e, context);
     return fail("unknown");
   }
 

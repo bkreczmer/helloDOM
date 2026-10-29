@@ -13,6 +13,7 @@ import {
   TRANSACTION_LABELS,
 } from "@/lib/dictionaries";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { OWNER_OFFERS_LIMIT, formatOfferDate, formatPrice, toOfferListItem } from "@/lib/services/offers";
 import type { OfferListItem } from "@/types";
 
@@ -27,12 +28,21 @@ if (supabase) {
       .select("id, city, property_type, transaction, price, status, created_at")
       .order("created_at", { ascending: false })
       .limit(OWNER_OFFERS_LIMIT);
-    if (!error) {
+    if (error) {
+      reportError("error", "owner.offers.list", error, Astro);
+    } else {
       offers = data.map(toOfferListItem);
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "owner.offers.list", e, Astro);
     offers = null;
   }
+} else {
+  reportError("error", "owner.offers.list.config", undefined, Astro);
+}
+// The list renders its own error message; the 503 keeps a database failure out of the healthy-traffic metrics.
+if (offers === null) {
+  Astro.response.status = 503;
 }
 
 const deleted = Astro.url.searchParams.get("deleted") === "1";

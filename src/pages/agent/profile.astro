@@ -4,6 +4,7 @@ import Card from "@/components/ui/Card.astro";
 import AgentProfileForm from "@/components/agent/AgentProfileForm";
 import { ServerError } from "@/components/auth/ServerError";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import {
   MAX_EXPERIENCE_YEARS,
   MAX_PRICE,
@@ -18,19 +19,32 @@ const userId = Astro.locals.user?.id;
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 
 let profile: AgentProfile | null = null;
-if (supabase && userId) {
+// A Supabase error, an exception or a missing client is a 503; a missing row keeps today's rendering.
+let failed = false;
+if (!supabase) {
+  reportError("error", "agent.profile.read.config", undefined, Astro);
+  failed = true;
+} else if (userId) {
   try {
     const { data, error } = await supabase
       .from("profiles")
       .select("cities, property_types, price_min, price_max, experience_years, profile_complete")
       .eq("id", userId)
       .maybeSingle();
-    if (!error && data) {
+    if (error) {
+      reportError("error", "agent.profile.read", error, Astro);
+      failed = true;
+    } else if (data) {
       profile = toAgentProfile(data);
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "agent.profile.read", e, Astro);
     profile = null;
+    failed = true;
   }
+}
+if (failed) {
+  Astro.response.status = 503;
 }
 
 const serverError = profileErrorMessage(Astro.url.searchParams.get("error"));

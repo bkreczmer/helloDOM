@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { parseOfferForm, parseOfferId, type OfferErrorCode } from "@/lib/services/offers";
 
 export const POST: APIRoute = async (context) => {
@@ -19,6 +20,7 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
+    reportError("error", "owner.offers.update.config", undefined, context, { offerId });
     return fail("unavailable");
   }
   // /api/* is not gated by the middleware: check the session and the role here.
@@ -34,6 +36,7 @@ export const POST: APIRoute = async (context) => {
       .eq("id", user.id)
       .maybeSingle();
     if (roleError) {
+      reportError("error", "owner.offers.update.role", roleError, context, { offerId });
       return fail("unavailable");
     }
     if (profile?.role !== "owner") {
@@ -68,6 +71,7 @@ export const POST: APIRoute = async (context) => {
       .select("id");
     if (error) {
       // Includes 23514 (check violation): the schema should have caught it, so it is not user input.
+      reportError("error", "owner.offers.update", error, context, { offerId });
       return fail("unknown");
     }
     if (data.length > 0) {
@@ -82,13 +86,16 @@ export const POST: APIRoute = async (context) => {
       .eq("id", offerId)
       .maybeSingle();
     if (readError) {
+      reportError("error", "owner.offers.update.read", readError, context, { offerId });
       return fail("unavailable");
     }
     if (!existing) {
+      reportError("warn", "owner.offers.update.not_found", undefined, context, { offerId });
       return notFound();
     }
     return context.redirect(`/owner/offers/${offerId}?error=edit_locked`);
-  } catch {
+  } catch (e) {
+    reportError("error", "owner.offers.update", e, context, { offerId });
     return fail("unknown");
   }
 };

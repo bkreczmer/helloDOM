@@ -12,8 +12,8 @@ export default defineConfig(({ mode }) => {
 
   return {
     test: {
-      // tests/hooks: proof for the Claude Code hooks in .claude/hooks (no Supabase needed).
-      include: ["tests/integration/**/*.test.ts", "tests/hooks/**/*.test.ts"],
+      // tests/hooks: proof for the Claude Code hooks in .claude/hooks; tests/unit: pure modules (neither needs Supabase).
+      include: ["tests/integration/**/*.test.ts", "tests/hooks/**/*.test.ts", "tests/unit/**/*.test.ts"],
       environment: "node",
       // Test files share the auth rate limit of the local Supabase; run them one by one.
       fileParallelism: false,

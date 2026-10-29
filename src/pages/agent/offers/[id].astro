@@ -6,6 +6,7 @@ import OfferSummary from "@/components/offers/OfferSummary.astro";
 import { ServerError } from "@/components/auth/ServerError";
 import { InvitationResponse } from "@/components/agent/InvitationResponse";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { invitationResponseErrorMessage } from "@/lib/services/invitations";
 import { formatOfferDate, parseOfferId, toOffer } from "@/lib/services/offers";
 import type { Offer } from "@/types";
@@ -20,6 +21,8 @@ let state: "found" | "missing" | "error" = "missing";
 let offer: Offer | null = null;
 // The agent's active invitation; null when the read failed (the card then shows no actions).
 let invitation: { status: "pending" | "accepted"; createdAt: string; respondedAt: string | null } | null = null;
+// A failed invitation read still renders the offer (without actions), but the response is a 503.
+let invitationFailed = false;
 
 if (offerId && supabase) {
   try {
@@ -29,12 +32,14 @@ if (offerId && supabase) {
       .eq("id", offerId)
       .maybeSingle();
     if (error) {
+      reportError("error", "agent.offer.read", error, Astro, { offerId });
       state = "error";
     } else if (data) {
       offer = toOffer(data);
       state = "found";
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "agent.offer.read", e, Astro, { offerId });
     state = "error";
   }
 
@@ -47,19 +52,28 @@ if (offerId && supabase) {
         .eq("offer_id", offer.id)
         .in("status", ["pending", "accepted"])
         .maybeSingle();
-      if (!error && data && (data.status === "pending" || data.status === "accepted")) {
+      if (error) {
+        reportError("error", "agent.offer.invitation", error, Astro, { offerId });
+        invitationFailed = true;
+      } else if (data && (data.status === "pending" || data.status === "accepted")) {
         invitation = { status: data.status, createdAt: data.created_at, respondedAt: data.responded_at };
       }
-    } catch {
+    } catch (e) {
+      reportError("error", "agent.offer.invitation", e, Astro, { offerId });
       invitation = null;
+      invitationFailed = true;
     }
   }
 } else if (offerId) {
+  reportError("error", "agent.offer.read.config", undefined, Astro, { offerId });
   state = "error";
 }
 
+// "missing" stays a 404; a database or config failure is a 503, so it does not look like healthy traffic.
 if (state === "missing") {
   Astro.response.status = 404;
+} else if (state === "error" || invitationFailed) {
+  Astro.response.status = 503;
 }
 
 const accepted = Astro.url.searchParams.get("accepted") === "1";

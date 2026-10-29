@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { homeFor } from "@/lib/route-guard";
 import { isDeleteAccountResult, type AccountErrorCode } from "@/lib/services/account";
 import type { Role } from "@/types";
@@ -15,6 +16,7 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
+    reportError("error", "account.delete.config", undefined, context);
     return unavailable();
   }
 
@@ -26,11 +28,13 @@ export const POST: APIRoute = async (context) => {
       .eq("id", user.id)
       .maybeSingle();
     if (roleError || profile === null) {
+      reportError("error", "account.delete.role", roleError ?? undefined, context, { profileFound: profile !== null });
       return unavailable();
     }
     // The check constraint on profiles.role guarantees a Role.
     role = profile.role as Role;
-  } catch {
+  } catch (e) {
+    reportError("error", "account.delete.role", e, context);
     return unavailable();
   }
   const fail = (code: AccountErrorCode) => context.redirect(`${homeFor(role)}/account?error=${code}`);
@@ -39,18 +43,32 @@ export const POST: APIRoute = async (context) => {
     // delete_own_account removes auth.users for auth.uid(); cascades and the invitations trigger do the rest.
     const { data, error } = await supabase.rpc("delete_own_account");
     if (error || !isDeleteAccountResult(data)) {
+      reportError("error", "account.delete", error ?? data, context, { rpc: "delete_own_account" });
       return fail("unknown");
     }
-  } catch {
+    // "not_found" for a signed-in user with a profile means nothing was deleted, so it must not be
+    // confirmed as a deletion (D1 in context/changes/refactor-error-reporting/plan.md, user decision of
+    // 2026-10-29; reverses context/archive/2026-10-28-account-deletion/plan.md:140).
+    // No signOut: the account still exists.
+    if (data === "not_found") {
+      reportError("error", "account.delete", data, context, { rpc: "delete_own_account" });
+      return fail("unknown");
+    }
+  } catch (e) {
+    reportError("error", "account.delete", e, context, { rpc: "delete_own_account" });
     return fail("unknown");
   }
 
-  // "ok" and "not_found" both mean the account is gone. Scope "local" only clears the session cookies
+  // Only "ok" reaches this point. Scope "local" only clears the session cookies
   // (no /logout call for a user that no longer exists); its failure must not change the result.
   try {
-    await supabase.auth.signOut({ scope: "local" });
-  } catch {
+    const { error: signOutError } = await supabase.auth.signOut({ scope: "local" });
+    if (signOutError) {
+      reportError("warn", "account.delete.signOut", signOutError, context);
+    }
+  } catch (e) {
     // The account is already deleted; the redirect below still applies.
+    reportError("warn", "account.delete.signOut", e, context);
   }
   return context.redirect("/?deleted=1");
 };

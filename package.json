@@ -14,7 +14,8 @@
     "db:types": "supabase gen types typescript --local > src/db/database.types.ts",
     "test:integration": "vitest run",
     "test:e2e": "playwright test",
-    "test:hooks": "vitest run tests/hooks"
+    "test:hooks": "vitest run tests/hooks",
+    "test:unit": "vitest run tests/unit"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

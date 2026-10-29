@@ -5,6 +5,7 @@ import Card from "@/components/ui/Card.astro";
 import OfferForm from "@/components/owner/OfferForm";
 import { ServerError } from "@/components/auth/ServerError";
 import { createClient } from "@/lib/supabase";
+import { reportError } from "@/lib/report-error";
 import { MAX_PRICE } from "@/lib/services/agent-profile";
 import {
   AREA_M2_PATTERN,
@@ -35,15 +36,18 @@ if (offerId && supabase) {
       .eq("id", offerId)
       .maybeSingle();
     if (error) {
+      reportError("error", "owner.offer.edit.read", error, Astro, { offerId });
       state = "error";
     } else if (data) {
       offer = toOffer(data);
       state = "found";
     }
-  } catch {
+  } catch (e) {
+    reportError("error", "owner.offer.edit.read", e, Astro, { offerId });
     state = "error";
   }
 } else if (offerId) {
+  reportError("error", "owner.offer.edit.read.config", undefined, Astro, { offerId });
   state = "error";
 }
 
@@ -56,6 +60,8 @@ if (locked && offer) {
   Astro.response.headers.set("Location", `/owner/offers/${offer.id}?error=edit_locked`);
 } else if (state === "missing") {
   Astro.response.status = 404;
+} else if (state === "error") {
+  Astro.response.status = 503;
 }
 
 const serverError = offerErrorMessage(Astro.url.searchParams.get("error"));
