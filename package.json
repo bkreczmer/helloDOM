@@ -13,7 +13,8 @@
     "smoke": "node scripts/smoke.mjs",
     "db:types": "supabase gen types typescript --local > src/db/database.types.ts",
     "test:integration": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:hooks": "vitest run tests/hooks"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

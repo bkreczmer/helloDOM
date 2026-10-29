@@ -16,6 +16,7 @@ helloDOM matches property owners' offers with real-estate agents (0–100 score,
 - `npx astro check` — type check (run by CI)
 - `npm run smoke` — auth smoke test against a running server (`BASE_URL`); run after dependency upgrades.
 - `npm run test:integration` — Vitest integration tests against the local Supabase (`tests/integration/`).
+- `npm run test:hooks` — proof for the Claude Code hooks in `.claude/hooks/` (Vitest, no Supabase).
 - `npm run test:e2e` — Playwright E2E (Chromium) on a cold build + preview; needs `npx supabase start` and `E2E_USERNAME`/`E2E_PASSWORD` (optionally `E2E_PORT`) in `.env`.
 
 Pre-commit: husky + lint-staged (`@package.json`).
@@ -50,6 +51,7 @@ Risks and layers: `@context/foundation/test-plan.md`; E2E setup: `@context/found
 - Integration (Vitest): `tests/integration/`, real sessions on the local Supabase, never `service_role`.
 - E2E (Playwright): `tests/e2e/`; new tests start from `/10x-e2e <risk-id>` and follow `tests/e2e/seed.spec.ts` (test-plan §6.4).
 - `npm run smoke`: HTTP smoke against a running server.
+- Agent hooks (`.claude/settings.json`): ESLint on every edited file, ESLint on changed files + `astro check` at end of turn (exit 2 sends errors back to the agent). Change them together with `tests/hooks/agent-hooks.test.ts`.
 
 ## CI
 
