@@ -77,7 +77,7 @@ Przenieść nagłówki z `setAll` na odpowiedź HTTP i objąć to smoke'iem.
 
 #### Manual Verification:
 
-- [ ] Na produkcji `POST /api/auth/signin` z poprawnym hasłem zwraca `Cache-Control` z `no-store`, a `GET /` anonimowo — bez niego
+- [x] Na produkcji `POST /api/auth/signin` z poprawnym hasłem zwraca `Cache-Control` z `no-store`, a `GET /` anonimowo — bez niego
 
 ## Performance Considerations
 
@@ -96,6 +96,7 @@ Brak.
 
 - `MiddlewareHandler` zwraca `Response | void`, więc `guard` jest funkcją typowaną jako `Promise<Response>` (CI `astro check` na PR #30).
 - Triage impl-review (CI), F1: `applyAuthCacheHeaders` kopiuje odpowiedź, gdy jej nagłówki są niemodyfikowalne (`Response.redirect()`, `fetch()`); Astro dokleja ciasteczka po middleware (`node_modules/astro/dist/core/middleware/astro-middleware.js:56`), więc kopia ich nie gubi.
+- Krok 1.5 sprawdzony na produkcji 29.10 innym żądaniem niż w planie: `GET /owner` z nieważnym ciasteczkiem `sb-…-auth-token` (sesja czyszczona, `Max-Age=0`) zwraca `Cache-Control: private, no-cache, no-store, must-revalidate, max-age=0`, `Expires: 0`, `Pragma: no-cache`; anonimowe `GET /` — bez `Cache-Control`. Signin z prawdziwym kontem pokrywa smoke w CI (bez zakładania kont na produkcji).
 - Triage impl-review (CI), F2: smoke sprawdza też brak `no-store` na anonimowym `GET /` (pozytywna strona punktu 1.5 zostaje ręczna na produkcji).
 
 ## Progress
@@ -104,11 +105,11 @@ Brak.
 
 #### Automated
 
-- [x] 1.1 Lint, typy i build
-- [x] 1.2 Testy jednostkowe
-- [x] 1.3 Smoke na działającym serwerze
-- [x] 1.4 Celowe uszkodzenie czerwieni smoke
+- [x] 1.1 Lint, typy i build — 9dc620f
+- [x] 1.2 Testy jednostkowe — 55e19ff
+- [x] 1.3 Smoke na działającym serwerze — 995087d
+- [x] 1.4 Celowe uszkodzenie czerwieni smoke — 995087d
 
 #### Manual
 
-- [ ] 1.5 Nagłówki na produkcji
+- [x] 1.5 Nagłówki na produkcji — 995087d
