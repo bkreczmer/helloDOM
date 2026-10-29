@@ -2,22 +2,21 @@
 import { FileText } from "lucide-react";
 import Card from "@/components/ui/Card.astro";
 import StatusPill from "@/components/ui/StatusPill.astro";
-import { CITY_LABELS, OFFER_STATUS_LABELS, PROPERTY_TYPE_LABELS, TRANSACTION_LABELS } from "@/lib/dictionaries";
+import {
+  CITY_LABELS,
+  OFFER_STATUS_LABELS,
+  OFFER_STATUS_TONES,
+  PROPERTY_TYPE_LABELS,
+  TRANSACTION_LABELS,
+} from "@/lib/dictionaries";
 import { formatArea, formatPrice } from "@/lib/services/offers";
-import type { Offer, OfferStatus, StatusTone } from "@/types";
+import type { Offer } from "@/types";
 
 interface Props {
   offer: Offer;
 }
 
 const { offer } = Astro.props;
-
-const STATUS_TONES: Record<OfferStatus, StatusTone> = {
-  draft: "info",
-  seeking_agent: "accent",
-  invited: "warn",
-  in_progress: "success",
-};
 
 const details: [string, string][] = [
   ["Miasto", CITY_LABELS[offer.city]],
@@ -40,7 +39,7 @@ const details: [string, string][] = [
       </div>
       <div class="flex flex-col gap-1">
         <p class="microlabel">Status</p>
-        <StatusPill tone={STATUS_TONES[offer.status]}>{OFFER_STATUS_LABELS[offer.status]}</StatusPill>
+        <StatusPill tone={OFFER_STATUS_TONES[offer.status]}>{OFFER_STATUS_LABELS[offer.status]}</StatusPill>
       </div>
     </div>
     <dl class="grid grid-cols-2 gap-x-4 gap-y-3 tablet:grid-cols-3">
