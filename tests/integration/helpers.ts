@@ -130,7 +130,7 @@ export async function assertCitiesEmpty(owner: TestUser, cities: string[]): Prom
       throw new Error(
         `Lokalna baza ma kompletnych agentów w ${city} — testy wymagają pustego miasta. ` +
           `Pozostałości testów usuniesz: docker exec supabase_db_10x-astro-starter psql -U postgres -c ` +
-          `"delete from auth.users where email like 'it-%@example.com'". ` +
+          `"delete from auth.users where email like 'it-%@example.com' or email like 'smoke-%@example.com'". ` +
           `Ostateczność: npx supabase db reset (kasuje wszystkie lokalne konta).`,
       );
     }

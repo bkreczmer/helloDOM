@@ -218,12 +218,10 @@ describe("izolacja danych między użytkownikami (RLS i RPC)", () => {
     const anon = anonClient();
     for (const table of ["offers", "profiles"] as const) {
       const { data, error } = await anon.from(table).select("id");
-      // Either the missing grant (permission denied) or an empty answer, but never a row.
-      if (error) {
-        expect(error.code).toBe("42501");
-      } else {
-        expect(data).toEqual([]);
-      }
+      // anon has no grant on either table (revoke all ... from anon), so the request is denied outright;
+      // an empty answer would mean someone granted select to anon and only RLS stands in the way.
+      expect(error?.code).toBe("42501");
+      expect(data).toBeNull();
     }
   });
 });

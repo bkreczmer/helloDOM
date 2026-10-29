@@ -112,7 +112,7 @@ Hot-spot scope used for likelihood weighting: `src/`, `supabase/migrations/`, `s
 
 (Dopisywane po każdym etapie.)
 
-- **Etap 1 (ranking i izolacja)**: pełny przebieg rejestruje ~13 kont, więc `[auth.rate_limit] sign_in_sign_ups` w `supabase/config.toml` podniesiono do 100 (lokalnie i w CI; produkcja bez zmian). Kilka przebiegów pod rząd może dać 429 — wtedy odczekaj 5 minut. Break-check RLS: `drop policy offers_select_own` *zaostrza* dostęp (RLS domyślnie odmawia), więc zapala kontrolę pozytywną, a nie test IDOR. Zepsucie izolacji to polityka przepuszczająca wszystko (`create policy … for select to authenticated using (true)`), zatwierdzona w bazie, bo PostgREST nie widzi zmian z transakcji z rollback. Wyniki: `context/changes/testing-ranking-and-isolation/plan.md`, sekcja Break-check.
+- **Etap 1 (ranking i izolacja)**: pełny przebieg rejestruje ~13 kont, więc `[auth.rate_limit] sign_in_sign_ups` w `supabase/config.toml` podniesiono do 100 (lokalnie i w CI; produkcja bez zmian). Lokalnie nowy limit działa dopiero po `npx supabase stop && npx supabase start` (dane zostają); bez restartu drugi przebieg dostaje 429. Kilka przebiegów pod rząd może dać 429 — wtedy odczekaj 5 minut. Break-check RLS: `drop policy offers_select_own` *zaostrza* dostęp (RLS domyślnie odmawia), więc zapala kontrolę pozytywną, a nie test IDOR. Zepsucie izolacji to polityka przepuszczająca wszystko (`create policy … for select to authenticated using (true)`), zatwierdzona w bazie, bo PostgREST nie widzi zmian z transakcji z rollback. Wyniki: `context/changes/testing-ranking-and-isolation/plan.md`, sekcja Break-check.
 
 ## 7. What We Deliberately Don't Test
 

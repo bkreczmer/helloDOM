@@ -305,6 +305,16 @@ Wykonane 2026-10-29 na lokalnej bazie. Zepsucie zatwierdzone przez `docker exec 
 
 Każdy czerwony wynik to nieudana asercja `toEqual` na oczekiwanym przypadku (bez błędu `beforeAll` i bez 429).
 
+## Addendum
+
+Odstępstwa od planu wykryte w implementacji i w `/10x-impl-review` (2026-10-29, `reviews/impl-review.md`):
+
+- **R8 na dwóch świeżych ofertach** (faza 1). Plan: zaproszenie i odrzucenie na ofercie R1, a potem „R1 nadal A2, A1, A3”. Jest: dwie nowe oferty z parametrami R1; na jednej O zaprasza A2 i A2 odrzuca, druga musi dać top R1. Powód: oferta z `it.for` nie jest dostępna poza swoim przypadkiem, a świeże oferty uniezależniają R8 od kolejności i stanu R1. Intencja bez zmian.
+- **CI z `--reporter=verbose`** (faza 3). Plan: `npm run test:integration`. Jest: `npm run test:integration -- --reporter=verbose`, bo kryterium 3.4 wymaga, żeby log kroku pokazywał R1–R8 i I1–I16.
+- **I16 tylko `42501`** (impl-review F2). Plan dopuszczał błąd uprawnień albo `[]`. `anon` nie ma grantu na `offers` ani `profiles` (`revoke all … from anon`), więc gałąź `[]` była martwa i nie złapałaby przypadkowego grantu. Break-check: `grant select on public.offers to anon` → I16 czerwony, `revoke` → 16/16.
+- **`.gitignore`: `.env.*` z wyjątkiem `!.env.example`** (impl-review F1). Vitest w trybie `test` czyta też `.env.local`, `.env.test` i `.env.test.local`, których wcześniej nic nie chroniło przed commitem do publicznego repo.
+- **Komunikat strażnika obejmuje też `smoke-%@example.com`, a §6.5 test-planu mówi o restarcie Supabase po zmianie limitu** (impl-review F4).
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
