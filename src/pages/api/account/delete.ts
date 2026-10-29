@@ -10,8 +10,8 @@ export const POST: APIRoute = async (context) => {
   if (!user) {
     return context.redirect("/auth/signin");
   }
-  // Without a role the account page is unknown; /dashboard routes on to the role's panel.
-  const unavailable = () => context.redirect("/dashboard?error=unavailable");
+  // Without a role the account page is unknown; same target as the middleware on a profile read error.
+  const unavailable = () => context.redirect("/auth/signin?error=unavailable");
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {

@@ -274,6 +274,15 @@ Trigger wykonuje jeden `update` po kluczu głównym na każde usunięte zaprosze
 - Wzorzec potwierdzenia: `src/components/agent/InvitationResponse.tsx`
 - Wzorzec testu SQL: `supabase/tests/invitation-response.sql`
 
+## Addendum — weryfikacja produkcyjna
+
+Dopisane w impl-review (F1), bo kroki 3.4–3.6 były odhaczone bez zapisanych wyników.
+
+- 3.4: `npx supabase migration list --linked` (2026-10-29) pokazuje `20261028220000` po obu stronach; lista lokalna i zdalna są zgodne. Wyniku `db push --dry-run` z 2026-10-28 nie zapisano.
+- 3.5: zapytanie o osierocone oferty na produkcji (SQL Editor, 2026-10-29) zwraca 0. Liczby sprzed `db push` nie zapisano.
+- 3.6: usunięcie konta agenta z przyjętym zaproszeniem i konta właściciela w UI na produkcji wykonał użytkownik 2026-10-28. Ponownie sprawdzone `curl`-em 2026-10-29: `POST /api/account/delete` bez sesji → 302 `/auth/signin`, `GET /?deleted=1` pokazuje komunikat o usunięciu.
+- Odstępstwo po impl-review (F2): przy błędzie odczytu roli endpoint przekierowuje na `/auth/signin?error=unavailable` (jak middleware), a nie na `/dashboard?error=unavailable`, bo `/dashboard` gubił parametr i użytkownik nie wiedział, że konto nie zostało usunięte.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.

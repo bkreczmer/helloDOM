@@ -3,6 +3,7 @@ import { Trash2, UserCog } from "lucide-react";
 import Card from "@/components/ui/Card.astro";
 import { DeleteAccount } from "@/components/account/DeleteAccount";
 import { ServerError } from "@/components/auth/ServerError";
+import { ROLE_LABELS } from "@/lib/dictionaries";
 import { accountErrorMessage } from "@/lib/services/account";
 import type { Role } from "@/types";
 
@@ -12,7 +13,6 @@ interface Props {
 }
 
 const { email, role } = Astro.props;
-const ROLE_LABELS: Record<Role, string> = { owner: "Właściciel", agent: "Agent" };
 const serverError = accountErrorMessage(Astro.url.searchParams.get("error"));
 ---
 
