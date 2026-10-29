@@ -300,24 +300,24 @@ Brak migracji. Zmiana `supabase/config.toml` wymaga jednorazowego restartu lokal
 
 #### Automated
 
-- [x] 1.1 `npm run test:integration` zielony lokalnie: 8 przypadków R1–R8
-- [x] 1.2 Drugie uruchomienie zaraz po pierwszym też zielone (sprzątanie działa, brak 429)
-- [x] 1.3 Po przebiegu lokalna baza nie ma kont `it-*@example.com`
-- [x] 1.4 Strażnik działa: kompletny agent w `opole` → czytelny błąd; po usunięciu znów zielony
-- [x] 1.5 Blokada hosta działa: nie-localhost `SUPABASE_URL` → błąd przed żądaniem
-- [x] 1.6 `npm run lint` i `npx astro check` bez błędów
+- [x] 1.1 `npm run test:integration` zielony lokalnie: 8 przypadków R1–R8 — 6ccd3a8
+- [x] 1.2 Drugie uruchomienie zaraz po pierwszym też zielone (sprzątanie działa, brak 429) — 6ccd3a8
+- [x] 1.3 Po przebiegu lokalna baza nie ma kont `it-*@example.com` — 6ccd3a8
+- [x] 1.4 Strażnik działa: kompletny agent w `opole` → czytelny błąd; po usunięciu znów zielony — 6ccd3a8
+- [x] 1.5 Blokada hosta działa: nie-localhost `SUPABASE_URL` → błąd przed żądaniem — 6ccd3a8
+- [x] 1.6 `npm run lint` i `npx astro check` bez błędów — 6ccd3a8
 
 #### Manual
 
-- [x] 1.7 Użytkownik potwierdza tabelę wyroczni R1–R8 względem PRD
+- [x] 1.7 Użytkownik potwierdza tabelę wyroczni R1–R8 względem PRD — 6ccd3a8
 
 ### Phase 2: Test izolacji
 
 #### Automated
 
-- [ ] 2.1 `npm run test:integration` zielony lokalnie: ranking i izolacja razem
-- [ ] 2.2 Po przebiegu brak kont `it-*@example.com` w lokalnej bazie
-- [ ] 2.3 `npm run lint` i `npx astro check` bez błędów
+- [x] 2.1 `npm run test:integration` zielony lokalnie: ranking i izolacja razem
+- [x] 2.2 Po przebiegu brak kont `it-*@example.com` w lokalnej bazie
+- [x] 2.3 `npm run lint` i `npx astro check` bez błędów
 
 ### Phase 3: CI, break-check i dokumentacja
 
