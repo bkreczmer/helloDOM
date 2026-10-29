@@ -120,7 +120,12 @@ function session() {
       body: form ? new URLSearchParams(form).toString() : undefined,
     });
     storeCookies(response);
-    return { status: response.status, location: response.headers.get("location") ?? "", body: await response.text() };
+    return {
+      status: response.status,
+      location: response.headers.get("location") ?? "",
+      cacheControl: response.headers.get("cache-control") ?? "",
+      body: await response.text(),
+    };
   };
 }
 
@@ -136,13 +141,17 @@ const steps = [
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password, role: "owner" } }),
-    { status: 302, location: "/dashboard" },
+    { status: 302, location: "/dashboard", noStore: true },
   ],
   ["signup session routes dashboard to owner panel", () => request("/dashboard"), { status: 302, location: "/owner" }],
   ["signup session reaches owner panel", () => request("/owner"), { status: 200 }],
   ["owner is redirected from agent panel", () => request("/agent"), { status: 302, location: "/owner" }],
   ["owner is redirected from agent profile", () => request("/agent/profile"), { status: 302, location: "/owner" }],
-  ["signout after signup", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
+  [
+    "signout after signup",
+    () => request("/api/auth/signout", { method: "POST" }),
+    { status: 302, location: "/", noStore: true },
+  ],
   [
     "signup without role is rejected",
     () => request("/api/auth/signup", { method: "POST", form: { email: `norole-${email}`, password } }),
@@ -161,7 +170,7 @@ const steps = [
   [
     "signin accepts correct password",
     () => request("/api/auth/signin", { method: "POST", form: { email, password } }),
-    { status: 302, location: "/dashboard" },
+    { status: 302, location: "/dashboard", noStore: true },
   ],
   ["dashboard routes signed-in owner to owner panel", () => request("/dashboard"), { status: 302, location: "/owner" }],
   ["owner panel renders for signed-in owner", () => request("/owner"), { status: 200 }],
@@ -804,12 +813,16 @@ for (const [name, run, expected] of steps) {
     actual.status === expected.status &&
     (location === undefined || actual.location === location) &&
     (expected.locationMatch === undefined || expected.locationMatch.test(actual.location)) &&
+    // Responses that set auth cookies must not be cached by a CDN (@supabase/ssr cache headers).
+    (expected.noStore === undefined || actual.cacheControl.includes("no-store")) &&
     missing.length === 0 &&
     leaked.length === 0;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
     console.log(`      expected ${expected.status} ${location ?? expected.locationMatch ?? ""}`);
+    if (expected.noStore && !actual.cacheControl.includes("no-store"))
+      console.log(`      cache-control is "${actual.cacheControl}", expected no-store`);
     if (missing.length) console.log(`      body is missing: ${missing.join(" | ")}`);
     if (leaked.length) console.log(`      body must not contain: ${leaked.join(" | ")}`);
   }
