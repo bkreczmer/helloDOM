@@ -47,7 +47,7 @@ export const POST: APIRoute = async (context) => {
       return fail("unknown");
     }
     // "not_found" for a signed-in user with a profile means nothing was deleted, so it must not be
-    // confirmed as a deletion (D1 in context/changes/refactor-error-reporting/plan.md, user decision of
+    // confirmed as a deletion (D1 in context/archive/2026-10-29-refactor-error-reporting/plan.md, user decision of
     // 2026-10-29; reverses context/archive/2026-10-28-account-deletion/plan.md:140).
     // No signOut: the account still exists.
     if (data === "not_found") {

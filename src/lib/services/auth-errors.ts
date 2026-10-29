@@ -43,6 +43,16 @@ export function toAuthErrorCode(error: { code?: string }): AuthErrorCode {
   return SUPABASE_CODE_ALIASES[error.code] ?? "unknown";
 }
 
+/**
+ * Log level for a Supabase auth error at an endpoint: outages and unknown codes are errors, the rate
+ * limit is a warning, ordinary user errors (wrong password, existing account) are not logged.
+ */
+export function authErrorLogLevel(code: AuthErrorCode, status: number | undefined): "error" | "warn" | null {
+  if (code === "unknown" || code === "unavailable" || (status ?? 0) >= 500) return "error";
+  if (code === "rate_limited") return "warn";
+  return null;
+}
+
 /** Page side: maps a `?error=` value to a Polish message. Arbitrary URL text never reaches the UI. */
 export function authErrorMessage(code: string | null): string | null {
   if (code === null) return null;

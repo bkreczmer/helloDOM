@@ -150,6 +150,25 @@ describe("reportError", () => {
     expect(loggedLine(warnSpy)).toMatchObject({ level: "warn", op: "account.delete" });
     expect(errorSpy).not.toHaveBeenCalled();
   });
+
+  it("extra cannot overwrite the context fields", () => {
+    reportError("error", "account.delete", undefined, ctx({ userId: USER_ID }), { userId: "forged", route: "/x" });
+
+    expect(loggedLine(errorSpy)).toMatchObject({ userId: USER_ID, route: "/owner/offers/[id]" });
+  });
+});
+
+describe("describeError — leaks the review caught", () => {
+  it('drops stack line 1 ("Name: message"), so a long message is not logged untruncated', () => {
+    const err = new Error(`${"x".repeat(300)} ${EMAIL}`);
+    const described = describeError(err);
+
+    expect(JSON.stringify(described)).not.toContain(EMAIL);
+  });
+
+  it("an unexpected object (e.g. a data row) is logged only by its type", () => {
+    expect(describeError({ email: EMAIL, price: 500000 })).toEqual({ kind: "result", value: "object" });
+  });
 });
 
 describe("isAuthOutage", () => {

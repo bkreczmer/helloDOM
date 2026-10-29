@@ -51,7 +51,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return context.redirect("/auth/signin?error=unavailable");
   }
   if (data === null) {
-    reportError("error", "middleware.no_profile", undefined, context, { userId: user.id });
+    reportError("error", "middleware.no_profile", undefined, context);
     const { error: signOutError } = await supabase.auth.signOut();
     if (signOutError) {
       reportError("warn", "middleware.signOut", signOutError, context);
