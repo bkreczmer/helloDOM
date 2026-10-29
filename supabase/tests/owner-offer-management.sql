@@ -21,12 +21,14 @@ insert into auth.users (id, email, raw_user_meta_data) values
 --   O1 (owner 1): seeking_agent;
 --   O2 (owner 1): invited, agent A pending;
 --   O3 (owner 1): in_progress, agent B rejected and agent A accepted;
---   O4 (owner 2): seeking_agent, untouched by owner 1's delete.
+--   O4 (owner 2): seeking_agent, untouched by owner 1's delete;
+--   O5 (owner 1): draft (unreachable from the app today, but the policy allows editing it).
 insert into public.offers (id, owner_id, city, property_type, transaction, price, status) values
   ('00000000-0000-0000-0008-000000000101', '00000000-0000-0000-0008-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'seeking_agent'),
   ('00000000-0000-0000-0008-000000000102', '00000000-0000-0000-0008-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'invited'),
   ('00000000-0000-0000-0008-000000000103', '00000000-0000-0000-0008-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'in_progress'),
-  ('00000000-0000-0000-0008-000000000104', '00000000-0000-0000-0008-000000000002', 'rzeszow', 'apartment', 'sale', 500000, 'seeking_agent');
+  ('00000000-0000-0000-0008-000000000104', '00000000-0000-0000-0008-000000000002', 'rzeszow', 'apartment', 'sale', 500000, 'seeking_agent'),
+  ('00000000-0000-0000-0008-000000000105', '00000000-0000-0000-0008-000000000001', 'rzeszow', 'apartment', 'sale', 500000, 'draft');
 
 insert into public.invitations (offer_id, agent_id, owner_id, status, responded_at) values
   ('00000000-0000-0000-0008-000000000102', '00000000-0000-0000-0008-000000000011', '00000000-0000-0000-0008-000000000001', 'pending', null),
@@ -36,7 +38,7 @@ insert into public.invitations (offer_id, agent_id, owner_id, status, responded_
 set local role authenticated;
 
 -- ---------------------------------------------------------------------------------------------
--- Owner 1 updates own offers: only 'seeking_agent' is editable.
+-- Owner 1 updates own offers: only 'draft' and 'seeking_agent' are editable.
 -- ---------------------------------------------------------------------------------------------
 
 set local request.jwt.claims = '{"sub":"00000000-0000-0000-0008-000000000001","role":"authenticated"}';
@@ -64,6 +66,20 @@ begin
   update public.offers set price = 1 where id = '00000000-0000-0000-0008-000000000103';
   get diagnostics n = row_count;
   if n <> 0 then raise exception 'owner 1 on in_progress O3: expected 0 updated rows, got %', n; end if;
+  if (select price from public.offers where id = '00000000-0000-0000-0008-000000000103') is distinct from 500000 then
+    raise exception 'owner 1 on in_progress O3: price should stay 500000';
+  end if;
+end $$;
+
+do $$
+declare n integer;
+begin
+  update public.offers set price = 450000 where id = '00000000-0000-0000-0008-000000000105';
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'owner 1 on draft O5: expected 1 updated row, got %', n; end if;
+  if (select price from public.offers where id = '00000000-0000-0000-0008-000000000105') is distinct from 450000 then
+    raise exception 'owner 1 on draft O5: new price not saved';
+  end if;
 end $$;
 
 -- The values pass the policy's with check, so only the missing column grant stops these updates.
