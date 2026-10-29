@@ -46,8 +46,8 @@ Hot-spot scope used for likelihood weighting: `src/`, `supabase/migrations/`, `s
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|---|---|---|---|---|---|
-| 1 | Ranking i izolacja danych | Wprowadzić runner testów i udowodnić z prawdziwymi sesjami, że top 3 zgadza się z regułą PRD, a użytkownik B nie dosięga danych użytkownika A | #1, #2, #6 | integration (lokalny Supabase, dwa konta), break-check, CI | implemented | context/changes/testing-ranking-and-isolation/ |
-| 2 | Ścieżka krytyczna w przeglądarce | Jeden test E2E z perspektywy użytkownika: właściciel → oferta → top 3 → zaproszenie → agent przyjmuje, uruchamiany w CI | #1, #2, #3 | e2e (Playwright, Chromium), CI | not started | — |
+| 1 | Ranking i izolacja danych | Wprowadzić runner testów i udowodnić z prawdziwymi sesjami, że top 3 zgadza się z regułą PRD, a użytkownik B nie dosięga danych użytkownika A | #1, #2, #6 | integration (lokalny Supabase, dwa konta), break-check, CI | complete | context/archive/2026-10-29-testing-ranking-and-isolation/ |
+| 2 | Ścieżka krytyczna w przeglądarce | Jeden test E2E z perspektywy użytkownika: właściciel → oferta → top 3 → zaproszenie → agent przyjmuje, uruchamiany w CI | #1, #2, #3 | e2e (Playwright, Chromium), CI | change opened | context/changes/testing-critical-path-e2e/ |
 
 ## 4. Stack
 
