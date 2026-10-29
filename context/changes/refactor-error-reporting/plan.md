@@ -324,6 +324,7 @@ Brak migracji i zmian w schemacie; wycofanie = revert commitów (Worker przez `w
 - **Krok 2.5:** awarię Auth wywołano zatrzymaniem kontenera `supabase_kong_*` (a nie `npx supabase stop`). Szybsze i nie rusza bazy; kontener wystartowany z powrotem, Auth `health` 200.
 - **Krok 3.6:** `delete_own_account` podmieniona przez psql na wersję zwracającą `not_found` (definicja z `pg_get_functiondef`), po teście przywrócona; `diff` z oryginałem pusty.
 - **Nazwy `op`:** poza nazwami bazowymi z planu kod używa przyrostków gałęzi: `.config` (brak klienta Supabase), `.role` (odczyt roli), `.read`, `.not_found` (0 wierszy / `not_found` po weryfikacji roli), `.signOut`; konwencja opisana w `src/lib/report-error.ts`. `agent.profile.save` loguje 0 zaktualizowanych wierszy jako `error` (anomalia RLS, ta sama gałąź co błąd zapisu).
+- **Krok 4.8:** sprawdzony przez `npx wrangler tail hellodom --format json` i sondę `/auth/callback?error_code=observability_probe_4_8` po deployu `9a90502`: produkcja zapisuje obiekt `{ level: "warn", op: "auth.callback", route, requestId: <cf-ray>, userId: null, errorCode, error }`. Filtrowania po polu w panelu Workers Logs nie sprawdzano.
 - **Impl-review (F1–F7):** poprawki w osobnym PR — stack bez linii 1, `authErrorLogLevel` w `services/auth-errors.ts`, `extra` przed polami kontekstu, testy (`tests/unit`: 24).
 - **Krok 4.7:** zamiast `docker pause` bazy (zatrzymałby też Auth i odczyt profilu w middleware, więc żądanie kończyłoby się `?error=unavailable` przed renderem strony) tabela `offers` została chwilowo przemianowana z `notify pgrst, 'reload schema'`. Wynik: `/owner` i `/owner/offers/<id>` → 503 z niezmienionym widokiem, logi `owner.offers.list` i `owner.offer.read`; tabela przywrócona (`to_regclass`), strony znów 200.
 
@@ -384,4 +385,4 @@ Brak migracji i zmian w schemacie; wycofanie = revert commitów (Worker przez `w
 #### Manual
 
 - [x] 4.7 Symulowana awaria bazy daje 503 i logi — 0fdd733
-- [ ] 4.8 Linia logu z indeksowanymi polami w Workers Logs na produkcji
+- [x] 4.8 Linia logu z indeksowanymi polami w Workers Logs na produkcji — 0fdd733
