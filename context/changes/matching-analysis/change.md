@@ -1,7 +1,7 @@
 ---
 change_id: matching-analysis
 title: Analiza przepływu dopasowania (oferta → ranking → zaproszenie) — M4L3
-status: new
+status: preparing
 created: 2026-10-29
 updated: 2026-10-29
 archived_at: null
