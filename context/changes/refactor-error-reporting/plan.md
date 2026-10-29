@@ -324,13 +324,13 @@ Brak migracji i zmian w schemacie; wycofanie = revert commitów (Worker przez `w
 
 #### Automated
 
-- [ ] 1.1 Testy jednostkowe przechodzą
-- [ ] 1.2 Lint i typy
-- [ ] 1.3 Celowe uszkodzenie czerwieni test prywatności
+- [x] 1.1 Testy jednostkowe przechodzą
+- [x] 1.2 Lint i typy
+- [x] 1.3 Celowe uszkodzenie czerwieni test prywatności
 
 #### Manual
 
-- [ ] 1.4 Przegląd report-error.ts pod kątem danych osobowych
+- [x] 1.4 Przegląd report-error.ts pod kątem danych osobowych
 
 ### Phase 2: Bramka i auth
 

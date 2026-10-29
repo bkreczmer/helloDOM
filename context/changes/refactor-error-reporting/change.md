@@ -1,7 +1,7 @@
 ---
 change_id: refactor-error-reporting
 title: Wspólna obsługa i raportowanie błędów (refaktor M4)
-status: plan_reviewed
+status: implementing
 created: 2026-10-29
 updated: 2026-10-29
 archived_at: null
