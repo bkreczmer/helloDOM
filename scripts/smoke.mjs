@@ -601,6 +601,80 @@ const steps = [
       bodyExcludes: [() => `/owner/offers/${acceptedOfferId}/edit`],
     },
   ],
+  // Deleting an offer with an invitation: the smoke agent is still ranked on managedOfferId (rejections
+  // only exclude an agent from the offer they rejected), so the owner invites them first.
+  [
+    "owner invites the smoke agent to the managed offer",
+    () =>
+      request("/api/owner/invitations", {
+        method: "POST",
+        form: { offerId: managedOfferId, agentId: smokeAgentId },
+      }),
+    { status: 302, location: () => `/owner/offers/${managedOfferId}?invited=1` },
+  ],
+  [
+    "owner cannot update an invited offer",
+    () => request("/api/owner/offers/update", { method: "POST", form: updateForm(managedOfferId) }),
+    { status: 302, location: () => `/owner/offers/${managedOfferId}?error=edit_locked` },
+  ],
+  [
+    "agent sees the managed offer before it is deleted",
+    () => agent(`/agent/offers/${managedOfferId}`),
+    { status: 200, bodyIncludes: ["Podsumowanie oferty", editedDescription] },
+  ],
+  [
+    "second owner gets 404 when deleting someone else's offer",
+    () => otherOwner("/api/owner/offers/delete", { method: "POST", form: { offerId: managedOfferId } }),
+    { status: 404 },
+  ],
+  [
+    "agent cannot delete an offer",
+    () => agent("/api/owner/offers/delete", { method: "POST", form: { offerId: managedOfferId } }),
+    { status: 403 },
+  ],
+  [
+    "anonymous offer deletion redirects to signin",
+    () => anonymous("/api/owner/offers/delete", { method: "POST", form: { offerId: managedOfferId } }),
+    { status: 302, location: "/auth/signin" },
+  ],
+  [
+    "offer page offers the deletion with the agent warning",
+    () => request(`/owner/offers/${managedOfferId}`),
+    {
+      status: 200,
+      bodyIncludes: ["Usuń ofertę", "Po usunięciu zaproszony agent straci dostęp do oferty."],
+    },
+  ],
+  [
+    "owner deletes the invited offer",
+    () => request("/api/owner/offers/delete", { method: "POST", form: { offerId: managedOfferId } }),
+    { status: 302, location: "/owner?deleted=1" },
+  ],
+  [
+    "owner panel confirms the deletion without the offer",
+    () => request("/owner?deleted=1"),
+    { status: 200, bodyIncludes: ["Usunięto ofertę"], bodyExcludes: [() => `/owner/offers/${managedOfferId}`] },
+  ],
+  [
+    "owner gets 404 for the deleted offer",
+    () => request(`/owner/offers/${managedOfferId}`),
+    { status: 404, bodyIncludes: ["Nie znaleziono oferty"] },
+  ],
+  [
+    "second deletion of the same offer gets 404",
+    () => request("/api/owner/offers/delete", { method: "POST", form: { offerId: managedOfferId } }),
+    { status: 404 },
+  ],
+  [
+    "agent gets 404 for the deleted offer",
+    () => agent(`/agent/offers/${managedOfferId}`),
+    { status: 404, bodyIncludes: ["Nie znaleziono oferty"], bodyExcludes: ["Podsumowanie oferty"] },
+  ],
+  [
+    "agent panel no longer lists the deleted offer",
+    () => agent("/agent"),
+    { status: 200, bodyExcludes: [() => `/agent/offers/${managedOfferId}`] },
+  ],
   ["second owner signout", () => otherOwner("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   [
     "owner signout after ranking checks",

@@ -1,5 +1,5 @@
 ---
-import { ChevronRight, FilePlus2, Files } from "lucide-react";
+import { ChevronRight, CircleCheck, FilePlus2, Files } from "lucide-react";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
 import StatusPill from "@/components/ui/StatusPill.astro";
@@ -34,10 +34,21 @@ if (supabase) {
     offers = null;
   }
 }
+
+const deleted = Astro.url.searchParams.get("deleted") === "1";
 ---
 
 <AppLayout title="Panel właściciela">
   <div class="flex w-full max-w-2xl flex-col gap-[18px]">
+    {deleted && (
+      <p
+        role="status"
+        class="flex items-center gap-2 rounded-control border border-[color-mix(in_oklab,var(--rs-success)_30%,transparent)] bg-rs-success-soft px-3 py-2 text-[13px] font-semibold text-rs-success-fg"
+      >
+        <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
+        Usunięto ofertę
+      </p>
+    )}
     <a href="/owner/offers/new" class:list={[buttonVariants({ variant: "accent" }), "self-start"]}>
       <FilePlus2 className="size-4" aria-hidden="true" />
       Dodaj ofertę

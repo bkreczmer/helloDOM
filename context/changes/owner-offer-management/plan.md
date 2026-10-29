@@ -346,31 +346,31 @@ Migracja dodaje tylko granty i polityki, bez zmian danych. Wycofanie: SQL z blok
 
 #### Automated
 
-- [x] 2.1 Lint przechodzi: `npm run lint`
-- [x] 2.2 Typy przechodzą: `npx astro check`
-- [x] 2.3 Build przechodzi: `npm run build`
-- [x] 2.4 Smoke z krokami edycji przechodzi: `npm run smoke`
+- [x] 2.1 Lint przechodzi: `npm run lint` — 9b11709
+- [x] 2.2 Typy przechodzą: `npx astro check` — 9b11709
+- [x] 2.3 Build przechodzi: `npm run build` — 9b11709
+- [x] 2.4 Smoke z krokami edycji przechodzi: `npm run smoke` — 9b11709
 
 #### Manual
 
-- [x] 2.5 `/owner`: pill statusu w każdym wierszu, light i dark, 360 px
-- [x] 2.6 `/owner/offers/<id>/edit`: formularz wypełniony, walidacja, stan „Zapisywanie…”
-- [x] 2.7 Strona oferty: „Edytuj” / tekst blokady, „Zapisano zmiany”, fokus i klawiatura
+- [x] 2.5 `/owner`: pill statusu w każdym wierszu, light i dark, 360 px — 9b11709
+- [x] 2.6 `/owner/offers/<id>/edit`: formularz wypełniony, walidacja, stan „Zapisywanie…” — 9b11709
+- [x] 2.7 Strona oferty: „Edytuj” / tekst blokady, „Zapisano zmiany”, fokus i klawiatura — 9b11709
 
 ### Phase 3: Usuwanie
 
 #### Automated
 
-- [ ] 3.1 Lint przechodzi: `npm run lint`
-- [ ] 3.2 Typy przechodzą: `npx astro check`
-- [ ] 3.3 Build przechodzi: `npm run build`
-- [ ] 3.4 Smoke z krokami usuwania przechodzi: `npm run smoke`
+- [x] 3.1 Lint przechodzi: `npm run lint`
+- [x] 3.2 Typy przechodzą: `npx astro check`
+- [x] 3.3 Build przechodzi: `npm run build`
+- [x] 3.4 Smoke z krokami usuwania przechodzi: `npm run smoke`
 
 #### Manual
 
-- [ ] 3.5 Potwierdzenie usuwania: tekst zależny od statusu, fokus, stan „Usuwanie…”
-- [ ] 3.6 Usunięcie oferty z zaproszeniem: znika u właściciela i agenta
-- [ ] 3.7 Light/dark i 360 px karty „Zarządzanie ofertą”
+- [x] 3.5 Potwierdzenie usuwania: tekst zależny od statusu, fokus, stan „Usuwanie…”
+- [x] 3.6 Usunięcie oferty z zaproszeniem: znika u właściciela i agenta
+- [x] 3.7 Light/dark i 360 px karty „Zarządzanie ofertą”
 
 ### Phase 4: Produkcja
 
