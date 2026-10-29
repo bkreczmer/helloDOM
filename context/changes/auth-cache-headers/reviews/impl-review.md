@@ -54,7 +54,7 @@ Manual verification (production `Cache-Control` on `POST /api/auth/signin` vs an
 - **Location**: src/lib/supabase.ts:36
 - **Detail**: `response.headers.set(...)` throws `TypeError` when the headers are immutable, for example on `Response.redirect()` or a response passed through from `fetch()`. This only happens when auth cookies were written during that request. No current route hits it: every endpoint uses `context.redirect()` or `new Response(...)`, and both have mutable headers. A future route that returns `Response.redirect()` after a session write would turn a working redirect into a 500.
 - **Fix**: If a route like that is ever added, catch the `TypeError` in `applyAuthCacheHeaders` and return `new Response(response.body, response)` with the headers set. Until then, leave it as is.
-- **Decision**: PENDING
+- **Decision**: FIX NOW — fixed in the triage commit (copy the response when its headers are immutable)
 
 ### F2 — "No headers without a cookie write" has no automated check
 
@@ -64,6 +64,6 @@ Manual verification (production `Cache-Control` on `POST /api/auth/signin` vs an
 - **Location**: scripts/smoke.mjs
 - **Detail**: Desired End State says responses without a session-cookie write keep their current headers. Only the unchecked Manual Verification item covers this (anonymous `GET /` on production). Smoke asserts that `no-store` is present but never that it is absent. The plan only committed to the positive check, so this is not a gap against the plan.
 - **Fix**: Optionally add a smoke step for anonymous `GET /` that expects no `no-store` in `Cache-Control`.
-- **Decision**: PENDING
+- **Decision**: FIX NOW — fixed in the triage commit (smoke: anonymous `GET /` has no `no-store`)
 
 <!-- End of report -->

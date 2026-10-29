@@ -29,12 +29,22 @@ export function createClient(requestHeaders: Headers, cookies: AstroCookies) {
 }
 
 // A response that sets auth cookies must not be cached by Cloudflare or any other proxy.
+// Response.redirect() and fetch() responses have immutable headers, so those get copied first;
+// Astro attaches the cookies after the middleware, so the copy keeps them.
 export function applyAuthCacheHeaders(cookies: AstroCookies, response: Response): Response {
   const headers = authCacheHeaders.get(cookies);
-  if (headers) {
-    for (const [name, value] of Object.entries(headers)) {
-      response.headers.set(name, value);
-    }
+  if (!headers) {
+    return response;
   }
-  return response;
+  const setAll = (target: Response) => {
+    for (const [name, value] of Object.entries(headers)) {
+      target.headers.set(name, value);
+    }
+    return target;
+  };
+  try {
+    return setAll(response);
+  } catch {
+    return setAll(new Response(response.body, response));
+  }
 }

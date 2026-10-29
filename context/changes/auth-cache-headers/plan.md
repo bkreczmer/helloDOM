@@ -92,6 +92,12 @@ Brak.
 - `context/domain/03-anti-corruption-layer.md` §3.2
 - `node_modules/@supabase/ssr/dist/main/types.d.ts:23-58`
 
+## Addendum — odstępstwa z implementacji
+
+- `MiddlewareHandler` zwraca `Response | void`, więc `guard` jest funkcją typowaną jako `Promise<Response>` (CI `astro check` na PR #30).
+- Triage impl-review (CI), F1: `applyAuthCacheHeaders` kopiuje odpowiedź, gdy jej nagłówki są niemodyfikowalne (`Response.redirect()`, `fetch()`); Astro dokleja ciasteczka po middleware (`node_modules/astro/dist/core/middleware/astro-middleware.js:56`), więc kopia ich nie gubi.
+- Triage impl-review (CI), F2: smoke sprawdza też brak `no-store` na anonimowym `GET /` (pozytywna strona punktu 1.5 zostaje ręczna na produkcji).
+
 ## Progress
 
 ### Phase 1: Nagłówki cache z setAll na odpowiedzi

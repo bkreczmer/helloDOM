@@ -136,7 +136,7 @@ const secondAgent = session();
 const anonymous = session();
 
 const steps = [
-  ["home renders", () => request("/"), { status: 200 }],
+  ["home renders without no-store", () => request("/"), { status: 200, noStore: false }],
   ["dashboard redirects anonymous user", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
   [
     "signup creates account",
@@ -814,15 +814,15 @@ for (const [name, run, expected] of steps) {
     (location === undefined || actual.location === location) &&
     (expected.locationMatch === undefined || expected.locationMatch.test(actual.location)) &&
     // Responses that set auth cookies must not be cached by a CDN (@supabase/ssr cache headers).
-    (expected.noStore === undefined || actual.cacheControl.includes("no-store")) &&
+    (expected.noStore === undefined || actual.cacheControl.includes("no-store") === expected.noStore) &&
     missing.length === 0 &&
     leaked.length === 0;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
     console.log(`      expected ${expected.status} ${location ?? expected.locationMatch ?? ""}`);
-    if (expected.noStore && !actual.cacheControl.includes("no-store"))
-      console.log(`      cache-control is "${actual.cacheControl}", expected no-store`);
+    if (expected.noStore !== undefined)
+      console.log(`      cache-control is "${actual.cacheControl}", expected no-store: ${expected.noStore}`);
     if (missing.length) console.log(`      body is missing: ${missing.join(" | ")}`);
     if (leaked.length) console.log(`      body must not contain: ${leaked.join(" | ")}`);
   }
