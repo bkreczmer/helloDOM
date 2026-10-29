@@ -48,7 +48,7 @@ Właściciel nieruchomości, który chce ją sprzedać lub wynająć, nie wie, k
 | S-01 | role-based-signup          | użytkownik rejestruje się jako właściciel albo agent i trafia na swój panel           | F-01          | FR-001, FR-002                  | done |
 | S-02 | agent-profile              | agent uzupełnia profil: miasta, typy, przedział cen, lata doświadczenia              | S-01          | FR-007                          | done |
 | S-03 | offer-top3-ranking         | właściciel zapisuje ofertę i widzi top 3 agentów z wynikiem 0–100                    | S-01, S-02    | US-01, FR-003, FR-008           | done |
-| S-04 | owner-offer-management     | właściciel przegląda swoje oferty ze statusem, edytuje je i usuwa                    | S-03          | FR-004, FR-005, FR-006          | proposed |
+| S-04 | owner-offer-management     | właściciel przegląda swoje oferty ze statusem, edytuje je i usuwa                    | S-03          | FR-004, FR-005, FR-006          | done        |
 | S-05 | agent-invitation           | właściciel zaprasza agenta z top 3, a agent widzi zaproszenie i ofertę               | S-03          | FR-009, FR-010                  | done |
 | S-06 | invitation-response        | agent przyjmuje albo odrzuca zaproszenie, a status oferty się zmienia                | S-05          | FR-011                          | done |
 | S-07 | account-deletion           | użytkownik usuwa konto razem ze wszystkimi swoimi danymi                             | S-06          | FR-012                          | done |
@@ -134,7 +134,7 @@ Foundations below assume these are present and do NOT re-scaffold them.
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Poza ścieżką gwiazdy przewodniej, więc może iść równolegle; blokada edycji po zaproszeniu zależy od statusów wprowadzanych w S-05, więc trzeba uzgodnić zestaw statusów.
-- **Status:** proposed
+- **Status:** done
 
 ### S-05: Zaproszenie agenta
 
@@ -220,3 +220,4 @@ Brak otwartych pytań. Pytania o tokeny design systemu i o format miast/typów z
 - **S-05: właściciel zaprasza jednego agenta z top 3 swojej oferty (oferta przechodzi w „zaproszenie wysłane”), a agent widzi swoje zaproszenia i tylko te oferty, do których go zaproszono.** — Archived 2026-10-28 → `context/archive/2026-10-28-agent-invitation/`. Lesson: —.
 - **S-06: agent przyjmuje zaproszenie (oferta przechodzi w „w obsłudze”) albo je odrzuca (oferta wraca do „szuka agenta”, a ten agent znika z jej rankingu).** — Archived 2026-10-28 → `context/archive/2026-10-28-invitation-response/`. Lesson: —.
 - **S-07: użytkownik usuwa konto razem ze wszystkimi swoimi danymi; gdy robi to agent z przyjętą ofertą, oferta wraca do „szuka agenta” bez przypisanego agenta.** — Archived 2026-10-29 → `context/archive/2026-10-28-account-deletion/`. Lesson: —.
+- **S-04: właściciel przegląda listę swoich ofert ze statusem, edytuje ofertę w statusie „szkic” albo „szuka agenta” i może usunąć ofertę.** — Archived 2026-10-29 → `context/archive/2026-10-29-owner-offer-management/`. Lesson: —.

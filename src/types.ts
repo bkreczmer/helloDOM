@@ -57,7 +57,22 @@ export interface Offer {
 }
 
 // One row of the owner's offer list on /owner (a subset of Offer).
-export type OfferListItem = Pick<Offer, "id" | "city" | "propertyType" | "transaction" | "price" | "createdAt">;
+export type OfferListItem = Pick<
+  Offer,
+  "id" | "city" | "propertyType" | "transaction" | "price" | "status" | "createdAt"
+>;
+
+// Starting values of OfferForm on the edit page, as the inputs show them:
+// area with a decimal comma (54.5 → "54,5"), missing optional values as "".
+export interface OfferFormValues {
+  city: City;
+  propertyType: PropertyType;
+  transaction: Transaction;
+  price: string;
+  areaM2: string;
+  rooms: string;
+  description: string;
+}
 
 // One row of the agent's invitation list on /agent. `offer` is null when RLS hides the offer,
 // i.e. once the invitation is no longer pending/accepted (rejected in S-06).

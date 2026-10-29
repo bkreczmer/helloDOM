@@ -1,14 +1,23 @@
 ---
-import { ArrowLeft, CircleCheck, Info } from "lucide-react";
+import { ArrowLeft, CircleCheck, Info, Lock, Pencil, Settings2 } from "lucide-react";
 import AppLayout from "@/layouts/AppLayout.astro";
 import Card from "@/components/ui/Card.astro";
+import { buttonVariants } from "@/components/ui/button";
 import OfferSummary from "@/components/offers/OfferSummary.astro";
 import InvitationStatusCard from "@/components/owner/InvitationStatusCard.astro";
 import RankingList from "@/components/owner/RankingList.astro";
+import { DeleteOffer } from "@/components/owner/DeleteOffer";
 import { ServerError } from "@/components/auth/ServerError";
 import { createClient } from "@/lib/supabase";
 import { invitationErrorMessage } from "@/lib/services/invitations";
-import { formatOfferDate, parseOfferId, toOffer, toRankedAgent } from "@/lib/services/offers";
+import {
+  formatOfferDate,
+  isOfferEditable,
+  offerActionErrorMessage,
+  parseOfferId,
+  toOffer,
+  toRankedAgent,
+} from "@/lib/services/offers";
 import type { Offer, RankedAgent } from "@/types";
 
 // The middleware guarantees a signed-in owner on /owner/*.
@@ -90,7 +99,10 @@ if (state === "missing") {
 
 const created = Astro.url.searchParams.get("created") === "1";
 const invited = Astro.url.searchParams.get("invited") === "1";
-const inviteError = invitationErrorMessage(Astro.url.searchParams.get("error"));
+const updated = Astro.url.searchParams.get("updated") === "1";
+// Offer action codes first: invitationErrorMessage turns any code it does not know into its own "unknown" message.
+const errorCode = Astro.url.searchParams.get("error");
+const actionError = offerActionErrorMessage(errorCode) ?? invitationErrorMessage(errorCode);
 ---
 
 <AppLayout title={state === "missing" ? "Nie znaleziono oferty" : "Oferta"}>
@@ -115,8 +127,43 @@ const inviteError = invitationErrorMessage(Astro.url.searchParams.get("error"));
             Wysłano zaproszenie
           </p>
         )}
-        <ServerError message={inviteError} />
+        {updated && (
+          <p
+            role="status"
+            class="flex items-center gap-2 rounded-control border border-[color-mix(in_oklab,var(--rs-success)_30%,transparent)] bg-rs-success-soft px-3 py-2 text-[13px] font-semibold text-rs-success-fg"
+          >
+            <CircleCheck className="size-4 shrink-0" aria-hidden="true" />
+            Zapisano zmiany
+          </p>
+        )}
+        <ServerError message={actionError} />
         <OfferSummary offer={offer} />
+        {/* Owner-only actions: OfferSummary is shared with the agent's offer page, so they live here. */}
+        <Card title="Zarządzanie ofertą">
+          <Fragment slot="icon">
+            <Settings2 className="size-4" aria-hidden="true" />
+          </Fragment>
+          <div class="flex flex-col gap-4">
+            {isOfferEditable(offer.status) ? (
+              <a
+                href={`/owner/offers/${offer.id}/edit`}
+                class:list={[buttonVariants({ variant: "default" }), "self-start"]}
+              >
+                <Pencil className="size-4" aria-hidden="true" />
+                Edytuj
+              </a>
+            ) : (
+              <p class="flex items-start gap-2 text-[13px] leading-[1.6] text-rs-fg-2">
+                <Lock className="mt-[3px] size-4 shrink-0" aria-hidden="true" />
+                Edycja jest zablokowana, bo wysłano zaproszenie do agenta.
+              </p>
+            )}
+            {/* Deletion is allowed in every status (offers_delete_own); the island words the warning per status. */}
+            <div class="border-t border-rs-line pt-4">
+              <DeleteOffer client:load offerId={offer.id} status={offer.status} />
+            </div>
+          </div>
+        </Card>
         {offer.status === "seeking_agent" ? (
           <>
             {rejectedAt && (

@@ -28,7 +28,7 @@ import {
   TRANSACTION_LABELS,
 } from "@/lib/dictionaries";
 import { cn } from "@/lib/utils";
-import type { City, PropertyType, Transaction } from "@/types";
+import type { City, OfferFormValues, PropertyType, Transaction } from "@/types";
 
 const PROPERTY_TYPE_ICONS: Record<PropertyType, ReactNode> = {
   apartment: <Building2 className="size-4" />,
@@ -68,6 +68,13 @@ interface Props {
     areaM2Pattern: string;
   };
   serverError?: string | null;
+  /** Form target; the edit page posts to /api/owner/offers/update. */
+  action?: string;
+  submitLabel?: string;
+  /** Set on the edit page: sent as a hidden field so the endpoint knows which offer to update. */
+  offerId?: string;
+  /** Starting values on the edit page, as the inputs show them (area with a decimal comma, blanks as ""). */
+  initialValues?: OfferFormValues;
 }
 
 /** Counts like the server (code points, CRLF as one line break), so the counter matches what is stored. */
@@ -83,14 +90,21 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
-export default function OfferForm({ limits, serverError }: Props) {
-  const [city, setCity] = useState<City | "">("");
-  const [propertyType, setPropertyType] = useState<PropertyType | "">("");
-  const [transaction, setTransaction] = useState<Transaction | "">("");
-  const [price, setPrice] = useState("");
-  const [areaM2, setAreaM2] = useState("");
-  const [rooms, setRooms] = useState("");
-  const [description, setDescription] = useState("");
+export default function OfferForm({
+  limits,
+  serverError,
+  action = "/api/owner/offers",
+  submitLabel = "Zapisz i pokaż agentów",
+  offerId,
+  initialValues,
+}: Props) {
+  const [city, setCity] = useState<City | "">(initialValues?.city ?? "");
+  const [propertyType, setPropertyType] = useState<PropertyType | "">(initialValues?.propertyType ?? "");
+  const [transaction, setTransaction] = useState<Transaction | "">(initialValues?.transaction ?? "");
+  const [price, setPrice] = useState(initialValues?.price ?? "");
+  const [areaM2, setAreaM2] = useState(initialValues?.areaM2 ?? "");
+  const [rooms, setRooms] = useState(initialValues?.rooms ?? "");
+  const [description, setDescription] = useState(initialValues?.description ?? "");
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [submitting, setSubmitting] = useNativeSubmitting();
 
@@ -158,7 +172,8 @@ export default function OfferForm({ limits, serverError }: Props) {
   }
 
   return (
-    <form method="POST" action="/api/owner/offers" className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
+    <form method="POST" action={action} className="flex flex-col gap-5" onSubmit={handleSubmit} noValidate>
+      {offerId && <input type="hidden" name="offerId" value={offerId} />}
       {/* inert, not disabled: disabled controls would drop out of the natively submitted form data. */}
       <div
         inert={submitting}
@@ -315,7 +330,7 @@ export default function OfferForm({ limits, serverError }: Props) {
       <ServerError message={serverError} />
 
       <SubmitButton pending={submitting} pendingText="Zapisywanie…" icon={<Save className="size-4" />}>
-        Zapisz i pokaż agentów
+        {submitLabel}
       </SubmitButton>
     </form>
   );
