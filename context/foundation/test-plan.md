@@ -67,14 +67,14 @@ Hot-spot scope used for likelihood weighting: `src/`, `supabase/migrations/`, `s
 
 ## 5. Quality Gates
 
-| Gate                             | Where                       | Required?                                                | Catches                                     |
-| -------------------------------- | --------------------------- | -------------------------------------------------------- | ------------------------------------------- |
-| lint + typecheck + build         | husky lint-staged + CI      | required (już działa)                                    | dryf składni i typów                        |
-| testy SQL `supabase/tests/`      | CI (job smoke)              | required (już działa)                                    | regresje RLS i RPC                          |
-| smoke HTTP                       | CI (job smoke) + po deployu | required (już działa)                                    | zepsute przepływy auth i podstawowe ścieżki |
-| integration (ranking + izolacja) | local + CI                  | required after §3 Phase 1                                | regresje reguły rankingu i IDOR             |
-| e2e ścieżki krytycznej           | CI on PR (job smoke)        | required (działa od §3 Phase 2)                          | zepsuta ścieżka właściciel → agent          |
-| post-edit hook                   | local (agent loop)          | recommended after §3 Phase 2 (via `/10x-configure-hook`) | regresje w trakcie edycji                   |
+| Gate                             | Where                                                                                                                                  | Required?                                                        | Catches                                     |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------- |
+| lint + typecheck + build         | husky lint-staged + CI                                                                                                                 | required (już działa)                                            | dryf składni i typów                        |
+| testy SQL `supabase/tests/`      | CI (job smoke)                                                                                                                         | required (już działa)                                            | regresje RLS i RPC                          |
+| smoke HTTP                       | CI (job smoke) + po deployu                                                                                                            | required (już działa)                                            | zepsute przepływy auth i podstawowe ścieżki |
+| integration (ranking + izolacja) | local + CI                                                                                                                             | required after §3 Phase 1                                        | regresje reguły rankingu i IDOR             |
+| e2e ścieżki krytycznej           | CI on PR (job smoke)                                                                                                                   | required (działa od §3 Phase 2)                                  | zepsuta ścieżka właściciel → agent          |
+| post-edit hook                   | local (agent loop): `.claude/settings.json` → ESLint edytowanego pliku (PostToolUse), ESLint zmienionych plików + `astro check` (Stop) | active; dowód `npm run test:hooks` (też w CI w kroku integracji) | regresje w trakcie edycji                   |
 
 ## 6. Cookbook Patterns
 
