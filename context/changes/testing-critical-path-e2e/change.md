@@ -1,7 +1,7 @@
 ---
 change_id: testing-critical-path-e2e
 title: Test E2E ścieżki krytycznej w przeglądarce (rollout Phase 2)
-status: plan_reviewed
+status: implementing
 created: 2026-10-29
 updated: 2026-10-29
 archived_at: null

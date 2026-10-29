@@ -323,6 +323,21 @@ Nie dotyczy: brak zmian schematu i danych produkcyjnych.
 - Helpery integracji: `tests/integration/helpers.ts:29-138`
 - Job smoke: `.github/workflows/ci.yml:27-68`
 
+## Addendum — odstępstwa z implementacji
+
+**Faza 1 (`/10x-e2e-setup`)**
+- Lokalnie port E2E to 4322 (`E2E_PORT` w `.env`), bo na 4321 działa `astro dev`. Na 4322 wisiał osierocony demon `astro preview` z 28.10 (zatrzymany `npx astro preview stop`). CI zostaje na domyślnym 4321. Config ma `env: { ASTRO_PREVIEW_BACKGROUND: "1" }`, żeby Astro 7 nie przenosił preview w tło.
+
+**Faza 2 (`/10x-e2e`)**
+- `waitForHydration` czeka tylko na wyspy `client:load`. `MobileNav` (`client:media="(max-width: 640px)"`) nigdy nie hydratuje się na desktopie, więc warunek „brak `astro-island[ssr]`” wisiał na każdej stronie z app shellem.
+- Typ nieruchomości i transakcję wybieramy kliknięciem etykiety karty (radio jest `sr-only`, klik przechwytuje ikona), a potem sprawdzamy `toBeChecked()`.
+- `--repeat-each=3` wymaga `--workers=1`: powtórzenia startują równolegle, ich agenci trafiają do tych samych miast i rankingi się mieszają. Plik nie może biec równolegle sam ze sobą (komentarz w spec). W CI `workers: 1` jest globalne.
+- Uszkodzenie „#1 filtr 0” zrobione przez `create or replace function` w psql z definicją z `pg_get_functiondef` (bez wiersza `where r.score > 0`), a nie tymczasową migracją. Przywrócenie z zapisanej definicji, porównanie `diff` = identyczne; `db reset` (kasuje lokalne konta) niepotrzebny.
+- Uszkodzenie „#3 status” (odwrócone `p_response`) czerwieni krok 7 na **asercji stanu bazy**, nie na URL: endpoint buduje przekierowanie z wartości formularza, więc URL `/agent?rejected=1` jest poprawny mimo przyjęcia w bazie. Potwierdza, że sam URL/HTTP nie dowodzi stanu.
+- Uszkodzenie „#2 izolacja” czerwieni krok 6 na niezaproszonym T2 (200 zamiast 404) — pierwsza kontrola negatywna w kroku; B jest sprawdzany zaraz po nim.
+- Sprzątanie: `signUp` dopisuje konto do rejestru zaraz po udanej rejestracji, a `afterAll` usuwa cały rejestr. Sprawdzone przerwaniem `beforeAll` po rejestracji A i B → 0 kont `e2e-%-%`.
+- Komunikat naprawczy `assertCitiesEmpty` używa wzorca `e2e-%-%@example.com` (nie `e2e-%`), żeby nie kasować stałego konta `e2e-owner@example.com` z projektu `setup`.
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
@@ -332,29 +347,29 @@ Nie dotyczy: brak zmian schematu i danych produkcyjnych.
 #### Automated
 
 - [x] 1.1 Seed przechodzi na zimnym serwerze
-- [x] 1.2 Lint przechodzi
-- [x] 1.3 Typy przechodzą (astro check)
-- [x] 1.4 Testy integracyjne nadal biorą tylko swoje pliki
-- [x] 1.5 git status nie pokazuje artefaktów Playwright ani .env
+- [x] 1.2 Lint przechodzi — c9e7e60
+- [x] 1.3 Typy przechodzą (astro check) — c9e7e60
+- [x] 1.4 Testy integracyjne nadal biorą tylko swoje pliki — c9e7e60
+- [x] 1.5 git status nie pokazuje artefaktów Playwright ani .env — c9e7e60
 
 #### Manual
 
-- [x] 1.6 Przegląd seed.spec.ts i playwright.config.ts przed commitem
+- [x] 1.6 Przegląd seed.spec.ts i playwright.config.ts przed commitem — c9e7e60
 
 ### Phase 2: Test ścieżki krytycznej
 
 #### Automated
 
-- [ ] 2.1 critical-path.spec.ts przechodzi na zimnym serwerze
-- [ ] 2.2 Spec przechodzi 3 razy pod rząd (--repeat-each=3)
-- [ ] 2.3 Każde celowe uszkodzenie daje czerwień we wskazanym kroku
-- [ ] 2.4 Testy integracyjne nadal przechodzą
-- [ ] 2.5 Lint i typy
+- [x] 2.1 critical-path.spec.ts przechodzi na zimnym serwerze
+- [x] 2.2 Spec przechodzi 3 razy pod rząd (--repeat-each=3)
+- [x] 2.3 Każde celowe uszkodzenie daje czerwień we wskazanym kroku
+- [x] 2.4 Testy integracyjne nadal przechodzą
+- [x] 2.5 Lint i typy
 
 #### Manual
 
-- [ ] 2.6 Przegląd spec: asercje stanu i wyrocznia ze stałych PRD
-- [ ] 2.7 Trace przebiegu bez nieoczekiwanych przekierowań
+- [x] 2.6 Przegląd spec: asercje stanu i wyrocznia ze stałych PRD
+- [x] 2.7 Trace przebiegu bez nieoczekiwanych przekierowań
 
 ### Phase 3: CI i dokumentacja
 
