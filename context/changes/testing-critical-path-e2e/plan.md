@@ -383,9 +383,9 @@ Nie dotyczy: brak zmian schematu i danych produkcyjnych.
 
 #### Automated
 
-- [x] 3.1 Składnia workflow poprawna
+- [x] 3.1 Składnia workflow poprawna — e687919
 - [x] 3.2 Job smoke na PR zielony z critical-path.spec.ts w logu — e687919
-- [x] 3.3 Lint, typy i build
+- [x] 3.3 Lint, typy i build — e687919
 
 #### Manual
 
