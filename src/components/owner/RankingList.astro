@@ -28,7 +28,7 @@ const { offerId, agents } = Astro.props;
     <div class="flex flex-col gap-3">
       {agents.length > 0 && (
         <ol class="flex flex-col gap-2.5">
-          {agents.map((agent, index) => (
+          {[...agents].reverse().map((agent, index) => (
             <li class="flex flex-col gap-2 rounded-control border border-rs-line px-3 py-2.5">
               <div class="flex flex-wrap items-center justify-between gap-2">
                 <h3 class="font-display text-[13.5px] font-semibold text-rs-fg">Agent {index + 1}</h3>
