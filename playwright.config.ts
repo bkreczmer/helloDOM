@@ -15,12 +15,13 @@ export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
+  // No retries, also in CI: a retry would hide flakiness (and re-run a serial beforeAll).
+  retries: 0,
   workers: process.env.CI ? 1 : undefined,
   reporter: "html",
   use: {
     baseURL,
-    trace: "on-first-retry",
+    trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
   projects: [

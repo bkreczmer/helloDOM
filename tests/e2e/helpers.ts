@@ -1,3 +1,6 @@
+import { existsSync, readFileSync } from "node:fs";
+import { parseEnv } from "node:util";
+
 import { expect, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
@@ -38,6 +41,25 @@ export interface OfferState {
 const PASSWORD = "E2E-Test-Passw0rd!";
 // Shared by every account of one run, so leftovers of a failed run are easy to spot (e2e-%@example.com).
 export const runId = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+
+const LOCAL_HOSTS = new Set(["127.0.0.1", "localhost"]);
+
+/**
+ * Accounts are created by the app server, not by this process: it reads Supabase from .dev.vars
+ * (Cloudflare adapter), and the base URL may be any server reused on the port. supabaseEnv() only
+ * checks .env, so refuse a non-local app or a non-local Supabase in .dev.vars as well.
+ */
+function assertLocalApp(baseURL: string): void {
+  const appHost = new URL(baseURL).hostname;
+  if (!LOCAL_HOSTS.has(appHost)) {
+    throw new Error(`Testy E2E zakładają konta tylko w lokalnej aplikacji, a baseURL to ${baseURL}.`);
+  }
+  if (!existsSync(".dev.vars")) return;
+  const devVarsUrl = parseEnv(readFileSync(".dev.vars", "utf8")).SUPABASE_URL ?? "";
+  if (!LOCAL_HOSTS.has(URL.canParse(devVarsUrl) ? new URL(devVarsUrl).hostname : "")) {
+    throw new Error("SUPABASE_URL w .dev.vars nie wskazuje lokalnego Supabase, a z niego korzysta serwer aplikacji.");
+  }
+}
 
 // Astro marks an island with the ssr attribute until it has hydrated; a click before that is lost.
 // Only client:load islands count: MobileNav (client:media, narrow screens) never hydrates on desktop.
@@ -81,10 +103,13 @@ export async function signUp(
   created: Account[],
 ): Promise<E2EUser> {
   supabaseEnv(); // refuses to create accounts anywhere but a local Supabase
+  assertLocalApp(baseURL);
   const context = await browser.newContext({ baseURL, storageState: { cookies: [], origins: [] } });
   const email = `e2e-${label}-${runId}@example.com`;
   const signup = await postForm(context, baseURL, "/api/auth/signup", { email, password: PASSWORD, role });
-  if (signup.location === "/dashboard") created.push({ context, email });
+  // Any redirect without ?error= may have created the account (e.g. /auth/confirm-email when
+  // confirmations are on); such an account has no session, so the cleanup reports it by e-mail.
+  if (signup.status === 302 && !signup.location.includes("error=")) created.push({ context, email });
   expect(signup, `rejestracja ${email}`).toEqual({ status: 302, location: "/dashboard" });
 
   const { url, key } = supabaseEnv();
@@ -144,8 +169,9 @@ export async function deleteAccounts(users: Account[], baseURL: string): Promise
       }
     } catch (error) {
       errors.push(`${user.email}: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      await user.context.close();
     }
-    await user.context.close();
   }
   if (errors.length > 0) {
     throw new Error(`Sprzątanie kont E2E nie powiodło się:\n${errors.join("\n")}`);
