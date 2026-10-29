@@ -331,15 +331,15 @@ Nie dotyczy: brak zmian schematu i danych produkcyjnych.
 
 #### Automated
 
-- [ ] 1.1 Seed przechodzi na zimnym serwerze
-- [ ] 1.2 Lint przechodzi
-- [ ] 1.3 Typy przechodzą (astro check)
-- [ ] 1.4 Testy integracyjne nadal biorą tylko swoje pliki
-- [ ] 1.5 git status nie pokazuje artefaktów Playwright ani .env
+- [x] 1.1 Seed przechodzi na zimnym serwerze
+- [x] 1.2 Lint przechodzi
+- [x] 1.3 Typy przechodzą (astro check)
+- [x] 1.4 Testy integracyjne nadal biorą tylko swoje pliki
+- [x] 1.5 git status nie pokazuje artefaktów Playwright ani .env
 
 #### Manual
 
-- [ ] 1.6 Przegląd seed.spec.ts i playwright.config.ts przed commitem
+- [x] 1.6 Przegląd seed.spec.ts i playwright.config.ts przed commitem
 
 ### Phase 2: Test ścieżki krytycznej
 

@@ -38,3 +38,12 @@ pnpm-debug.log*
 
 # private Claude instructions (advisor mode)
 /CLAUDE.local.md
+
+# Playwright
+playwright/.auth/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.playwright-cli/
+.playwright/
