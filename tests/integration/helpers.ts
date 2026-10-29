@@ -45,9 +45,7 @@ export function supabaseEnv(): { url: string; key: string } {
     throw new Error(`SUPABASE_URL nie jest poprawnym adresem URL: ${url}`);
   }
   if (!LOCAL_HOSTS.has(host)) {
-    throw new Error(
-      `Testy integracyjne działają tylko na lokalnym Supabase (127.0.0.1 lub localhost), a host to ${host}.`,
-    );
+    throw new Error(`Testy działają tylko na lokalnym Supabase (127.0.0.1 lub localhost), a host to ${host}.`);
   }
   return { url, key };
 }

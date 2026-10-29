@@ -1,4 +1,4 @@
-// risk: #1 #2 #3 — context/foundation/test-plan.md §3 Phase 2 (plan: context/changes/testing-critical-path-e2e/plan.md)
+// risk: #1 #2 #3 — context/foundation/test-plan.md §3 Phase 2 (plan: context/archive/2026-10-29-testing-critical-path-e2e/plan.md)
 // Modelled on tests/e2e/seed.spec.ts. Every user gets an own browser context; accounts and agent
 // profiles are seeded through the app's HTTP API, the owner's offer A1 is created in the UI.
 //
