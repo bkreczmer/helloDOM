@@ -65,9 +65,6 @@ Plan powstał jako zmiana `refactor-error-reporting` (folder `context/archive/20
 
 ## 6. Decyzje, które należą do mnie
 
-> **SZKIC do redakcji przez autora** — poniżej cztery decyzje podjęte w trakcie M4. Przeredaguj własnymi słowami i usuń tę ramkę.
+> **SZKIC do redakcji przez autora** — przeredaguj własnymi słowami i usuń tę ramkę.
 
-1. **Wybór refaktoru A (obsługa błędów).** Agent przedstawił trzy opcje. Wybrałem A, nie kontrakt SQL rankingu (B) ani podział modułów (C), bo audyt observability pokazał, że awarie na produkcji nie zostawiają śladu, a bez logów każda kolejna zmiana, także B i C, byłaby robiona na ślepo.
-2. **`not_found` przy usuwaniu konta to błąd (D1).** Odwróciłem decyzję z planu account-deletion, który traktował ten wynik jak sukces. Endpoint wcześniej sprawdza, że profil istnieje, więc `not_found` oznacza niespójność, a nie „już usunięte” — użytkownik nie może dostać komunikatu, że jego dane zniknęły, gdy nie zniknęły.
-3. **`no_profile` zostaje z wylogowaniem, dochodzi tylko log.** Zmiana semantyki wymagałaby nowego widoku i decyzji produktowej; w refaktorze chciałem, żeby zachowanie widoczne dla użytkownika zmieniało się w jak najmniejszej liczbie miejsc.
-4. **Awaria Auth kończy się `?error=unavailable`, nie stroną 503.** Istniejący kod i komunikat wystarczają użytkownikowi, a nie zmieniają kontraktu smoke testu; osobna strona 503 to koszt bez proporcjonalnej korzyści przy obecnej skali.
+Agent zaproponował trzy kierunki refaktoru. Wybrałem obsługę błędów (A), a nie kontrakt SQL rankingu (B) ani podział modułów (C), bo audyt pokazał, że awarie na produkcji nie zostawiają śladu, a bez logów każda kolejna zmiana byłaby robiona na ślepo. Odwróciłem też decyzję z planu account-deletion: `not_found` przy usuwaniu konta jest teraz błędem, bo endpoint chwilę wcześniej sprawdza, że profil istnieje, a użytkownik nie może dostać potwierdzenia usunięcia danych, które nie zniknęły. Odrzuciłem natomiast dwie zmiany zachowania, które podpowiadał audyt: `no_profile` dalej wylogowuje (dochodzi tylko log), a awaria Auth kończy się istniejącym `?error=unavailable` zamiast nowej strony 503. Zasada była jedna: refaktor zmienia to, co widzi użytkownik, tylko tam, gdzie obecne zachowanie ukrywa awarię.
