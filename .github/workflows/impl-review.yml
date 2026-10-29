@@ -147,6 +147,14 @@ jobs:
             neutral "no plan" comment and exit cleanly — do not fail
             the workflow.
 
+      - name: Show Claude error
+        # The action hides the run output; on failure print only the final
+        # result message (e.g. an API error) from the execution log.
+        if: failure() && steps.guard.outputs.skip != 'true'
+        run: |
+          LOG="$RUNNER_TEMP/claude-execution-output.json"
+          [ -f "$LOG" ] && jq -r '.[] | select(.type == "result") | .result // empty' "$LOG" | head -20 || echo "No execution log."
+
       - name: Validate Claude's commit (skip-ci + output contract)
         # `if: always()` so this re-evaluates the latest tip regardless of
         # whether the Claude step ran — catches off-contract bot commits
@@ -238,7 +246,7 @@ jobs:
           # mtime ordering picks the newest across plain `impl-review.md`
           # and `impl-review-phase-N.md` variants.
           REVIEW_FILE=$(find . -type f -path '*/context/changes/*/reviews/impl-review*.md' 2>/dev/null \
-                          | xargs ls -t 2>/dev/null | head -1)
+                          | xargs -r ls -t 2>/dev/null | head -1)
           if [ -z "$REVIEW_FILE" ] || [ ! -f "$REVIEW_FILE" ]; then
             echo "No review file on this branch — nothing to gate on. Passing."
             # Deliberately skip posting a status here: no review means no
