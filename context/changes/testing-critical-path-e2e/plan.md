@@ -52,14 +52,14 @@ Wyrocznia jest policzona ręcznie z reguły PRD (`context/foundation/prd.md:106-
 
 **Oferta A1** — `lublin`, mieszkanie, 500 000 zł. Agentów rejestrujemy w kolejności: P, T1, T2, F, I, O.
 
-| Agent | Profil | Wynik z PRD | Oczekiwanie |
-|---|---|---|---|
-| P | lublin, apartment, 400–600 tys., 10 lat | 35+35+30 = 100 | Agent 1 |
-| T1 | lublin, apartment, 400 000–500 000, 5 lat | 85 | Agent 2 (remis z T2, wcześniejsza rejestracja) |
-| T2 | lublin, apartment, 500 000–700 000, 5 lat | 85 | Agent 3 |
-| F | lublin, house, 400–600 tys., 15 lat | 0+35+30 = 65 | poza top 3; Agent 3 po odrzuceniu przez P |
-| I | lublin, apartment, 400–600 tys., bez stażu | — (niepełny profil) | nigdy w HTML |
-| O | rzeszow, apartment, 400–600 tys., 10 lat | — (inne miasto) | nigdy w HTML |
+| Agent | Profil                                     | Wynik z PRD         | Oczekiwanie                                    |
+| ----- | ------------------------------------------ | ------------------- | ---------------------------------------------- |
+| P     | lublin, apartment, 400–600 tys., 10 lat    | 35+35+30 = 100      | Agent 1                                        |
+| T1    | lublin, apartment, 400 000–500 000, 5 lat  | 85                  | Agent 2 (remis z T2, wcześniejsza rejestracja) |
+| T2    | lublin, apartment, 500 000–700 000, 5 lat  | 85                  | Agent 3                                        |
+| F     | lublin, house, 400–600 tys., 15 lat        | 0+35+30 = 65        | poza top 3; Agent 3 po odrzuceniu przez P      |
+| I     | lublin, apartment, 400–600 tys., bez stażu | — (niepełny profil) | nigdy w HTML                                   |
+| O     | rzeszow, apartment, 400–600 tys., 10 lat   | — (inne miasto)     | nigdy w HTML                                   |
 
 **Oferta A2** — `zielona-gora`, działka, 950 000 zł. Y (zielona-gora, plot, 900 000–1 000 000, 0 lat) ma 70 pkt i jest jedynym `<li>`. Z (zielona-gora, house, 1–10 zł, 0 lat) ma 0 pkt i nie występuje. Widoczny jest komunikat „Dopasowanych agentów jest mniej niż 3…”.
 
@@ -96,6 +96,7 @@ Instalujemy `@playwright/test` i Chromium, tworzymy `playwright.config.ts` i pro
 **Intent**: Konfiguracja wygenerowana przez skill z wykrytymi wartościami projektu.
 
 **Contract**:
+
 - `testDir: "tests/e2e"`, tylko projekt Chromium (plus `setup`);
 - `PORT` z `E2E_PORT` z domyślnym 4321;
 - `webServer` uruchamia `npm run build && npm run preview -- --port <PORT>` z `url: baseURL` i `reuseExistingServer: !process.env.CI`;
@@ -159,11 +160,13 @@ Piszemy `tests/e2e/critical-path.spec.ts` z dwoma `test()` na wspólnym seedzie.
 **File**: `tests/e2e/helpers.ts` (nowy), `tests/integration/helpers.ts`
 
 **Intent**:
+
 - Zebrać seeding przez HTTP: signup z rolą w nowym kontekście przeglądarki, profil agenta przez `POST /api/agent/profile` (form z powtarzanymi `cities` i `propertyTypes`), sprzątanie przez `POST /api/account/delete`.
 - Zebrać odczyt bazy: supabase-js z kluczem anon i `signInWithPassword`.
 - Ponownie użyć `assertCitiesEmpty` i dopisać do jego komunikatu naprawczego wzorzec `e2e-%@example.com`.
 
 **Contract**:
+
 - Każdy POST wysyła `Origin: baseURL` i oczekuje 302 bez `?error=`.
 - Helper odczytu zwraca `offers.status/price/description` oraz listę `invitations(agent_id, status)` dla oferty.
 - Hosty inne niż lokalne są odrzucane, tak jak w `tests/integration/helpers.ts:47-50`.
@@ -178,7 +181,7 @@ Piszemy `tests/e2e/critical-path.spec.ts` z dwoma `test()` na wspólnym seedzie.
 
 1. **A tworzy ofertę A1 w UI**: „Dodaj ofertę” → formularz (Lublin, mieszkanie, 500 000 zł, unikalny opis) → „Zapisz i pokaż agentów”. Oczekiwane: URL `/owner/offers/<id>?created=1` i „Zapisano ofertę”.
 2. **Ryzyko #1 — top 3**: w sekcji „Najlepiej dopasowani agenci” `ol > li` ma dokładnie 3 elementy. Dla pozycji N=1..3 sprawdzamy „Agent N”, wynik `NN/100` i `input[name=agentId]` równe kolejno [P 100, T1 85, T2 85]. Brak `agentId` dla F, I i O w całym HTML. Brak komunikatu „mniej niż 3”.
-3. *(usunięty: A2 powstaje w `beforeAll`; numeracja kroków bez zmian)*
+3. _(usunięty: A2 powstaje w `beforeAll`; numeracja kroków bez zmian)_
 4. **Zaproszenie P**: klik „Zaproś agenta 1”. Oczekiwane w UI: „Wysłano zaproszenie”, karta „Zaproszenie wysłane”, brak listy rankingu, „Edycja jest zablokowana…”. W bazie (sesja A): A1 `invited`, jedno zaproszenie `pending` dla P.
 5. **Blokada edycji (#3)**: A wchodzi GET na `/owner/offers/<A1>/edit` → `?error=edit_locked`. Potem `request.post` na endpoint update ze zmienioną ceną → `?error=edit_locked`. W bazie `price` i `description` A1 są niezmienione.
 6. **Izolacja przed odpowiedzią (#2)**:
@@ -206,6 +209,7 @@ Piszemy `tests/e2e/critical-path.spec.ts` z dwoma `test()` na wspólnym seedzie.
 **Intent**: Pokazać, że każda asercja zawodzi przy materializacji ryzyka.
 
 **Contract**:
+
 - **#1 kolejność**: w `RankingList.astro` render odwróconej listy → czerwień w kroku 2.
 - **#1 mapowanie**: ukryte `agentId` w każdym `<li>` bierze `ranking[0].agentId` → czerwień w kroku 2.
 - **#1 filtr 0**: tymczasowa migracja, lokalnie i nigdy niecommitowana, która podmienia `rank_agents_for_offer` bez `where r.score > 0` → pierwszy `test()` zostaje zielony (A1 nie ma agenta z wynikiem 0 w top 3), czerwień tylko w drugim `test()` (Z na A2). Przywrócenie: `npx supabase db reset` (kasuje lokalne konta, uprzedzić użytkownika). Wariantu z `RankingList.astro` nie używamy, bo czerwieni krok 2 pierwszego testu, a nie filtr.
@@ -246,6 +250,7 @@ Podłączamy Playwright do joba `smoke` i aktualizujemy dokumenty, które dziś 
 **Intent**: Uruchomić E2E na każdym PR na tym samym lokalnym Supabase. Krok stoi po zapisie `.env` i buildzie, a **przed** krokiem smoke, żeby `webServer` był jedynym procesem na 4321.
 
 **Contract**: nowe kroki w jobie `smoke`:
+
 - cache `~/.cache/ms-playwright` z kluczem po wersji `@playwright/test` z `package-lock.json`;
 - `npx playwright install --with-deps chromium` (przy trafionym cache: `npx playwright install-deps chromium`);
 - dopisanie do `.env` stałych, niesekretnych `E2E_USERNAME` i `E2E_PASSWORD` dla lokalnego stacku CI;
@@ -262,6 +267,7 @@ Podwójny build (`npm run build` przed smoke i w `webServer`) jest akceptowalny.
 **Intent**: Opisać nową warstwę w miejscach, które dziś mówią „brak E2E”.
 
 **Contract**:
+
 - `test-plan.md`: §3 wiersz Phase 2 → status `done` (albo odpowiednik używany w tabeli); §4 wiersz e2e → narzędzie, lokalizacja `tests/e2e/`, polecenie; §5 bramka e2e → aktywna w jobie `smoke`; §6.4 „Adding an e2e test” → krótki przepis (nowy kontekst na użytkownika, seed przez API z `Origin`, unikalne miasta, sonda pustych miast, odczyt bazy sesją, `/10x-e2e`).
 - `CLAUDE.md`: Commands dostaje `npm run test:e2e`, a Testing zamiast „No test framework yet” wymienia vitest (integracja), testy SQL i Playwright (E2E).
 - `README.md`: sekcja Skrypty dostaje `npm run test:e2e`, sekcja CI opisuje krok E2E w jobie smoke.
@@ -326,9 +332,11 @@ Nie dotyczy: brak zmian schematu i danych produkcyjnych.
 ## Addendum — odstępstwa z implementacji
 
 **Faza 1 (`/10x-e2e-setup`)**
+
 - Lokalnie port E2E to 4322 (`E2E_PORT` w `.env`), bo na 4321 działa `astro dev`. Na 4322 wisiał osierocony demon `astro preview` z 28.10 (zatrzymany `npx astro preview stop`). CI zostaje na domyślnym 4321. Config ma `env: { ASTRO_PREVIEW_BACKGROUND: "1" }`, żeby Astro 7 nie przenosił preview w tło.
 
 **Faza 2 (`/10x-e2e`)**
+
 - `waitForHydration` czeka tylko na wyspy `client:load`. `MobileNav` (`client:media="(max-width: 640px)"`) nigdy nie hydratuje się na desktopie, więc warunek „brak `astro-island[ssr]`” wisiał na każdej stronie z app shellem.
 - Typ nieruchomości i transakcję wybieramy kliknięciem etykiety karty (radio jest `sr-only`, klik przechwytuje ikona), a potem sprawdzamy `toBeChecked()`.
 - `--repeat-each=3` wymaga `--workers=1`: powtórzenia startują równolegle, ich agenci trafiają do tych samych miast i rankingi się mieszają. Plik nie może biec równolegle sam ze sobą (komentarz w spec). W CI `workers: 1` jest globalne.
@@ -346,7 +354,7 @@ Nie dotyczy: brak zmian schematu i danych produkcyjnych.
 
 #### Automated
 
-- [x] 1.1 Seed przechodzi na zimnym serwerze
+- [x] 1.1 Seed przechodzi na zimnym serwerze — c9e7e60
 - [x] 1.2 Lint przechodzi — c9e7e60
 - [x] 1.3 Typy przechodzą (astro check) — c9e7e60
 - [x] 1.4 Testy integracyjne nadal biorą tylko swoje pliki — c9e7e60
@@ -360,24 +368,24 @@ Nie dotyczy: brak zmian schematu i danych produkcyjnych.
 
 #### Automated
 
-- [x] 2.1 critical-path.spec.ts przechodzi na zimnym serwerze
-- [x] 2.2 Spec przechodzi 3 razy pod rząd (--repeat-each=3)
-- [x] 2.3 Każde celowe uszkodzenie daje czerwień we wskazanym kroku
-- [x] 2.4 Testy integracyjne nadal przechodzą
-- [x] 2.5 Lint i typy
+- [x] 2.1 critical-path.spec.ts przechodzi na zimnym serwerze — e732b19
+- [x] 2.2 Spec przechodzi 3 razy pod rząd (--repeat-each=3) — e732b19
+- [x] 2.3 Każde celowe uszkodzenie daje czerwień we wskazanym kroku — e732b19
+- [x] 2.4 Testy integracyjne nadal przechodzą — e732b19
+- [x] 2.5 Lint i typy — e732b19
 
 #### Manual
 
-- [x] 2.6 Przegląd spec: asercje stanu i wyrocznia ze stałych PRD
-- [x] 2.7 Trace przebiegu bez nieoczekiwanych przekierowań
+- [x] 2.6 Przegląd spec: asercje stanu i wyrocznia ze stałych PRD — e732b19
+- [x] 2.7 Trace przebiegu bez nieoczekiwanych przekierowań — e732b19
 
 ### Phase 3: CI i dokumentacja
 
 #### Automated
 
-- [ ] 3.1 Składnia workflow poprawna
+- [x] 3.1 Składnia workflow poprawna
 - [ ] 3.2 Job smoke na PR zielony z critical-path.spec.ts w logu
-- [ ] 3.3 Lint, typy i build
+- [x] 3.3 Lint, typy i build
 
 #### Manual
 

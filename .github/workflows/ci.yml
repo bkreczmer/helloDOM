@@ -59,6 +59,38 @@ jobs:
           printf 'SUPABASE_URL=%s\nSUPABASE_KEY=%s\n' "$API_URL" "$ANON_KEY" > .env
           cp .env .dev.vars
       - run: npm run build
+      - name: Read Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+      - if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      - if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+      # E2E runs before the smoke step: its webServer must be the only process on port 4321.
+      - name: Create the E2E user and run E2E tests
+        run: |
+          source supabase.env
+          # Fixed, non-secret credentials: the account exists only in this job's throwaway Supabase.
+          E2E_USERNAME=e2e-owner@example.com
+          E2E_PASSWORD=E2E-ci-Passw0rd!
+          printf 'E2E_USERNAME=%s\nE2E_PASSWORD=%s\n' "$E2E_USERNAME" "$E2E_PASSWORD" >> .env
+          curl -sf -o /dev/null "$API_URL/auth/v1/signup" -H "apikey: $ANON_KEY" -H "Content-Type: application/json" \
+            -d "{\"email\":\"$E2E_USERNAME\",\"password\":\"$E2E_PASSWORD\",\"data\":{\"role\":\"owner\"}}"
+          npm run test:e2e
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 14
       - name: Run smoke test against production preview
         run: |
           npm run preview -- --port 4321 &

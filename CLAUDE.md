@@ -15,6 +15,8 @@ helloDOM matches property owners' offers with real-estate agents (0–100 score,
 - `npm run format` — Prettier
 - `npx astro check` — type check (run by CI)
 - `npm run smoke` — auth smoke test against a running server (`BASE_URL`); run after dependency upgrades.
+- `npm run test:integration` — Vitest integration tests against the local Supabase (`tests/integration/`).
+- `npm run test:e2e` — Playwright E2E (Chromium) on a cold build + preview; needs `npx supabase start` and `E2E_USERNAME`/`E2E_PASSWORD` (optionally `E2E_PORT`) in `.env`.
 
 Pre-commit: husky + lint-staged (`@package.json`).
 
@@ -42,7 +44,12 @@ Setup lokalny i deploy: @README.md
 
 ## Testing
 
-No test framework yet; `npm run smoke` and `npx astro check` are the only checks.
+Risks and layers: `@context/foundation/test-plan.md`; E2E setup: `@context/foundation/test-stack.md`.
+
+- SQL/RLS tests: `supabase/tests/*.sql` (psql, CI only).
+- Integration (Vitest): `tests/integration/`, real sessions on the local Supabase, never `service_role`.
+- E2E (Playwright): `tests/e2e/`; new tests start from `/10x-e2e <risk-id>` and follow `tests/e2e/seed.spec.ts` (test-plan §6.4).
+- `npm run smoke`: HTTP smoke against a running server.
 
 ## CI
 
