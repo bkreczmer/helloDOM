@@ -50,7 +50,7 @@ Plan jest źródłem prawdy — przegląd porównuje PR z deklarowaną intencją
 **Główne źródło: konwencja.** Projekty korzystające z workflow opartego na planach przechowują pliki planów w `context/changes/<change-id>/plan.md` w gałęzi PR — w katalogu głównym repozytorium lub, w monorepo, pod poddrzewem workspace (np. `projects/<app>/context/changes/<change-id>/plan.md`). Znajdź najnowszy plik będący częścią tego PR:
 
 ```bash
-BASE="${GITHUB_BASE_REF:-master}"
+BASE="${GITHUB_BASE_REF:-main}"
 # The leading `:(glob)**/` matches context/changes/ at the repo root AND
 # under any workspace subtree, so this works in single-package repos and
 # monorepos alike.
@@ -94,7 +94,7 @@ Przeczytaj cały plik planu (bez offsetu, bez limitu) i wyodrębnij jego zobowi�
 ### Oblicz diff
 
 ```bash
-BASE="${GITHUB_BASE_REF:-master}"
+BASE="${GITHUB_BASE_REF:-main}"
 git fetch origin "$BASE" --depth=50 2>/dev/null || true
 CHANGED_FILES=$(git diff --name-only "origin/${BASE}...HEAD")
 ```
