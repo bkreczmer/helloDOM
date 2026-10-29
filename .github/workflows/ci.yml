@@ -47,6 +47,10 @@ jobs:
             psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -v ON_ERROR_STOP=1 -f "$f"
             echo "::endgroup::"
           done
+      - name: Run integration tests
+        run: |
+          source supabase.env
+          SUPABASE_URL="$API_URL" SUPABASE_KEY="$ANON_KEY" npm run test:integration -- --reporter=verbose
       - name: Check generated database types are up to date
         run: npm run db:types && git diff --exit-code src/db/database.types.ts
       - name: Configure secrets for build and preview

@@ -292,6 +292,19 @@ Brak migracji. Zmiana `supabase/config.toml` wymaga jednorazowego restartu lokal
 - Wzorzec sesji i unikalnych e-maili: `scripts/smoke.mjs:7-13,93-130`
 - Precedens break-checku: `context/archive/2026-10-28-offer-top3-ranking/reviews/impl-review.md:38-46`
 
+## Break-check
+
+Wykonane 2026-10-29 na lokalnej bazie. Zepsucie zatwierdzone przez `docker exec supabase_db_10x-astro-starter psql -U postgres`, przywrócenie BC1–BC3 z definicji zapisanej wcześniej przez `pg_get_functiondef`. Po BC3 definicja funkcji w bazie jest identyczna z oryginałem (`diff` pusty).
+
+| Id | Zepsucie | Wynik na zepsutym kodzie | Po przywróceniu |
+|---|---|---|---|
+| BC1 | `experience_years desc` → `asc` | czerwony: R1, R2, R3, R4, R5, R6, R8 (7/8; R7 ma jednego agenta) | ranking 8/8 |
+| BC2 | `created_at asc` → `desc` | czerwony: R1, R2, R3, R8 (remis A3/A4 przy 50 pkt) | ranking 8/8 |
+| BC3 | `between` → `o.price > p.price_min and o.price < p.price_max` | czerwony: R2, R3 | ranking 8/8 |
+| BC4 | `create policy offers_select_all on public.offers for select to authenticated using (true)` | czerwony: I5, I13 | `drop policy`; zostaje 5 oryginalnych polityk `offers`; izolacja 16/16 |
+
+Każdy czerwony wynik to nieudana asercja `toEqual` na oczekiwanym przypadku (bez błędu `beforeAll` i bez 429).
+
 ## Progress
 
 > Convention: `- [ ]` pending, `- [x]` done. Append ` — <commit sha>` when a step lands. Do not rename step titles. See `references/progress-format.md`.
@@ -315,15 +328,15 @@ Brak migracji. Zmiana `supabase/config.toml` wymaga jednorazowego restartu lokal
 
 #### Automated
 
-- [x] 2.1 `npm run test:integration` zielony lokalnie: ranking i izolacja razem
-- [x] 2.2 Po przebiegu brak kont `it-*@example.com` w lokalnej bazie
-- [x] 2.3 `npm run lint` i `npx astro check` bez błędów
+- [x] 2.1 `npm run test:integration` zielony lokalnie: ranking i izolacja razem — b09ca17
+- [x] 2.2 Po przebiegu brak kont `it-*@example.com` w lokalnej bazie — b09ca17
+- [x] 2.3 `npm run lint` i `npx astro check` bez błędów — b09ca17
 
 ### Phase 3: CI, break-check i dokumentacja
 
 #### Automated
 
-- [ ] 3.1 BC1–BC4: każde zepsucie czerwone na oczekiwanym przypadku, przywrócenie zielone
-- [ ] 3.2 Po break-checku testy integracyjne i `supabase/tests/*.sql` zielone
-- [ ] 3.3 `npm run lint` bez błędów
+- [x] 3.1 BC1–BC4: każde zepsucie czerwone na oczekiwanym przypadku, przywrócenie zielone
+- [x] 3.2 Po break-checku testy integracyjne i `supabase/tests/*.sql` zielone
+- [x] 3.3 `npm run lint` bez błędów
 - [ ] 3.4 Na PR job `smoke` zielony z krokiem `Run integration tests`

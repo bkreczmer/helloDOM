@@ -46,7 +46,7 @@ Hot-spot scope used for likelihood weighting: `src/`, `supabase/migrations/`, `s
 
 | # | Phase name | Goal (one line) | Risks covered | Test types | Status | Change folder |
 |---|---|---|---|---|---|---|
-| 1 | Ranking i izolacja danych | Wprowadzić runner testów i udowodnić z prawdziwymi sesjami, że top 3 zgadza się z regułą PRD, a użytkownik B nie dosięga danych użytkownika A | #1, #2, #6 | integration (lokalny Supabase, dwa konta), break-check, CI | change opened | context/changes/testing-ranking-and-isolation/ |
+| 1 | Ranking i izolacja danych | Wprowadzić runner testów i udowodnić z prawdziwymi sesjami, że top 3 zgadza się z regułą PRD, a użytkownik B nie dosięga danych użytkownika A | #1, #2, #6 | integration (lokalny Supabase, dwa konta), break-check, CI | implemented | context/changes/testing-ranking-and-isolation/ |
 | 2 | Ścieżka krytyczna w przeglądarce | Jeden test E2E z perspektywy użytkownika: właściciel → oferta → top 3 → zaproszenie → agent przyjmuje, uruchamiany w CI | #1, #2, #3 | e2e (Playwright, Chromium), CI | not started | — |
 
 ## 4. Stack
@@ -55,7 +55,7 @@ Hot-spot scope used for likelihood weighting: `src/`, `supabase/migrations/`, `s
 |---|---|---|---|
 | database / RLS | skrypty SQL w `supabase/tests/` przez `psql` | — | istnieją (6 plików), uruchamiane w CI w jobie smoke |
 | smoke HTTP | `scripts/smoke.mjs` | — | istnieje; auth i główne przepływy na działającym serwerze |
-| unit + integration | none yet — see Phase 1 | — | runner wybiera `/10x-research` / `/10x-plan` (kandydat: Vitest) |
+| unit + integration | Vitest | 5.0.5 | `tests/integration/`, `npm run test:integration`; w CI w jobie smoke (krok `Run integration tests`) na lokalnym Supabase |
 | e2e | none yet — see Phase 2 | — | Playwright przez `/10x-e2e-setup`; tylko Chromium (§7) |
 
 **Stack grounding tools (current session):**
@@ -79,11 +79,25 @@ Hot-spot scope used for likelihood weighting: `src/`, `supabase/migrations/`, `s
 
 ### 6.1 Adding a ranking / scoring test
 
-- TBD — see §3 Phase 1 (tabela przypadków z PRD, wyrocznia z PRD, nie z kodu funkcji).
+- **Location**: `tests/integration/<obszar>.test.ts`, wspólne helpery w `tests/integration/helpers.ts`; uruchamiane przez `npm run test:integration` na lokalnym Supabase.
+- **Reference test**: `tests/integration/ranking.test.ts` (przypadki R1–R8).
+- **Zasady**:
+  - Wyrocznia z PRD (Business Logic), policzona ręcznie i wpisana jako stałe (`top: [["A2", 100], …]`). Nigdy nie licz wyniku tą samą formułą co `rank_agents_for_offer`.
+  - Jedna pula agentów (`AGENT_POOL`) na cały plik i kilka ofert na niej, bo każda rejestracja zjada limit auth. Przed testami `assertCitiesEmpty` sprawdza, że miasta puli są puste (pozostałości w bazie zajęłyby miejsca w top 3).
+  - Konta rejestruj sekwencyjnie w `beforeAll`: kolejność rejestracji wyznacza remis „wcześniejsza rejestracja”.
+  - Remis musi faktycznie zachodzić w danych (ten sam wynik i staż), a przypadek graniczny ceny sprawdzaj z obu stron (równa granica i ±1).
+  - Ranking wywołuj sesją właściciela oferty (`rank()`), nigdy `service_role`. Sprzątanie w `afterAll` przez `deleteUsers` (RPC `delete_own_account`).
 
 ### 6.2 Adding an access-isolation (IDOR) test
 
-- TBD — see §3 Phase 1 (dwie prawdziwe sesje, zapytanie krzyżowe, kontrola pozytywna, że właściciel widzi swoje dane).
+- **Location**: `tests/integration/<obszar>.test.ts`, helpery z `tests/integration/helpers.ts` (`signUpAs`, `anonClient`, `deleteUsers`).
+- **Reference test**: `tests/integration/isolation.test.ts` (przypadki I1–I16).
+- **Zasady**:
+  - Każde zapytanie idzie przez PostgREST z kluczem anon i JWT prawdziwej sesji (albo bez sesji, dla anon). Nigdy `service_role` ani `postgres`: omijają RLS.
+  - Kontrola pozytywna obok negatywnej: pusty wynik B jest dowodem tylko wtedy, gdy w tym samym przebiegu A widzi te same dane (np. `readXAsA()` po próbie B).
+  - Sprawdzaj każdą ścieżkę: odczyt, `update`/`delete` (0 zmienionych wierszy i niezmieniony stan u A) oraz RPC.
+  - Zaakceptowane ujawnienia (np. `owner_id` widoczny dla zaproszonego agenta) opisz w komentarzu pliku, żeby nie traktować ich jako wycieku.
+  - Konta rejestruj sekwencyjnie w `beforeAll`, miasta chroń `assertCitiesEmpty`, sprzątaj przez `deleteUsers` (RPC `delete_own_account`).
 
 ### 6.3 Adding a database / RLS test in SQL
 
@@ -97,6 +111,8 @@ Hot-spot scope used for likelihood weighting: `src/`, `supabase/migrations/`, `s
 ### 6.5 Per-rollout-phase notes
 
 (Dopisywane po każdym etapie.)
+
+- **Etap 1 (ranking i izolacja)**: pełny przebieg rejestruje ~13 kont, więc `[auth.rate_limit] sign_in_sign_ups` w `supabase/config.toml` podniesiono do 100 (lokalnie i w CI; produkcja bez zmian). Kilka przebiegów pod rząd może dać 429 — wtedy odczekaj 5 minut. Break-check RLS: `drop policy offers_select_own` *zaostrza* dostęp (RLS domyślnie odmawia), więc zapala kontrolę pozytywną, a nie test IDOR. Zepsucie izolacji to polityka przepuszczająca wszystko (`create policy … for select to authenticated using (true)`), zatwierdzona w bazie, bo PostgREST nie widzi zmian z transakcji z rollback. Wyniki: `context/changes/testing-ranking-and-isolation/plan.md`, sekcja Break-check.
 
 ## 7. What We Deliberately Don't Test
 
