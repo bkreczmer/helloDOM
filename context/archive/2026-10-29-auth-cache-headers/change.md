@@ -1,9 +1,10 @@
 ---
 change_id: auth-cache-headers
 title: Nagłówki no-store na odpowiedziach ustawiających ciasteczka sesji
-status: impl_reviewed
+status: archived
 created: 2026-10-29
 updated: 2026-10-29
+archived_at: 2026-10-29T19:36:38Z
 ---
 
 ## Notes
