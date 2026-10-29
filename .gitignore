@@ -47,3 +47,6 @@ blob-report/
 playwright/.cache/
 .playwright-cli/
 .playwright/
+
+# 10xDevs course materials (licensed, kept out of the public repo)
+/10xdev/
