@@ -107,7 +107,7 @@ Pierwszy przepływ (3 akcje do widocznej wartości): 1. rejestracja jako właśc
 
 System liczy dla każdego agenta wynik 0–100 dopasowania do oferty (miasto jest warunkiem koniecznym, a punkty dają typ nieruchomości, przedział cen i doświadczenie) i pokazuje właścicielowi do trzech agentów z najwyższym wynikiem większym od 0.
 
-Dane wejściowe to miasto, typ i cena z oferty właściciela oraz z profilu agenta: obsługiwane miasta, typy nieruchomości, przedział cen i lata doświadczenia. Agent, który nie obsługuje miasta oferty, dostaje 0. W pozostałych przypadkach punkty się sumują. Typ nieruchomości daje 35 pkt, jeśli agent go obsługuje. Cena daje 35 pkt, jeśli mieści się w przedziale agenta, a 0 poza nim. Doświadczenie daje do 30 pkt, liniowo do 10 lat (10 lat i więcej to pełne 30).
+Dane wejściowe to miasto, typ i cena z oferty właściciela oraz z profilu agenta: obsługiwane miasta, typy nieruchomości, przedział cen i lata doświadczenia. Agent, który nie obsługuje miasta oferty, dostaje 0. W pozostałych przypadkach punkty się sumują. Typ nieruchomości daje 35 pkt, jeśli agent go obsługuje. Cena daje 35 pkt, jeśli mieści się w przedziale agenta (granice włącznie), a 0 poza nim. Doświadczenie daje do 30 pkt, liniowo do 10 lat (10 lat i więcej to pełne 30).
 
 Ranking jest malejący według wyniku. Przy remisie wygrywa agent z większą liczbą lat doświadczenia, a potem ten, który zarejestrował się wcześniej. Agent, który odrzucił zaproszenie do danej oferty, nie występuje już w jej rankingu. Agent z niepełnym profilem nie trafia do rankingu. Właściciel widzi ranking po zapisaniu oferty i wybiera z niego agenta do zaproszenia.
 
